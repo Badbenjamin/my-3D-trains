@@ -5,6 +5,8 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from config import db, bcrypt
 
+from Commute import Commute
+
 class Rider(db.Model, SerializerMixin):
     __tablename__ = "riders"
 
@@ -32,9 +34,9 @@ class Rider(db.Model, SerializerMixin):
          
 
     station = db.relationship('Station', uselist=False, back_populates='riders')
-    # routes = db.relationship('Route', back_populates='rider')
+    commutes = db.relationship('Commute', back_populates='rider')
 
-    serialize_rules=['-station.riders',]
+    serialize_rules=['-station.riders', 'commutes.rider']
 
     def __repr__(self):
           return f'<Rider {self.username}, {self.my_stop}>'

@@ -5,6 +5,7 @@ from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from config import bcrypt
+from Commute import Commute
 
 # station data from https://data.ny.gov/Transportation/MTA-Subway-Stations/39hk-dx4f/about_data
 class Station(db.Model, SerializerMixin):
@@ -29,8 +30,8 @@ class Station(db.Model, SerializerMixin):
     station_endpoints = db.relationship('StationEndpoint', back_populates='station')
     riders = db.relationship('Rider', back_populates='station')
 
-    # start_stops = db.relationship('Route', back_populates='start_stop')
-    # end_stops = db.relationship('Route', back_populates='end_stop')
+    start_stations = db.relationship('Commute', foreign_keys=[Commute.start_station_id], back_populates='start_station')
+    end_stations = db.relationship('Commute', foreign_keys=[Commute.end_station_id], back_populates='end_station')
 
     serialize_rules=['-station_endpoints.stations', '-riders.station']
 
@@ -95,7 +96,7 @@ class Rider(db.Model, SerializerMixin):
          
 
     station = db.relationship('Station', uselist=False, back_populates='riders')
-    # routes = db.relationship('Route', back_populates='rider')
+    commutes = db.relationship('Commute', back_populates='rider')
 
     serialize_rules=['-station.riders',]
 

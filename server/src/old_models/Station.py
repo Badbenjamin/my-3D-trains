@@ -4,7 +4,7 @@ from config import db
 
 # from StationEndpoint import StationEndpoint
 # from Endpoint import Endpoint
-from Rider import Rider
+from server.src.old_models.Rider import Rider
 
 # station data from https://data.ny.gov/Transportation/MTA-Subway-Stations/39hk-dx4f/about_data
 class Station(db.Model, SerializerMixin):

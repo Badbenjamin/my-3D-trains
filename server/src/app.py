@@ -14,7 +14,7 @@ from google.transit import gtfs_realtime_pb2
 # from StationEndpoint import StationEndpoint
 # from Rider import Rider
 
-from models import Station, Endpoint, StationEndpoint, Rider
+from models import Station, Endpoint, StationEndpoint, Rider, Commute
 
 
 
