@@ -13,6 +13,7 @@ class Commute(db.Model, SerializerMixin):
     start_station = db.relationship('Station', foreign_keys=[start_station_id], back_populates='start_stations')
     end_station = db.relationship('Station', foreign_keys=[end_station_id], back_populates='end_stations')
     rider = db.relationship('Rider', foreign_keys=[rider_id], back_populates='commutes')
+    commutes = db.relationship('CommuteTime', back_populates=('commute'))
 
     serialize_rules = ['-start_station.start_stations', '-end_station.end_stations', '-rider.commutes']
 

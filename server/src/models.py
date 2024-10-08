@@ -102,3 +102,17 @@ class Rider(db.Model, SerializerMixin):
 
     def __repr__(self):
           return f'<Rider {self.username}, {self.station}>'
+    
+
+class CommuteTime(db.Model, SerializerMixin):
+    __tablename__ = 'commute_times'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    commute_id = db.Column(db.Integer, db.ForeignKey('commutes.id'))
+    start_time = db.Column(db.DateTime, nullable=False)
+    arrival_time = db.Column(db.DateTime, nullable=False)
+
+    commute = db.relationship('Commute', back_populates=('commutes'))
+
+    def __repr__(self):
+         return f'<CommuteTime {self.commute.rider.username}, {self.commute.start_station.stop_name}, {self.commute.end_station.stop_name}, {self.commute.name}>'
