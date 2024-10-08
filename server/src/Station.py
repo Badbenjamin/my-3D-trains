@@ -2,6 +2,10 @@ from sqlalchemy_serializer import SerializerMixin
 
 from config import db
 
+# from StationEndpoint import StationEndpoint
+# from Endpoint import Endpoint
+from Rider import Rider
+
 # station data from https://data.ny.gov/Transportation/MTA-Subway-Stations/39hk-dx4f/about_data
 class Station(db.Model, SerializerMixin):
     __tablename__ = 'stations'
@@ -22,7 +26,7 @@ class Station(db.Model, SerializerMixin):
     north_direction_label = db.Column(db.String)
     south_direction_label = db.Column(db.String)
 
-    station_endpoints = db.relationship('StationEndpoint', back_populates='stations')
+    station_endpoints = db.relationship('StationEndpoint', back_populates='station')
     riders = db.relationship('Rider', back_populates='station')
 
     # start_stops = db.relationship('Route', back_populates='start_stop')

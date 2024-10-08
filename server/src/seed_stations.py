@@ -1,4 +1,4 @@
-from Station import Station
+from models import Station
 from config import app, db
 import csv
 

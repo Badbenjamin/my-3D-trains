@@ -1,6 +1,9 @@
 from config import db
 from sqlalchemy_serializer import SerializerMixin
 
+# from Station import Station
+# from Endpoint import Endpoint
+
 class StationEndpoint(db.Model, SerializerMixin):
     __tablename__ = 'station_endpoints'
 
@@ -10,8 +13,8 @@ class StationEndpoint(db.Model, SerializerMixin):
     station_id = db.Column(db.Integer, db.ForeignKey('stations.id'), nullable=False)
     endpoint_id = db.Column(db.Integer, db.ForeignKey('endpoints.id'), nullable=False)
 
-    stations = db.relationship('Station', back_populates='station_endpoints')
-    endpoints = db.relationship('Endpoint', back_populates='station_endpoints')
+    station = db.relationship('Station', back_populates='station_endpoints', viewonly=True)
+    endpoint = db.relationship('Endpoint', back_populates='station_endpoints',viewonly=True)
 
     serialize_rules=['-stations.station_endpoints', '-endpoints.station_endpoints']
 

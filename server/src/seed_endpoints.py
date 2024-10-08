@@ -1,4 +1,4 @@
-from Endpoint import Endpoint
+from models import Endpoint
 from config import app, db
 
 

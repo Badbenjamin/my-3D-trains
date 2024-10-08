@@ -10,6 +10,7 @@ class Rider(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     username = db.Column(db.String, unique=True, nullable=False)
+    email = db.Column(db.String, unique=True)
     _password_hash = db.Column(db.String)
     fav_subway_activity = db.Column(db.String)
     station_id = db.Column(db.Integer, db.ForeignKey('stations.id')) 
