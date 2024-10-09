@@ -15,7 +15,7 @@ class Commute(db.Model, SerializerMixin):
     rider = db.relationship('Rider', foreign_keys=[rider_id], back_populates='commutes')
     commutes = db.relationship('CommuteTime', back_populates=('commute'))
 
-    serialize_rules = ['-start_station.start_stations', '-end_station.end_stations', '-rider.commutes']
+    serialize_rules = ['-start_station.start_stations', '-end_station.end_stations', '-rider.commutes', '-commutes.commute']
 
     # update for sub category in relationship
     def __repr__(self):
