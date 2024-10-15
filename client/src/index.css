@@ -10,6 +10,15 @@ body,
   overflow: hidden;
 }
 
+.label{
+  font-family: Helvetica;
+  color: green;
+  background: #00000088;
+  white-space: nowrap;
+  border-radius: none;
+  user-select: none;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
