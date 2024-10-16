@@ -6,8 +6,8 @@ import * as THREE from 'three'
 import './index.css'
 
 import PlaceHolder from "./Placeholder"
-import Model from "./Model"
-
+import LinesAndMap from "./LinesAndMap"
+import GLine from "./G_Line"
 
 function SubwayMap(){
 
@@ -28,8 +28,9 @@ function SubwayMap(){
 
     return( 
         <>
-            <Suspense fallback={<PlaceHolder/>}>
-                <Model/>
+            <Suspense fallback={<PlaceHolder position-y={0.5} scale = {[1,1,1]}/>}>
+                {/* <ambientLight/> */}
+                <LinesAndMap/>
             </Suspense>
         </>
         

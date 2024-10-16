@@ -1,8 +1,8 @@
 
-function PlaceHolder(){
+function PlaceHolder(props){
     return(
-        <mesh position-y={0.5} scale={[1,2,3]}>
-            <boxGeometry args={[1,1,1,2,2,2]}/>
+        <mesh {...props}>
+            <planeGeometry args={[1,1,1]}/>
             <meshBasicMaterial wireframe color='red' />
         </mesh>
     )
