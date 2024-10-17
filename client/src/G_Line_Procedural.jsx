@@ -3,12 +3,13 @@ import { useGLTF } from '@react-three/drei'
 // import { nodeArray } from 'three/webgpu'
 
 function G_Line_Procedural(){
-
-    const map = useGLTF('./public/subway_map_v4.glb')
-    Object.keys(map.nodes).forEach(key => {
-        console.log(key)
-    })
     
+    const map = useGLTF('./public/subway_map_v4.glb')
+    // console.log(map.nodes['01_Court_Sq_G'])
+    for (const key in map.nodes){
+        // console.log(map.nodes[key])
+        // console.log(key)
+    }
     return(
         <></>
     )

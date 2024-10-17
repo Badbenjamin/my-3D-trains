@@ -11,12 +11,20 @@ export default function GLine(props) {
   function makeStationBig(station){
     for (const node in nodes){
         if (node === station){
-            // console.log(node)
+            console.log(nodes[node].name)
+            nodes[node].scale.x = 10.0
+            nodes[node].scale.y = 10.0
+            nodes[node].scale.z = 10.0
+            nodes[node].scale.set(10.0,10.0,10.0)
+            console.log(nodes[node].scale)
+            // nodes[node].scale.set({x: 0.1, y: 0.1, z: 0.1 })
+            // console.log(nodes[node].material.color)
         }
     }
   }
 
   makeStationBig("01_Court_Sq_G")  
+  
   return (
     <group {...props} dispose={null}>
       <group name="Scene">
