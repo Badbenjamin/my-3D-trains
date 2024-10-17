@@ -16,27 +16,21 @@ export default function GLine(props) {
      const [stationArray, setStationArray] = useState([])
   
   const { nodes, materials } = useGLTF('./public/subway_map_just_G_stations.glb')
-    // console.log(nodes)
 
-  
-    // build station component here
+    // maybe I could clean up stationObjs and StationArray
   const newStationObj ={...stationObjs}
+  let index = 0
   for (const mesh in nodes){
-    // console.log(nodes[mesh])
+    index += 1
+    
     if (nodes[mesh].type === "Mesh"){
-        newStationObj[mesh] = <Station key={nodes[mesh].name} props={props} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
-    } else if (nodes[mesh].type === "Group"){
-        // newStationObj[mesh] = nodes[mesh]
-        console.log('pass')
-    }
+        newStationObj[mesh] = <Station name={nodes[mesh].name} selected={true} key={nodes[mesh].name} props={props} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
+    } 
   }
-//   same as nodes
-  console.log(stationObjs)
 
   useEffect(()=>{
     setStaionObjs(newStationObj)
   }, [])
-
 
 
   useEffect(()=>{
@@ -48,13 +42,32 @@ export default function GLine(props) {
     }
         
     setStationArray(newStationArray)
+    
   }, [stationObjs])
 
   useFrame((state, delta) => {
     // stationRef.current.rotation.y += delta
     
   })
-//   console.log(stationArray)
+  
+//   select a station to modify it's apperance on the map
+  function selectStation(stationName){
+        console.log(stationName)
+        console.log(stationArray)
+        // const alteredStationArray = [...stationArray]
+        const myStations = stationArray.filter((station)=>{
+            // console.log(station['props']['name']);
+            return station['props']['name'] == stationName;
+            // return station
+        })
+        const alteredStations =  myStations.map((station) => {
+            // cannot alter this property
+            // station['props'] = "1"
+        })
+        console.log(myStations)
+        
+  }
+  selectStation("01_Court_Sq_G")
 
   if (stationArray == []){
     return(
@@ -62,13 +75,9 @@ export default function GLine(props) {
     )
   }
 
-  const stationsForArray = stationArray.map(station => {
-    return station
-  })
-
   return (
     <group {...props} dispose={null}>
-        {stationsForArray}
+        {stationArray}
         {/* <Station props={props} nodes={nodes} materials={materials}/> */}
       {/* <mesh
         ref={null}

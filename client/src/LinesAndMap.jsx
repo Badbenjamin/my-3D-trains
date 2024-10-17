@@ -5,7 +5,6 @@ import {Perf} from 'r3f-perf'
 import {MapControls, Html, useGLTF} from '@react-three/drei'
 
 import GLine from "./G_Line"
-import G_Line_Procedural from "./G_Line_Procedural"
 import Map from "./Map"
 
 function LinesAndMap(){
