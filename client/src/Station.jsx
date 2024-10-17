@@ -1,18 +1,31 @@
 
-function Station(props){
+function Station({props, nodes, materials, mesh}){
 
-    console.log(props)
+        const materialName = Object.keys(materials)
+        console.log(materialName[0].toString())
+        
+        const newName = mesh['name']
+        const newGeometry = nodes[newName].geometry
+        const newMaterial = materials[materialName[0]]
+        const newCastShadow = mesh['castShadow']
+        const newRecieveShadow = mesh['recieveShadow']
+        const newPosition = mesh['position']
+        const newRotation = mesh['rotation']
+        const newScale = mesh['scale']
+        // const newName = mesh['name']
+
     return(
         <mesh
-                  ref={stationRef}
-                  name="01_Court_Sq_G"
-                  castShadow
-                  receiveShadow
-                  geometry={nodes['01_Court_Sq_G'].geometry}
-                  material={materials['Station_G.001']}
-                  position={[5.799, 0.034, 10.29]}
-                  rotation={[0, 0.401, 0]}
-                  scale={0.2}
+                  name={newName}
+                  castShadow={newCastShadow}
+                  receiveShadow={newRecieveShadow}
+                  geometry={newGeometry}
+                  material={newMaterial}
+                  position={newPosition}
+                  rotation={newRotation}
+                  scale={newScale}
                 />
     )
 }
+
+export default Station
