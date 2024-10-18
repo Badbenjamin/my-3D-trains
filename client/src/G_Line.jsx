@@ -12,62 +12,104 @@ import Station from './Station'
 
 export default function GLine(props) {
 
+     const { nodes, materials } = useGLTF('./public/subway_map_just_G_stations.glb')
+
+    //  const nodesLength = nodes.length
+    //  console.log(nodesLength)
+
      const [stationObjs, setStaionObjs] = useState({})
      const [stationArray, setStationArray] = useState([])
+     const [statusArray, setStatusArray] = useState([])
   
-  const { nodes, materials } = useGLTF('./public/subway_map_just_G_stations.glb')
+  
 
     // maybe I could clean up stationObjs and StationArray
-  const newStationObj ={...stationObjs}
-  let index = 0
-  for (const mesh in nodes){
-    index += 1
+  
+  useEffect(()=>{
+    let newStatusArray = [...statusArray]
     
-    if (nodes[mesh].type === "Mesh"){
-        newStationObj[mesh] = <Station name={nodes[mesh].name} selected={true} key={nodes[mesh].name} props={props} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
-    } 
-  }
+
+    for (const mesh in nodes){
+        if (nodes[mesh].type === "Mesh"){
+            const status = false
+            newStatusArray.push(status)
+            
+        } 
+      }
+      console.log(newStatusArray)
+    setStatusArray(newStatusArray)
+  }, [])
+  
 
   useEffect(()=>{
+    console.log(statusArray)
+    const newStationObj ={...stationObjs}
+    let count = 0
+    
+    for (const mesh in nodes){
+        if (nodes[mesh].type === "Mesh"){
+            
+            let index = count 
+            count += 1
+            newStationObj[mesh] = <Station name={nodes[mesh].name} status={statusArray[index]} index={[index]} key={nodes[mesh].name} props={props} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
+            
+        } 
+      }
+
+
     setStaionObjs(newStationObj)
-  }, [])
+    
+  }, [statusArray])
+
+  
 
 
   useEffect(()=>{
     //   build array here for react child
+    
     const newStationArray = [...stationArray]
     for (const station in stationObjs){
         // console.log(station)
         newStationArray.push(stationObjs[station])
     }
-        
+    console.log('run')
     setStationArray(newStationArray)
-    
   }, [stationObjs])
 
-  useFrame((state, delta) => {
-    // stationRef.current.rotation.y += delta
-    
-  })
+//   console.log(stationArray)
+
+//   useFrame((state, delta) => {
+//     // stationRef.current.rotation.y += delta
+//   },)
   
 //   select a station to modify it's apperance on the map
-  function selectStation(stationName){
-        console.log(stationName)
-        console.log(stationArray)
-        // const alteredStationArray = [...stationArray]
-        const myStations = stationArray.filter((station)=>{
-            // console.log(station['props']['name']);
-            return station['props']['name'] == stationName;
-            // return station
-        })
-        const alteredStations =  myStations.map((station) => {
-            // cannot alter this property
-            // station['props'] = "1"
-        })
-        console.log(myStations)
+//   function selectStation(stationName){
+//         // console.log(stationName)
+//         // console.log(stationArray)
+//         // const alteredStationArray = [...stationArray]
+//         const myStations = stationArray.filter((station)=>{
+//             return station['props']['name'] == stationName;
+//         })
+//         const alteredStations =  myStations.map((station) => {
+//             // cannot alter this property
+//             // station['props'] = "1"
+//         })
+//         // console.log(myStations)
         
+//   }
+//   selectStation("01_Court_Sq_G")
+
+  function updateStatusArrayByStation(){
+    const newStatusArray = [...statusArray]
+    newStatusArray[15] = true
+    setStatusArray(newStatusArray)
   }
-  selectStation("01_Court_Sq_G")
+
+
+
+useEffect(()=>{
+  updateStatusArrayByStation()
+}, [])
 
   if (stationArray == []){
     return(

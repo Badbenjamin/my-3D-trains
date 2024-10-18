@@ -3,13 +3,14 @@ import { useFrame } from "@react-three/fiber"
 
 
 
-function Station({props, nodes, materials, mesh, selected}){
+function Station({props, index, status, nodes, materials, mesh}){
 
         const materialName = Object.keys(materials)
         // console.log(materialName[0].toString())
         // console.log(refname)
         const stationRef = useRef()
-        console.log(selected)
+        console.log(status)
+        // console.log(index)
         
         const newName = mesh['name']
         const newGeometry = nodes[newName].geometry
@@ -21,12 +22,12 @@ function Station({props, nodes, materials, mesh, selected}){
         const newScale = mesh['scale']
         // const newName = mesh['name']
 
-        selected = true
+        // selected = true
         let movement = 0
         
        
         useFrame((state, delta)=>{
-            if (selected){
+            if (status){
                 movement = delta
             }
             stationRef.current.rotation.y += movement
