@@ -29,6 +29,7 @@ function Station({props, index, status, nodes, materials, mesh}){
         useFrame((state, delta)=>{
             if (status){
                 movement = delta
+                // color = {0.5,0.5,0.5}
             }
             stationRef.current.rotation.y += movement
         })

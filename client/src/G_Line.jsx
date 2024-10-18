@@ -14,102 +14,103 @@ export default function GLine(props) {
 
      const { nodes, materials } = useGLTF('./public/subway_map_just_G_stations.glb')
 
-    //  const nodesLength = nodes.length
-    //  console.log(nodesLength)
+     
 
      const [stationObjs, setStaionObjs] = useState({})
      const [stationArray, setStationArray] = useState([])
      const [statusArray, setStatusArray] = useState([])
-  
+    console.log(nodes)
   
 
     // maybe I could clean up stationObjs and StationArray
   
   useEffect(()=>{
-    let newStatusArray = [...statusArray]
+   
     
+   
+  }, [])
 
+
+
+  useEffect(()=>{
+    const newStationObj ={...stationObjs}
+    let newStatusArray = [...statusArray]
+
+    let count = 0
     for (const mesh in nodes){
+        
         if (nodes[mesh].type === "Mesh"){
             const status = false
             newStatusArray.push(status)
             
         } 
       }
-      console.log(newStatusArray)
-    setStatusArray(newStatusArray)
-  }, [])
-  
-
-  useEffect(()=>{
-    console.log(statusArray)
-    const newStationObj ={...stationObjs}
-    let count = 0
-    
     for (const mesh in nodes){
         if (nodes[mesh].type === "Mesh"){
             
             let index = count 
             count += 1
-            newStationObj[mesh] = <Station name={nodes[mesh].name} status={statusArray[index]} index={[index]} key={nodes[mesh].name} props={props} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
+            newStationObj[mesh] = <Station name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} key={nodes[mesh].name} props={props} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
             
         } 
       }
-
-
     setStaionObjs(newStationObj)
-    
-  }, [statusArray])
+    setStatusArray(newStatusArray)
+  }, [])
 
   
 
 
   useEffect(()=>{
     //   build array here for react child
-    
     const newStationArray = [...stationArray]
+
     for (const station in stationObjs){
-        // console.log(station)
         newStationArray.push(stationObjs[station])
     }
-    console.log('run')
     setStationArray(newStationArray)
   }, [stationObjs])
 
-//   console.log(stationArray)
 
-//   useFrame((state, delta) => {
-//     // stationRef.current.rotation.y += delta
-//   },)
-  
-//   select a station to modify it's apperance on the map
-//   function selectStation(stationName){
-//         // console.log(stationName)
-//         // console.log(stationArray)
-//         // const alteredStationArray = [...stationArray]
-//         const myStations = stationArray.filter((station)=>{
-//             return station['props']['name'] == stationName;
-//         })
-//         const alteredStations =  myStations.map((station) => {
-//             // cannot alter this property
-//             // station['props'] = "1"
-//         })
-//         // console.log(myStations)
-        
-//   }
-//   selectStation("01_Court_Sq_G")
 
-  function updateStatusArrayByStation(){
-    const newStatusArray = [...statusArray]
-    newStatusArray[15] = true
-    setStatusArray(newStatusArray)
+  function updateStatusArrayByStation(index){
+    const alteredStatusArray = [...statusArray]
+    alteredStatusArray[index] = true
+    console.log("asa", alteredStatusArray)
+
+    const newStationObj ={...stationObjs}
+    
+
+    let count = 0
+    for (const mesh in nodes){
+        if (nodes[mesh].type === "Mesh"){
+            
+            let index = count 
+            count += 1
+            newStationObj[mesh] = <Station name={nodes[mesh].name} status={alteredStatusArray[index]} index={[index]} key={nodes[mesh].name} props={props} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
+            
+        } 
+      }
+    setStaionObjs(newStationObj)
+    setStatusArray(alteredStatusArray)
+    // ADD BACK
+    // setStatusArray(alteredStatusArray)
   }
 
+  console.log("SOBJS", stationObjs)
+  console.log("StationA", stationArray)
+  console.log("StatusA", statusArray)
+
+  useEffect(()=>{
+    updateStatusArrayByStation(0)
+  }, [])
 
 
-useEffect(()=>{
-  updateStatusArrayByStation()
-}, [])
+
+if (true){
+    // updateStatusArrayByStation(0)
+}
+
 
   if (stationArray == []){
     return(
@@ -120,198 +121,6 @@ useEffect(()=>{
   return (
     <group {...props} dispose={null}>
         {stationArray}
-        {/* <Station props={props} nodes={nodes} materials={materials}/> */}
-      {/* <mesh
-        ref={null}
-        castShadow
-        receiveShadow
-        geometry={nodes['01_Court_Sq_G'].geometry}
-        material={materials['Station_G.001']}
-        position={[5.799, 0.034, 10.29]}
-        rotation={[0, 0.401, 0]}
-        scale={0.2}
-      />
-      <mesh
-        ref={null}
-        castShadow
-        receiveShadow
-        geometry={nodes['02_21_St_G'].geometry}
-        material={materials['Station_G.001']}
-        position={[6.467, 0.034, 11.546]}
-        rotation={[0, 0.593, 0]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['03_Greenpoint_Ave_G'].geometry}
-        material={materials['Station_G.001']}
-        position={[9.869, 0.034, 12.496]}
-        rotation={[0, 0.105, 0]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['04_Nassau_Av_G'].geometry}
-        material={materials['Station_G.001']}
-        position={[11.668, 0.034, 11.843]}
-        rotation={[0, Math.PI / 9, 0]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['05_Metropolitan_Lorimer_G'].geometry}
-        material={materials['Station_G.001']}
-        position={[14.807, 0.034, 11.871]}
-        rotation={[0, 0.105, 0]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['06_Broadway_G'].geometry}
-        material={materials['Station_G.001']}
-        position={[16.493, 0.034, 11.647]}
-        rotation={[0, 0.105, 0]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['07_Flushing_G001'].geometry}
-        material={materials['Station_G.001']}
-        position={[18.062, 0.034, 11.647]}
-        rotation={[0, 0.035, 0]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['08_Myrtle_Willoughby_G'].geometry}
-        material={materials['Station_G.001']}
-        position={[19.642, 0.034, 11.397]}
-        rotation={[0, 0.175, 0]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['09_Bedford_Nostrand_G'].geometry}
-        material={materials['Station_G.001']}
-        position={[20.955, 0.034, 12.316]}
-        rotation={[0, 0.175, 0]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['10_Classon_G'].geometry}
-        material={materials['Station_G.001']}
-        position={[21.167, 0.034, 13.63]}
-        rotation={[0, 0.175, 0]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['11_Clinton_Washington_G'].geometry}
-        material={materials['Station_G.001']}
-        position={[21.35, 0.034, 15.056]}
-        rotation={[0, 0.175, 0]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['12_Fulton_G'].geometry}
-        material={materials['Station_G.001']}
-        position={[21.604, 0.034, 16.62]}
-        rotation={[0, 0.175, 0]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['13_Hoyt_Schermerhorn_Sts_ACG'].geometry}
-        material={materials['Station_G.001']}
-        position={[21.239, 0.034, 18.603]}
-        rotation={[-0.004, -0.496, -0.005]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['14_Bergen_St_FG'].geometry}
-        material={materials['Station_G.001']}
-        position={[21.933, 0.034, 19.866]}
-        rotation={[-0.004, -0.496, -0.005]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['15_Caroll_St_FG'].geometry}
-        material={materials['Station_G.001']}
-        position={[23.562, 0.034, 20.734]}
-        rotation={[-0.004, -0.496, -0.005]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['16_Smith_9th_St'].geometry}
-        material={materials['Station_G.001']}
-        position={[25.195, 0.034, 20.843]}
-        rotation={[-0.005, -0.69, -0.006]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['17_4_Av-9_St_FGR'].geometry}
-        material={materials['Station_G.001']}
-        position={[26.104, 0.034, 19.615]}
-        rotation={[-0.008, 1.027, 0.004]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['17_7_Av_FFxG'].geometry}
-        material={materials['Station_G.001']}
-        position={[27.126, 0.034, 17.752]}
-        rotation={[-0.007, 1.005, 0.004]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['18_15_St_FG'].geometry}
-        material={materials['Station_G.001']}
-        position={[28.903, 0.034, 17.575]}
-        rotation={[-0.007, 1.005, 0.004]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['19_Ft_Hamilton_Pkwy_FG'].geometry}
-        material={materials['Station_G.001']}
-        position={[31.405, 0.034, 16.787]}
-        rotation={[-0.064, 1.509, 0.061]}
-        scale={0.2}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes['20_Church_Av_FFxG'].geometry}
-        material={materials['Station_G.001']}
-        position={[33.119, 0.034, 17.587]}
-        rotation={[-3.114, 1.427, 3.112]}
-        scale={0.2}
-      /> */}
     </group>
   )
 }
