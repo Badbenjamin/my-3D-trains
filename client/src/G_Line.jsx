@@ -12,23 +12,22 @@ import Station from './Station'
 
 export default function GLine(props) {
 
-     const { nodes, materials } = useGLTF('./public/subway_map_just_G_stations.glb')
+     const { nodes, materials } = useGLTF('./public/subway_map_just_G_stations+tracks.glb')
 
      
 
-     const [stationObjs, setStaionObjs] = useState({})
+     const [stationObjs, setStationObjs] = useState({})
      const [stationArray, setStationArray] = useState([])
-     const [statusArray, setStatusArray] = useState([])
-    console.log(nodes)
+     const [statusArray, setStatusArray] = useState(["hello"])
+    console.log("SA", statusArray)
   
+    function gClickHandler(index){
+        // console.log(index)
+        // updateStatusArrayByStation(index)
+        console.log(statusArray)
+        console.log(stationArray)
 
-    // maybe I could clean up stationObjs and StationArray
-  
-  useEffect(()=>{
-   
-    
-   
-  }, [])
+      }
 
 
 
@@ -50,15 +49,20 @@ export default function GLine(props) {
             
             let index = count 
             count += 1
-            newStationObj[mesh] = <Station name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} key={nodes[mesh].name} props={props} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
+            // store station in its own state? 
+            // 
+            newStationObj[mesh] = <Station gClickHandler={gClickHandler} name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
             
         } 
       }
-    setStaionObjs(newStationObj)
+    console.log("NSA", newStatusArray)
     setStatusArray(newStatusArray)
+    
+    setStationObjs(newStationObj)
+    
   }, [])
-
-  
+  console.log("SA", statusArray)
+ 
 
 
   useEffect(()=>{
@@ -72,45 +76,33 @@ export default function GLine(props) {
   }, [stationObjs])
 
 
-
+//   console.log(statusArray)
   function updateStatusArrayByStation(index){
+    // console.log(statusArray)
     const alteredStatusArray = [...statusArray]
     alteredStatusArray[index] = true
-    console.log("asa", alteredStatusArray)
-
+    // console.log("asa", alteredStatusArray)
+    console.log(statusArray)
+    // console.log("stationObjs)
     const newStationObj ={...stationObjs}
     
-
+    
     let count = 0
-    for (const mesh in nodes){
-        if (nodes[mesh].type === "Mesh"){
-            
-            let index = count 
-            count += 1
-            newStationObj[mesh] = <Station name={nodes[mesh].name} status={alteredStatusArray[index]} index={[index]} key={nodes[mesh].name} props={props} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
-            
-        } 
-      }
-    setStaionObjs(newStationObj)
-    setStatusArray(alteredStatusArray)
+    // for (const mesh in newStationObj){
+    //         let index = count 
+    //         count += 1
+    //         newStationObj[mesh] = <Station name={nodes[mesh].name} status={alteredStatusArray[index]} index={[index]} key={nodes[mesh].name} props={props} nodes={nodes} mesh={nodes[mesh]} materials={materials}/> 
+    //   }
+    
+    // setStaionObjs(newStationObj)
+    // setStatusArray(alteredStatusArray)
     // ADD BACK
     // setStatusArray(alteredStatusArray)
   }
 
   console.log("SOBJS", stationObjs)
-  console.log("StationA", stationArray)
-  console.log("StatusA", statusArray)
-
-  useEffect(()=>{
-    updateStatusArrayByStation(0)
-  }, [])
-
-
-
-if (true){
-    // updateStatusArrayByStation(0)
-}
-
+//   console.log("StationA", stationArray)
+//   console.log("StatusA", statusArray)
 
   if (stationArray == []){
     return(
@@ -119,7 +111,7 @@ if (true){
   }
 
   return (
-    <group {...props} dispose={null}>
+    <group onClick={()=>(console.log(stationObjs))} {...props} dispose={null}>
         {stationArray}
     </group>
   )

@@ -3,8 +3,9 @@ import { useFrame } from "@react-three/fiber"
 
 
 
-function Station({props, index, status, nodes, materials, mesh}){
-
+function Station({statusArray, index, gClickHandler, status, nodes, materials, mesh}){
+        // console.log(onClick)
+        
         const materialName = Object.keys(materials)
         // console.log(materialName[0].toString())
         // console.log(refname)
@@ -24,19 +25,27 @@ function Station({props, index, status, nodes, materials, mesh}){
 
         // selected = true
         let movement = 0
-        
+        let newColor = {isColor: true, r: 0.9051738381385803, g: 0, b: 0}
        
         useFrame((state, delta)=>{
             if (status){
                 movement = delta
                 // color = {0.5,0.5,0.5}
+                // stationRef.current.material.color.set(newColor)
             }
             stationRef.current.rotation.y += movement
         })
        
+        function handleClick(e){
+            // console.log(index)
+            // console.log(e.eventObject)
+            gClickHandler(index)
+        }
+       
 
     return(
-        <mesh
+        <mesh       
+                  onClick={handleClick}   
                   ref={stationRef}
                   name={newName}
                   castShadow={newCastShadow}
