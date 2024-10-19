@@ -1,17 +1,19 @@
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { useFrame } from "@react-three/fiber"
+import * as THREE from 'three'
 
 
-
-function Station({statusArray, index, gClickHandler, status, nodes, materials, mesh}){
-        // console.log(onClick)
-        
+function Station({status, nodes, materials, mesh}){
+  
         const materialName = Object.keys(materials)
-        // console.log(materialName[0].toString())
-        // console.log(refname)
         const stationRef = useRef()
-        console.log(status)
-        // console.log(index)
+
+        const red = new THREE.MeshBasicMaterial({color:'red'})
+        const [selected, setSelected] = useState(true)
+        const [currentSelectedColor, setCurrentSelectedColor] = useState(materials[materialName[0]])
+
+        
+     
         
         const newName = mesh['name']
         const newGeometry = nodes[newName].geometry
@@ -25,22 +27,34 @@ function Station({statusArray, index, gClickHandler, status, nodes, materials, m
 
         // selected = true
         let movement = 0
-        let newColor = {isColor: true, r: 0.9051738381385803, g: 0, b: 0}
+        let stationColor = materials[materialName[0]]
        
-        useFrame((state, delta)=>{
-            if (status){
-                movement = delta
-                // color = {0.5,0.5,0.5}
-                // stationRef.current.material.color.set(newColor)
+        // useFrame((state, delta)=>{
+        //     if (status){
+        //         movement = delta
+        //         // color = {0.5,0.5,0.5}
+        //         // stationRef.current.material.color.set(newColor)
+        //     }
+        //     stationRef.current.rotation.y += movement
+        // })
+       
+        function handleClick(){
+            console.log(selected)
+            if (selected){
+              setSelected(false)
+              stationColor = red
+              setCurrentSelectedColor(red)
+              
+          
+            } else {
+              setSelected(true)
+              stationColor = newMaterial
+              setCurrentSelectedColor(newMaterial)
             }
-            stationRef.current.rotation.y += movement
-        })
-       
-        function handleClick(e){
-            // console.log(index)
-            // console.log(e.eventObject)
-            gClickHandler(index)
-        }
+            
+          
+          
+          }
        
 
     return(
@@ -51,7 +65,7 @@ function Station({statusArray, index, gClickHandler, status, nodes, materials, m
                   castShadow={newCastShadow}
                   receiveShadow={newRecieveShadow}
                   geometry={newGeometry}
-                  material={newMaterial}
+                  material={currentSelectedColor}
                   position={newPosition}
                   rotation={newRotation}
                   scale={newScale}

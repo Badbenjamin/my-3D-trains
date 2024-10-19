@@ -18,7 +18,8 @@ function LinesAndMap(){
             <MapControls/>
             <ambientLight intensity={1.5} />
             <Map/>
-            <G_Line_Stations/>
+            {/* <G_Line_Stations/> */}
+            <GLine/>
             {/* <Map/> */}
             {/* <G_Line_Procedural/> */}
             {/* <primitive object={map.scene}/> */}

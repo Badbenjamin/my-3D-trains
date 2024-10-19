@@ -24,7 +24,7 @@ export default function GLine(props) {
     function gClickHandler(index){
         // console.log(index)
         // updateStatusArrayByStation(index)
-        console.log(statusArray)
+        console.log(stationObjs)
         console.log(stationArray)
 
       }
@@ -50,29 +50,40 @@ export default function GLine(props) {
             let index = count 
             count += 1
             // store station in its
-            newStationObj[mesh] = <Station gClickHandler={gClickHandler} name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
+            newStationObj[mesh] = <Station name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
             
         } 
       }
-    console.log("NSA", newStatusArray)
+
+     //   build array here for react child
+     const newStationArray = [...stationArray]
+
+     for (const station in newStationObj){
+         newStationArray.push(newStationObj[station])
+     }
+     
+    
+    
     setStatusArray(newStatusArray)
     
     setStationObjs(newStationObj)
+
+    setStationArray(newStationArray)
     
   }, [])
   console.log("SA", statusArray)
  
 
 
-  useEffect(()=>{
-    //   build array here for react child
-    const newStationArray = [...stationArray]
+//   useEffect(()=>{
+//     //   build array here for react child
+//     const newStationArray = [...stationArray]
 
-    for (const station in stationObjs){
-        newStationArray.push(stationObjs[station])
-    }
-    setStationArray(newStationArray)
-  }, [stationObjs])
+//     for (const station in stationObjs){
+//         newStationArray.push(stationObjs[station])
+//     }
+//     setStationArray(newStationArray)
+//   }, [stationObjs])
 
 
 //   console.log(statusArray)
