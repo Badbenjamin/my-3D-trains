@@ -6,6 +6,7 @@ import {MapControls, Html, useGLTF} from '@react-three/drei'
 
 import GLine from "./G_Line"
 import Map from "./Map"
+import { G_Line_Stations } from "./G_Line_Stations"
 
 function LinesAndMap(){
 
@@ -17,7 +18,7 @@ function LinesAndMap(){
             <MapControls/>
             <ambientLight intensity={1.5} />
             <Map/>
-            <GLine/>
+            <G_Line_Stations/>
             {/* <Map/> */}
             {/* <G_Line_Procedural/> */}
             {/* <primitive object={map.scene}/> */}

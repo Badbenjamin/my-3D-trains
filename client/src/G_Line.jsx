@@ -49,8 +49,7 @@ export default function GLine(props) {
             
             let index = count 
             count += 1
-            // store station in its own state? 
-            // 
+            // store station in its
             newStationObj[mesh] = <Station gClickHandler={gClickHandler} name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
             
         } 
