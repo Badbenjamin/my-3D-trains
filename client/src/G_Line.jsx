@@ -16,30 +16,22 @@ export default function GLine(props) {
 
      
 
-     const [stationObjs, setStationObjs] = useState({})
+    //  const [stationObjs, setStationObjs] = useState({})
      const [stationArray, setStationArray] = useState([])
-     const [statusArray, setStatusArray] = useState(["hello"])
+     const [statusArray, setStatusArray] = useState([])
     console.log("SA", statusArray)
-  
-    function gClickHandler(index){
-        // console.log(index)
-        // updateStatusArrayByStation(index)
-        console.log(stationObjs)
-        console.log(stationArray)
-
-      }
-
-
 
   useEffect(()=>{
-    const newStationObj ={...stationObjs}
-    let newStatusArray = [...statusArray]
+    
+    const newStationObj ={}
+    const newStatusArray = []
 
     let count = 0
     for (const mesh in nodes){
         
         if (nodes[mesh].type === "Mesh"){
-            const status = false
+            // console.log(mesh)
+            const status = {"name": nodes[mesh].name, "status": false}
             newStatusArray.push(status)
             
         } 
@@ -59,60 +51,78 @@ export default function GLine(props) {
      const newStationArray = [...stationArray]
 
      for (const station in newStationObj){
-         newStationArray.push(newStationObj[station])
+        // console.log(stationArray.includes(newStationObj[station]))
+        // why is station array an object?
+        if (!newStationArray.includes(station)){
+            newStationArray.push(newStationObj[station])
+        }
+         
      }
      
     
     
     setStatusArray(newStatusArray)
     
-    setStationObjs(newStationObj)
+    // setStationObjs(newStationObj)
 
     setStationArray(newStationArray)
     
   }, [])
-  console.log("SA", statusArray)
+//   console.log("SA", statusArray)
  
-
-
-//   useEffect(()=>{
-//     //   build array here for react child
-//     const newStationArray = [...stationArray]
-
-//     for (const station in stationObjs){
-//         newStationArray.push(stationObjs[station])
-//     }
-//     setStationArray(newStationArray)
-//   }, [stationObjs])
-
-
-//   console.log(statusArray)
-  function updateStatusArrayByStation(index){
-    // console.log(statusArray)
-    const alteredStatusArray = [...statusArray]
-    alteredStatusArray[index] = true
-    // console.log("asa", alteredStatusArray)
-    console.log(statusArray)
-    // console.log("stationObjs)
-    const newStationObj ={...stationObjs}
-    
-    
+  const nameArray = ['01_Court_Sq_G', '02_21_St_G', '03_Greenpoint_Ave_G' ]
+  function selectMeshes(array){
     let count = 0
-    // for (const mesh in newStationObj){
-    //         let index = count 
-    //         count += 1
-    //         newStationObj[mesh] = <Station name={nodes[mesh].name} status={alteredStatusArray[index]} index={[index]} key={nodes[mesh].name} props={props} nodes={nodes} mesh={nodes[mesh]} materials={materials}/> 
-    //   }
+    const newStatusArray = [...statusArray]
+    console.log(newStatusArray)
+    for (const name of nameArray){
+        // console.log(name)
+        for (const status of newStatusArray){
+            // console.log(status['name'])
+            if (name === status['name']){
+                status['status'] = true
+            }
+        }
+    }
+    const newStationObj ={}
     
-    // setStaionObjs(newStationObj)
-    // setStatusArray(alteredStatusArray)
-    // ADD BACK
-    // setStatusArray(alteredStatusArray)
+    for (const mesh in nodes){
+        if (nodes[mesh].type === "Mesh"){
+            
+            let index = count 
+            count += 1
+            // store station in its
+            newStationObj[mesh] = <Station name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
+            
+        } 
+      }
+      const newStationArray = []
+      for (const station in newStationObj){
+        // console.log(stationArray.includes(newStationObj[station]))
+        // why is station array an object?
+        if (!newStationArray.includes(station)){
+            newStationArray.push(newStationObj[station])
+        }
+    setStatusArray(newStatusArray)
+    setStationArray(newStationArray)
+    
+  }
   }
 
-  console.log("SOBJS", stationObjs)
-//   console.log("StationA", stationArray)
-//   console.log("StatusA", statusArray)
+//   useEffect(()=>{
+//     const newStationArray = [...stationArray]
+//     for (const mesh of stationArray){ 
+//             stationArray.push(<Station name={nodes[mesh].name} status={statusArray[index]} index={[index]} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>)
+//       }
+//       setStationArray(newStationArray)
+    
+
+//   }, [statusArray])
+//   selectMeshes(nameArray)
+
+function groupClick(){
+    selectMeshes(nameArray)
+}
 
   if (stationArray == []){
     return(
@@ -121,7 +131,7 @@ export default function GLine(props) {
   }
 
   return (
-    <group onClick={()=>(console.log(stationObjs))} {...props} dispose={null}>
+    <group onClick={groupClick} {...props} dispose={null}>
         {stationArray}
     </group>
   )
