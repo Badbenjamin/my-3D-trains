@@ -19,7 +19,7 @@ function LinesAndMap(){
             <ambientLight intensity={1.5} />
             <Map/>
             {/* <G_Line_Stations/> */}
-            <GLine/>
+            <GLine props={"stationarray"}/>
             {/* <Map/> */}
             {/* <G_Line_Procedural/> */}
             {/* <primitive object={map.scene}/> */}

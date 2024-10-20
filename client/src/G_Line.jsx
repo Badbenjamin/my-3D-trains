@@ -13,7 +13,7 @@ import Station from './Station'
 export default function GLine(props) {
 
      const { nodes, materials } = useGLTF('./public/subway_map_just_G_stations+tracks.glb')
-
+    console.log(props)
      
 
     //  const [stationObjs, setStationObjs] = useState({})
@@ -60,7 +60,7 @@ export default function GLine(props) {
     
   }, [])
  
-  const nameArray = ['01_Court_Sq_G', '02_21_St_G', '03_Greenpoint_Ave_G' ]
+  const nameArray = ['01_Court_Sq_G', '02_21_St_G', '03_Greenpoint_Ave_G', "11_Clinton_Washington_G", "015_Court_21t_S" ]
   function selectStations(array){
     function updateVersion(){
         setVersion(version + 1)
@@ -90,7 +90,6 @@ export default function GLine(props) {
                 newStationStatus = status['status']
                 console.log(newStation['key'])
                 newStation['key'] =  version
-                // console.log(stationStatus)
             }
         }
         return newStation
@@ -98,23 +97,6 @@ export default function GLine(props) {
     setStationArray(alteredStationArray)
   }
   console.log(statusArray)
-
-//   useEffect(()=>{
-//     const newStationArray = [...stationArray]
-//     console.log(statusArray)
-//     const alteredStationArray = newStationArray.map((station, i) => {
-//         const stationName = station['props']['name']
-//         let stationStatus = station['props']['status']['status']
-//         for (const status of statusArray){
-//             if (status['name'] === stationName){
-//                 stationStatus = status['status']
-//                 console.log(stationStatus)
-//             }
-//         }
-//         return station
-//     })
-//   }, [statusArray])
-//   console.log(stationArray)
 
 function groupClick(){
     selectStations(nameArray)

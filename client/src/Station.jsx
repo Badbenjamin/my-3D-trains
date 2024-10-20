@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from 'three'
+import { Html } from "@react-three/drei"
 
 
 function Station( {setStatus, status, nodes, materials, mesh}){
@@ -33,7 +34,8 @@ function Station( {setStatus, status, nodes, materials, mesh}){
        
 
     return(
-        <mesh       
+        <group>
+            <mesh       
                 //   onClick={handleClick}   
                   ref={stationRef}
                   name={newName}
@@ -44,7 +46,11 @@ function Station( {setStatus, status, nodes, materials, mesh}){
                   position={newPosition}
                   rotation={newRotation}
                   scale={newScale}
-                />
+                  
+            />
+                <Html distanceFactor={10} position={newPosition}>{newName}</Html>
+        </group>
+        
     )
 }
 
