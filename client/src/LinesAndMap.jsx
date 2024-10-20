@@ -9,7 +9,7 @@ import Map from "./Map"
 import { G_Line_Stations } from "./G_Line_Stations"
 
 function LinesAndMap(){
-
+    const stationArray = ['G30', 'F25', 'F27']
     // const map = useGLTF('./public/subway_map_v3.glb')
     // console.log(map)
     return(
@@ -19,7 +19,7 @@ function LinesAndMap(){
             <ambientLight intensity={1.5} />
             <Map/>
             {/* <G_Line_Stations/> */}
-            <GLine props={"stationarray"}/>
+            <GLine stationList={stationArray}/>
             {/* <Map/> */}
             {/* <G_Line_Procedural/> */}
             {/* <primitive object={map.scene}/> */}

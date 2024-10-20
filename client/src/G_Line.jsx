@@ -10,10 +10,10 @@ import Station from './Station'
 
 
 
-export default function GLine(props) {
+export default function GLine({props, stationList}) {
 
-     const { nodes, materials } = useGLTF('./public/subway_map_just_G_stations+tracks.glb')
-    console.log(props)
+     const { nodes, materials } = useGLTF('./public/subway_map_just_G_Line_Stations+Tracks.glb')
+    console.log(stationList)
      
 
     //  const [stationObjs, setStationObjs] = useState({})
@@ -59,8 +59,12 @@ export default function GLine(props) {
     setStationArray(newStationArray)
     
   }, [])
+
+  useEffect(()=>{
+    // selectStations(stationList)
+  }, [])
  
-  const nameArray = ['01_Court_Sq_G', '02_21_St_G', '03_Greenpoint_Ave_G', "11_Clinton_Washington_G", "015_Court_21t_S" ]
+  
   function selectStations(array){
     function updateVersion(){
         setVersion(version + 1)
@@ -99,7 +103,7 @@ export default function GLine(props) {
   console.log(statusArray)
 
 function groupClick(){
-    selectStations(nameArray)
+    selectStations(stationList)
 }
 
   if (stationArray == []){
@@ -115,4 +119,4 @@ function groupClick(){
   )
 }
 
-useGLTF.preload('./public/subway_map_just_G_stations.glb')
+useGLTF.preload('./public/subway_map_just_G_Line_Stations+Tracks.glb')
