@@ -5,9 +5,12 @@ import SubwayMap from './SubwayMap'
 function MapExpierience(){
 
     return(
-        <Canvas>
-           <SubwayMap />
-        </Canvas>
+        <>
+            <Canvas>
+                <SubwayMap />
+            </Canvas>
+        </>
+        
     )
 }
 

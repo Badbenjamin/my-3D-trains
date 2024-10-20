@@ -19,18 +19,21 @@ export default function GLine(props) {
     //  const [stationObjs, setStationObjs] = useState({})
      const [stationArray, setStationArray] = useState([])
      const [statusArray, setStatusArray] = useState([])
-    console.log("SA", statusArray)
+     const [version, setVersion] = useState(0)
+    // console.log("SA", statusArray)
 
   useEffect(()=>{
     
     const newStationObj ={}
     const newStatusArray = []
 
+    function setStatus(func){
+        console.log(func)
+    }
+
     let count = 0
     for (const mesh in nodes){
-        
         if (nodes[mesh].type === "Mesh"){
-            // console.log(mesh)
             const status = {"name": nodes[mesh].name, "status": false}
             newStatusArray.push(status)
             
@@ -38,90 +41,83 @@ export default function GLine(props) {
       }
     for (const mesh in nodes){
         if (nodes[mesh].type === "Mesh"){
-            
             let index = count 
             count += 1
-            // store station in its
-            newStationObj[mesh] = <Station name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
+            newStationObj[mesh] = <Station setStatus={setStatus} name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
             
         } 
       }
-
-     //   build array here for react child
      const newStationArray = [...stationArray]
 
      for (const station in newStationObj){
-        // console.log(stationArray.includes(newStationObj[station]))
         // why is station array an object?
         if (!newStationArray.includes(station)){
             newStationArray.push(newStationObj[station])
         }
-         
      }
-     
-    
-    
     setStatusArray(newStatusArray)
-    
-    // setStationObjs(newStationObj)
-
     setStationArray(newStationArray)
     
   }, [])
-//   console.log("SA", statusArray)
  
   const nameArray = ['01_Court_Sq_G', '02_21_St_G', '03_Greenpoint_Ave_G' ]
-  function selectMeshes(array){
-    let count = 0
+  function selectStations(array){
+    function updateVersion(){
+        setVersion(version + 1)
+    }
+    updateVersion()
+    console.log(version)
+
     const newStatusArray = [...statusArray]
-    console.log(newStatusArray)
-    for (const name of nameArray){
-        // console.log(name)
+    for (const name of array){
         for (const status of newStatusArray){
-            // console.log(status['name'])
             if (name === status['name']){
                 status['status'] = true
             }
         }
     }
-    const newStationObj ={}
-    
-    for (const mesh in nodes){
-        if (nodes[mesh].type === "Mesh"){
-            
-            let index = count 
-            count += 1
-            // store station in its
-            newStationObj[mesh] = <Station name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
-            
-        } 
-      }
-      const newStationArray = []
-      for (const station in newStationObj){
-        // console.log(stationArray.includes(newStationObj[station]))
-        // why is station array an object?
-        if (!newStationArray.includes(station)){
-            newStationArray.push(newStationObj[station])
-        }
     setStatusArray(newStatusArray)
-    setStationArray(newStationArray)
-    
+
+    const newStationArray = [...stationArray]
+    // console.log(statusArray)
+    const alteredStationArray = newStationArray.map((station, i) => {
+        console.log(station)
+        const newStation = {...station}
+        const newStationName = newStation['props']['name']
+        let newStationStatus = newStation['props']['status']['status']
+        for (const status of newStatusArray){
+            if (status['name'] === newStationName){
+                newStationStatus = status['status']
+                console.log(newStation['key'])
+                newStation['key'] =  version
+                // console.log(stationStatus)
+            }
+        }
+        return newStation
+    })
+    setStationArray(alteredStationArray)
   }
-  }
+  console.log(statusArray)
 
 //   useEffect(()=>{
 //     const newStationArray = [...stationArray]
-//     for (const mesh of stationArray){ 
-//             stationArray.push(<Station name={nodes[mesh].name} status={statusArray[index]} index={[index]} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>)
-//       }
-//       setStationArray(newStationArray)
-    
-
+//     console.log(statusArray)
+//     const alteredStationArray = newStationArray.map((station, i) => {
+//         const stationName = station['props']['name']
+//         let stationStatus = station['props']['status']['status']
+//         for (const status of statusArray){
+//             if (status['name'] === stationName){
+//                 stationStatus = status['status']
+//                 console.log(stationStatus)
+//             }
+//         }
+//         return station
+//     })
 //   }, [statusArray])
-//   selectMeshes(nameArray)
+//   console.log(stationArray)
 
 function groupClick(){
-    selectMeshes(nameArray)
+    selectStations(nameArray)
 }
 
   if (stationArray == []){

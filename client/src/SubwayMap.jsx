@@ -7,7 +7,6 @@ import './index.css'
 
 import PlaceHolder from "./Placeholder"
 import LinesAndMap from "./LinesAndMap"
-import GLine from "./G_Line"
 
 function SubwayMap(){
 
