@@ -6,7 +6,7 @@ import {MapControls, Html, useGLTF} from '@react-three/drei'
 
 import GLine from "./G_Line"
 import Map from "./Map"
-import { G_Line_Stations } from "./G_Line_Stations"
+// import { G_Line_Stations } from "./old/G_Line_Stations"
 
 function LinesAndMap(){
     const stationArray = ['G30', 'F25', 'F27']

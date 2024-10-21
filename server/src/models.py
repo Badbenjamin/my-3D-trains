@@ -33,7 +33,7 @@ class Station(db.Model, SerializerMixin):
     start_stations = db.relationship('Commute', foreign_keys=[Commute.start_station_id], back_populates='start_station')
     end_stations = db.relationship('Commute', foreign_keys=[Commute.end_station_id], back_populates='end_station')
 
-    serialize_rules=['-station_endpoints.stations', '-riders.station', '-start_stations.start_station', '-end_stations.end_station']
+    serialize_rules=['-station_endpoints.station', '-riders.station', '-start_stations.start_station', '-end_stations.end_station']
 
     def __repr__(self):
          return f'<Station {self.stop_name}, {self.gtfs_stop_id}, {self.daytime_routes}>'

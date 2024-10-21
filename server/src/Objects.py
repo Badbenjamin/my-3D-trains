@@ -1,5 +1,6 @@
 from config import db, app
 from flask import session, request
+from sqlalchemy_serializer import SerializerMixin
 import requests
 
 from datetime import datetime, timedelta
@@ -228,6 +229,16 @@ class TrainData:
         trains_for_react = []
         
         for train in self.sort_trains_by_arrival_at_destination():
+            stop_schedule = []
+            
+            for stop in train.schedule:
+                stop_obj = {
+                    "stop_id" : stop.stop_id,
+                    "arrival" : stop.arrival,
+                    "departure" : stop.departure
+                }
+                stop_schedule.append(stop_obj)
+
             train_for_react = {
                 "train_id" : train.trip_id,
                 "start_station" : journey_object.start_station.stop_name,
@@ -236,7 +247,8 @@ class TrainData:
                 "end_station_arrival" : str(convert_timestamp(train.arrival_time(journey_object.end_station.gtfs_stop_id))),
                 "transfer_station" : None,
                 "route" : train.route(),
-                "direction_label" : None
+                "direction_label" : None,
+                "schedule" : stop_schedule
             }
             if train.direction() == "N":
                 train_for_react['direction_label'] = journey_object.start_station.north_direction_label
