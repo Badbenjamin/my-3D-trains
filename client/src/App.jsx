@@ -82,13 +82,16 @@ function App() {
     } else if (tripInfo[0]?.schedule){
       console.log(tripInfo[0]?.schedule)
       const currentTripSchedule = tripInfo[0].schedule
-      const startStation = null
-      const endStation = null
-      const justStations = currentTripSchedule.map((station) => {
-
+      const startStation = tripInfo[0].start_station_gtfs
+      const endStation = tripInfo[0].end_station_gtfs
+      const justStationIds = currentTripSchedule.map((station) => {
         return station['stop_id'].slice(0,3)})
-      // console.log(justStations)
-      selectStations(justStations)
+      // console.log(justStationIds)
+      const startIndex = justStationIds.indexOf(startStation)
+      const endIndex = justStationIds.indexOf(endStation)
+      console.log(startIndex)
+      console.log(endIndex)
+      selectStations(justStationIds.slice(startIndex, endIndex + 1))
     }
   
   }, [tripInfo])

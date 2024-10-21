@@ -242,8 +242,10 @@ class TrainData:
             train_for_react = {
                 "train_id" : train.trip_id,
                 "start_station" : journey_object.start_station.stop_name,
+                "start_station_gtfs" : journey_object.start_station.gtfs_stop_id,
                 "start_station_arrival" : str(convert_timestamp(train.arrival_time(journey_object.start_station.gtfs_stop_id))),
                 "end_station" : journey_object.end_station.stop_name,
+                "end_station_gtfs" : journey_object.end_station.gtfs_stop_id,
                 "end_station_arrival" : str(convert_timestamp(train.arrival_time(journey_object.end_station.gtfs_stop_id))),
                 "transfer_station" : None,
                 "route" : train.route(),
