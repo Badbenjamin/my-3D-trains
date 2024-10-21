@@ -80,18 +80,29 @@ function App() {
     if (tripInfo == []){
       return 
     } else if (tripInfo[0]?.schedule){
-      console.log(tripInfo[0]?.schedule)
+      console.log(tripInfo[0])
       const currentTripSchedule = tripInfo[0].schedule
       const startStation = tripInfo[0].start_station_gtfs
       const endStation = tripInfo[0].end_station_gtfs
       const justStationIds = currentTripSchedule.map((station) => {
+        // console.log(station['stop_id'])
         return station['stop_id'].slice(0,3)})
       // console.log(justStationIds)
       const startIndex = justStationIds.indexOf(startStation)
       const endIndex = justStationIds.indexOf(endStation)
-      console.log(startIndex)
-      console.log(endIndex)
-      selectStations(justStationIds.slice(startIndex, endIndex + 1))
+      const stationArray = justStationIds.slice(startIndex, endIndex + 1)
+
+      const justTrackIds = currentTripSchedule.map((trackid)=>{
+          // LEFT OFF HERE
+          // need to slice array to only have stops between start and stop stations
+          return trackid['stop_id']
+      })
+      const directoin = tripInfo[0].schedule[0]['stop_id'].slice(3,4)
+      // const trackStartIndex = 
+      // const trackArray = justTrackIds.slice()
+      // const startTrackIndex = justTrackIds.indexOf()
+      const allIds = stationArray.concat(justTrackIds)
+      selectStations(stationArray)
     }
   
   }, [tripInfo])
@@ -101,13 +112,15 @@ function App() {
         setVersion(version + 1)
     }
     updateVersion()
-    // console.log(version)
+    console.log(array)
 
     const newStatusArray = [...statusArray]
     for (const name of array){
         for (const status of newStatusArray){
             if (name === status['name']){
                 status['status'] = true
+            } else if (name === status['name'].slice(0,4)){
+              status['status'] = true
             }
         }
     }
