@@ -73,41 +73,42 @@ export default function GLine({stationList}) {
   }, [])
  
   
-  function selectStations(array){
-    function updateVersion(){
-        setVersion(version + 1)
-    }
-    updateVersion()
-    console.log(version)
+//   MOVED TO APP 
+//   function selectStations(array){
+//     function updateVersion(){
+//         setVersion(version + 1)
+//     }
+//     updateVersion()
+//     console.log(version)
 
-    const newStatusArray = [...statusArray]
-    for (const name of array){
-        for (const status of newStatusArray){
-            if (name === status['name']){
-                status['status'] = true
-            }
-        }
-    }
-    setStatusArray(newStatusArray)
+//     const newStatusArray = [...statusArray]
+//     for (const name of array){
+//         for (const status of newStatusArray){
+//             if (name === status['name']){
+//                 status['status'] = true
+//             }
+//         }
+//     }
+//     setStatusArray(newStatusArray)
 
-    const newStationArray = [...stationArray]
-    // console.log(statusArray)
-    const alteredStationArray = newStationArray.map((station, i) => {
-        console.log(station)
-        const newStation = {...station}
-        const newStationName = newStation['props']['name']
-        let newStationStatus = newStation['props']['status']['status']
-        for (const status of newStatusArray){
-            if (status['name'] === newStationName){
-                newStationStatus = status['status']
-                console.log(newStation['key'])
-                newStation['key'] =  version
-            }
-        }
-        return newStation
-    })
-    setStationArray(alteredStationArray)
-  }
+//     const newStationArray = [...stationArray]
+//     // console.log(statusArray)
+//     const alteredStationArray = newStationArray.map((station, i) => {
+//         console.log(station)
+//         const newStation = {...station}
+//         const newStationName = newStation['props']['name']
+//         let newStationStatus = newStation['props']['status']['status']
+//         for (const status of newStatusArray){
+//             if (status['name'] === newStationName){
+//                 newStationStatus = status['status']
+//                 console.log(newStation['key'])
+//                 newStation['key'] =  version
+//             }
+//         }
+//         return newStation
+//     })
+//     setStationArray(alteredStationArray)
+//   }
 //   console.log(statusArray)
 
 function groupClick(){

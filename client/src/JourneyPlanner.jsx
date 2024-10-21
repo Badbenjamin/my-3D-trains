@@ -8,9 +8,16 @@ import TripInfo from "./TripInfo";
 
 function JourneyPlanner() {
     
-    const  [stations]  = useOutletContext()
+    console.log(useOutletContext())
+    
+    // move tripInfo up to App. 
+    const  [stations, tripInfo]  = useOutletContext()
+
+    const setTripInfo = useOutletContext()[10]
+    
     const [journeyStations, setJourneyStations] = useState([null, null])
-    const [tripInfo, setTripInfo] = useState([])
+    // Moved to APP
+    // const [tripInfo, setTripInfo] = useState([])
     // console.log(stations)
     // console.log(journeyStations)
   

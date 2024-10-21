@@ -14,6 +14,8 @@ function App() {
 
   const { nodes, materials } = useGLTF('./public/subway_map_just_G_Line_Stations+Tracks.glb')
   
+  
+  
 
   const [stations, setStations] = useState([])
 
@@ -21,9 +23,12 @@ function App() {
   const [stationArray, setStationArray] = useState([])
   const [statusArray, setStatusArray] = useState([])
   const [version, setVersion] = useState(0)
+  const [selectedMeshes, setSelectedMeshes] = useState([])
+  const [tripInfo, setTripInfo] = useState([])
 
-  console.log(stationArray)
+  console.log(tripInfo)
 
+  // get station info for trip planner
   useEffect(() => {
     fetch("http://127.0.0.1:5555/api/stations")
       .then(response => response.json())
@@ -31,6 +36,7 @@ function App() {
       console.log('fetch')
   }, [])
 
+  // build stationArray for LinesAndMap
   useEffect(()=>{
     
     const newStationObj ={}
@@ -68,6 +74,60 @@ function App() {
     setStationArray(newStationArray)
     
   }, [])
+
+  useEffect(()=>{
+    console.log("trip_info", tripInfo)
+    if (tripInfo == []){
+      return 
+    } else if (tripInfo[0]?.schedule){
+      console.log(tripInfo[0]?.schedule)
+      const currentTripSchedule = tripInfo[0].schedule
+      const startStation = null
+      const endStation = null
+      const justStations = currentTripSchedule.map((station) => {
+
+        return station['stop_id'].slice(0,3)})
+      // console.log(justStations)
+      selectStations(justStations)
+    }
+  
+  }, [tripInfo])
+
+  function selectStations(array){
+    function updateVersion(){
+        setVersion(version + 1)
+    }
+    updateVersion()
+    // console.log(version)
+
+    const newStatusArray = [...statusArray]
+    for (const name of array){
+        for (const status of newStatusArray){
+            if (name === status['name']){
+                status['status'] = true
+            }
+        }
+    }
+    setStatusArray(newStatusArray)
+
+    const newStationArray = [...stationArray]
+    // console.log(statusArray)
+    const alteredStationArray = newStationArray.map((station, i) => {
+        // console.log(station)
+        const newStation = {...station}
+        const newStationName = newStation['props']['name']
+        let newStationStatus = newStation['props']['status']['status']
+        for (const status of newStatusArray){
+            if (status['name'] === newStationName){
+                newStationStatus = status['status']
+                console.log(newStation['key'])
+                newStation['key'] =  version
+            }
+        }
+        return newStation
+    })
+    setStationArray(alteredStationArray)
+  }
   if (!nodes || !stationArray){
     return (
       <>loading</>
@@ -77,7 +137,7 @@ function App() {
   return (
     <>
       <NavBar/>
-      <Outlet context={[stations, version, setVersion, statusArray, setStatusArray, stationArray, setStationArray ,nodes, materials]}/>
+      <Outlet context={[stations, version, setVersion, statusArray, setStatusArray, stationArray, setStationArray ,nodes, materials, tripInfo, setTripInfo]}/>
     </>
   )
 }

@@ -14,7 +14,7 @@ function LinesAndMap(){
     // console.log(map)
     return(
         <>
-            <Perf position="top-left" />
+            {/* <Perf position="top-left" /> */}
             <MapControls/>
             <ambientLight intensity={1.5} />
             <Map/>
