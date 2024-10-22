@@ -9,7 +9,7 @@ function LegInfo({tripInfo}){
         <div className="leg-info-grid-cointainer">
             <div className="start-station-info">
                 <div className="top">{tripInfo[0].direction_label} Bound {tripInfo[0].route}</div>
-                <div className="middle">{tripInfo[0].start_station_name}</div>
+                <div className="middle">{tripInfo[0].start_station}</div>
                 <div className="bottom">Departs {tripInfo[0].start_station_arrival.slice(10,-3)}</div>
             </div>
             <div className="middle-info">
@@ -18,7 +18,7 @@ function LegInfo({tripInfo}){
                 <div className="bottom"></div>
             </div>
             <div className="end-station-info">
-                <div className="top">{tripInfo[0].end_station_name}</div>
+                <div className="top">{tripInfo[0].end_station}</div>
                 <div className="middle">Arrives {tripInfo[0].end_station_arrival.slice(10,-3)}</div>
                 <div className="bottom">transfer or destination</div>
             </div>

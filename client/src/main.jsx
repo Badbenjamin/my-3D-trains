@@ -25,10 +25,10 @@ const router = createBrowserRouter([
         path: "/",
         element: <MapExpierience />
       },
-      {
-        path:"/journeyplanner",
-        element: <JourneyPlanner/>
-      }
+      // {
+      //   path:"/journeyplanner",
+      //   element: <JourneyPlanner/>
+      // }
       // {
       //   path: "/login",
       //   element: <Login />

@@ -40,9 +40,11 @@ def get_all_stations():
         "daytime_routes" : station.daytime_routes
         }
         station_list.append(station_obj)
-   
-    
-    # print(stations)
-    # stations = AllSubwayStations.query.all()
-    # print([station.to_dict(only=('station.id',)) for station in Station.query.all()])
     return station_list, 200
+
+@app.route('/api/stationname/<string:gtfs_id>')
+def get_station_name(gtfs_id):
+    # print(gtfs_id)
+    station = Station.query.filter(Station.gtfs_stop_id == gtfs_id).first()
+    # print(station.stop_name)
+    return {"name" : station.stop_name}, 200

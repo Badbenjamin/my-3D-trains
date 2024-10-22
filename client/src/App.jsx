@@ -26,7 +26,7 @@ function App() {
   const [selectedMeshes, setSelectedMeshes] = useState([])
   const [tripInfo, setTripInfo] = useState([])
 
-  console.log(tripInfo)
+  // console.log(tripInfo)
 
   // get station info for trip planner
   useEffect(() => {
@@ -80,7 +80,7 @@ function App() {
     if (tripInfo == []){
       return 
     } else if (tripInfo[0]?.schedule){
-      console.log(tripInfo[0])
+      // console.log(tripInfo[0])
       const currentTripSchedule = tripInfo[0].schedule
       const startStation = tripInfo[0].start_station_gtfs
       const endStation = tripInfo[0].end_station_gtfs
@@ -93,11 +93,11 @@ function App() {
       const direction = tripInfo[0].schedule[0]['stop_id'].slice(3,4)
       
       // need to add status['name'] to array if it contatns stationAndDirection
-      console.log(statusArray)
+      // console.log(statusArray)
       const justTrackIds = stationArray.map((stationId) => {
         const stationAndDirection = stationId + direction
         // use this variable to match to track mesh id
-        console.log(stationAndDirection)
+        // console.log(stationAndDirection)
         for (const status of statusArray){
           if (status['name'].includes(stationAndDirection)){
             return status['name']
@@ -143,7 +143,7 @@ function App() {
         for (const status of newStatusArray){
             if (status['name'] === newStationName){
                 newStationStatus = status['status']
-                console.log(newStation['key'])
+                // console.log(newStation['key'])
                 newStation['key'] =  version
             }
         }
@@ -160,6 +160,7 @@ function App() {
   return (
     <>
       <NavBar/>
+      {/* destructure the context later */}
       <Outlet context={[stations, version, setVersion, statusArray, setStatusArray, stationArray, setStationArray ,nodes, materials, tripInfo, setTripInfo]}/>
     </>
   )

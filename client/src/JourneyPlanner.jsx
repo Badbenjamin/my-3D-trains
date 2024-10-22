@@ -8,12 +8,14 @@ import TripInfo from "./TripInfo";
 
 function JourneyPlanner() {
     
-    console.log(useOutletContext())
+    // const [tripInfo] = useOutletContext()
     
     // move tripInfo up to App. 
-    const  [stations, tripInfo]  = useOutletContext()
+    const  [stations]  = useOutletContext()
 
     const setTripInfo = useOutletContext()[10]
+
+    const tripInfo = useOutletContext()[9]
     
     const [journeyStations, setJourneyStations] = useState([null, null])
     // Moved to APP
@@ -48,8 +50,6 @@ function JourneyPlanner() {
 
     return (
         <div>
-            {tripInfo[0] !== undefined ? <TripInfo tripInfo={tripInfo}/> : ""}
-            <br></br>
             <div className='journey-planner'>
                 <h2>Start Station</h2>
                 <StationSearch stations={stations} getStations={getStations} position={"start"}/>
@@ -58,6 +58,7 @@ function JourneyPlanner() {
                 <br></br>
                 <button onClick={planTrip}>Plan Trip</button>
             </div>
+            {tripInfo[0] !== undefined ? <TripInfo tripInfo={tripInfo}/> : ""}
         </div>
 
     )
