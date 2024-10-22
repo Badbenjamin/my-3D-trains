@@ -85,24 +85,28 @@ function App() {
       const startStation = tripInfo[0].start_station_gtfs
       const endStation = tripInfo[0].end_station_gtfs
       const justStationIds = currentTripSchedule.map((station) => {
-        // console.log(station['stop_id'])
-        return station['stop_id'].slice(0,3)})
-      // console.log(justStationIds)
+          return station['stop_id'].slice(0,3)
+        })
       const startIndex = justStationIds.indexOf(startStation)
       const endIndex = justStationIds.indexOf(endStation)
       const stationArray = justStationIds.slice(startIndex, endIndex + 1)
-
-      const justTrackIds = currentTripSchedule.map((trackid)=>{
-          // LEFT OFF HERE
-          // need to slice array to only have stops between start and stop stations
-          return trackid['stop_id']
+      const direction = tripInfo[0].schedule[0]['stop_id'].slice(3,4)
+      
+      // need to add status['name'] to array if it contatns stationAndDirection
+      console.log(statusArray)
+      const justTrackIds = stationArray.map((stationId) => {
+        const stationAndDirection = stationId + direction
+        // use this variable to match to track mesh id
+        console.log(stationAndDirection)
+        for (const status of statusArray){
+          if (status['name'].includes(stationAndDirection)){
+            return status['name']
+          }
+        }
       })
-      const directoin = tripInfo[0].schedule[0]['stop_id'].slice(3,4)
-      // const trackStartIndex = 
-      // const trackArray = justTrackIds.slice()
-      // const startTrackIndex = justTrackIds.indexOf()
-      const allIds = stationArray.concat(justTrackIds)
-      selectStations(stationArray)
+      
+      const allIdsArray = stationArray.concat(justTrackIds)
+      selectStations(allIdsArray)
     }
   
   }, [tripInfo])

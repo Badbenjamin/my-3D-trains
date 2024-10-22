@@ -15,7 +15,8 @@ function Station( {setStatus, status, nodes, materials, mesh}){
      
         const red = new THREE.MeshBasicMaterial({color:'red'})
         // emmissive?
-        const blue = new THREE.MeshBasicMaterial({color:'blue', emmisive: 'purple', emmissiveintesity: 10})
+        const blue = new THREE.MeshBasicMaterial({color:'blue'})
+        // const newBlue = <meshBasicMaterial color={'blue'} emmisive={'blue'} emmissiveIntesity={4}/>
         const newName = mesh['name']
         const newGeometry = nodes[newName].geometry
         const newMaterial = materials[materialName[0]]
