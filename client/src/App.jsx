@@ -115,6 +115,9 @@ function App() {
     console.log(array)
 
     const newStatusArray = [...statusArray]
+    for (const status of newStatusArray){
+        status['status'] = false
+    }
     for (const name of array){
         for (const status of newStatusArray){
             if (name === status['name']){
