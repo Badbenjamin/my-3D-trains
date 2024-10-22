@@ -23,10 +23,10 @@ function App() {
   const [stationArray, setStationArray] = useState([])
   const [statusArray, setStatusArray] = useState([])
   const [version, setVersion] = useState(0)
-  const [selectedMeshes, setSelectedMeshes] = useState([])
   const [tripInfo, setTripInfo] = useState([])
 
   // console.log(tripInfo)
+  console.log(statusArray)
 
   // get station info for trip planner
   useEffect(() => {
@@ -118,17 +118,35 @@ function App() {
     updateVersion()
     console.log(array)
 
+    // WHAT IS GOING ON HERE?
     const newStatusArray = [...statusArray]
     for (const status of newStatusArray){
-        status['status'] = false
+      status['status'] = false
     }
+    // console.log(newStatusArray)
+    // is this re-setting?
+    // console.log('before' , statusArray)
+    // const empty = []
+    // for (let statusObj of statusArray){
+        
+    //     // status['status'] = false
+    //     const cpy = {...statusObj}
+    //     cpy.status = false
+    //     empty.push(statusObj)
+    //     console.log(statusObj)
+    // }
+    // console.log("after", empty)
+    // const newStatusArray = [...statusArray]
+    // const resetStatusArray = statusArray.map((status) =>{status['status'] = false; return status})
+    // console.log("Reset", resetStatusArray)
     for (const name of array){
         for (const status of newStatusArray){
+            
             if (name === status['name']){
                 status['status'] = true
             } else if (name === status['name'].slice(0,4)){
               status['status'] = true
-            }
+            } 
         }
     }
     setStatusArray(newStatusArray)

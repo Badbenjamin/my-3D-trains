@@ -9,7 +9,7 @@ function MapExpierience(){
 
     return(
         <>
-        <JourneyPlanner/>
+            <JourneyPlanner/>
             <Canvas>
                 <SubwayMap />
             </Canvas>
