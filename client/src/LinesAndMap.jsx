@@ -15,7 +15,7 @@ function LinesAndMap(){
     return(
         <>
             {/* <Perf position="top-left" /> */}
-            <MapControls/>
+            <MapControls />
             <ambientLight intensity={1.5} />
             <directionalLight position={[1,2,3]} intenstity={1.5}/>
             <Sky/>

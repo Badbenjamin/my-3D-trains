@@ -47,4 +47,4 @@ def get_station_name(gtfs_id):
     # print(gtfs_id)
     station = Station.query.filter(Station.gtfs_stop_id == gtfs_id).first()
     # print(station.stop_name)
-    return {"name" : station.stop_name}, 200
+    return {"name" : station.stop_name, "daytime_routes" : station.daytime_routes}, 200

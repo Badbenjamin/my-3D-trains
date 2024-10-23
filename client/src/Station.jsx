@@ -19,11 +19,13 @@ function Station( {id, key,setStatus, status, nodes, materials, mesh, index}){
         const red = new THREE.MeshBasicMaterial({color:'red'})
         // emmissive?
         const blue = new THREE.MeshBasicMaterial({color:'blue'})
+        const line = mesh['name'][0]
+        console.log(line)
         
         // const newBlue = <meshBasicMaterial color={'blue'} emmisive={'blue'} emmissiveIntesity={4}/>
         const newName = mesh['name']
         const newGeometry = nodes[newName].geometry
-        const newMaterial = materials[materialName[0]]
+        const newMaterial =  mesh['name'][0] !== "7" ? materials[materialName[0]] : materials[materialName[2]];
         const newCastShadow = true
         const newRecieveShadow = true
         const newPosition = mesh['position']
@@ -52,7 +54,7 @@ function Station( {id, key,setStatus, status, nodes, materials, mesh, index}){
             if (newName.length < 5 ){
                 fetch(`http://127.0.0.1:5555/api/stationname/${newName}`)
                 .then(response => response.json())
-                .then(decodedName => {setReadableName(decodedName.name)})
+                .then(decodedName => {setReadableName(decodedName.name + " " + decodedName.daytime_routes)})
                 console.log('fetch')
             }
         }, [])

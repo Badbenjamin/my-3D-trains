@@ -12,9 +12,9 @@ import Station from './Station'
 
 function App() {
 
-  const { nodes, materials } = useGLTF('./public/subway_map_just_G_Line_Stations+Tracks.glb')
+  const { nodes, materials } = useGLTF('./public/subway_map_G_7.glb')
   
-  
+  console.log(materials)
   
 
   const [stations, setStations] = useState([])
@@ -181,5 +181,5 @@ function App() {
   )
 }
 
-useGLTF.preload('./public/subway_map_just_G_Line_Stations+Tracks.glb')
+useGLTF.preload('./public/subway_map_G_7.glb')
 export default App
