@@ -26,7 +26,7 @@ function App() {
   const [tripInfo, setTripInfo] = useState([])
 
   // console.log(tripInfo)
-  console.log("StA", stationArray)
+  // console.log("StA", stationArray)
 
   // get station info for trip planner
   useEffect(() => {
@@ -94,7 +94,7 @@ function App() {
       
       // need to add status['name'] to array if it contatns stationAndDirection
       // console.log(statusArray)
-      console.log("SA inside useEffect", statusArray)
+      // console.log("SA inside useEffect", statusArray)
       const justTrackIds = selectedStationArray.map((stationId) => {
         const stationAndDirection = stationId + direction
         // use this variable to match to track mesh id
@@ -115,15 +115,15 @@ function App() {
             setVersion(version + 1)
         }
         updateVersion()
-        console.log("stations to select array, inside selectStations" ,array)
-        console.log("SA inside selectStations", statusArray)
+        // console.log("stations to select array, inside selectStations" ,array)
+        // console.log("SA inside selectStations", statusArray)
         // WHAT IS GOING ON HERE?
         const newStatusArray = [...statusArray]
         for (const status of newStatusArray){
     
           status['status'] = false
         }
-        console.log("NSA", newStatusArray)
+        // console.log("NSA", newStatusArray)
         for (const name of array){
             for (const status of newStatusArray){
                 
@@ -139,11 +139,12 @@ function App() {
         const newStationArray = [...stationArray]
         // console.log(statusArray)
         const alteredStationArray = newStationArray.map((station, i) => {
-            console.log("altered_station array station", station)
+            // console.log("altered_station array station", station)
             const newStation = {...station}
             const newStationName = newStation['props']['name']
             let newStationStatus = newStation['props']['status']['status']
-            console.log('new station key', newStation['key'])
+            // console.log('new station key', newStation['key'])
+            // IMPORTANT TO UPDATE KEY TO TRIGGER RE RENDER
             for (const status of newStatusArray){
                 if (status['name'] === newStationName){
                     newStationStatus = status['status']
@@ -157,71 +158,13 @@ function App() {
             }
             return newStation
         })
-        console.log("altered station array ", alteredStationArray)
+        // console.log("altered station array ", alteredStationArray)
         setStationArray(alteredStationArray)
       }
       selectStations(allIdsArray)
     }
   // resetStatusArrayToFalse()
   }, [tripInfo])
-
-  // this function fires when tripInfo is updated
-  function resetStatusArrayToFalse(){
-    console.log("reset", statusArray)
-    const resetStatusArray = statusArray.map((statusObj) => {
-      const newStatusObj = {
-        "name" : statusObj['name'],
-        "status" : false
-      }
-      return newStatusObj
-    })
-  }
-
-  // function selectStations(array){
-  //   function updateVersion(){
-  //       setVersion(version + 1)
-  //   }
-  //   updateVersion()
-  //   console.log("stations to select array, inside selectStations" ,array)
-  //   console.log("SA inside selectStations", statusArray)
-  //   // WHAT IS GOING ON HERE?
-  //   const newStatusArray = [...statusArray]
-  //   for (const status of newStatusArray){
-
-  //     // status['status'] = false
-  //   }
-  //   console.log("NSA", newStatusArray)
-  //   for (const name of array){
-  //       for (const status of newStatusArray){
-            
-  //           if (name === status['name']){
-  //               status['status'] = true
-  //           } else if (name === status['name'].slice(0,4)){
-  //             status['status'] = true
-  //           } 
-  //       }
-  //   }
-  //   setStatusArray(newStatusArray)
-
-  //   const newStationArray = [...stationArray]
-  //   // console.log(statusArray)
-  //   const alteredStationArray = newStationArray.map((station, i) => {
-  //       console.log("altered_station array station", station)
-  //       const newStation = {...station}
-  //       const newStationName = newStation['props']['name']
-  //       let newStationStatus = newStation['props']['status']['status']
-  //       for (const status of newStatusArray){
-  //           if (status['name'] === newStationName){
-  //               newStationStatus = status['status']
-  //               // console.log(newStation['key'])
-  //               newStation['key'] =  version
-  //           }
-  //       }
-  //       return newStation
-  //   })
-  //   console.log("altered station array ", alteredStationArray)
-  //   setStationArray(alteredStationArray)
-  // }
 
   if (!nodes || !stationArray){
     return (

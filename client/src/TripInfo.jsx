@@ -5,7 +5,7 @@ function TripInfo({tripInfo}){
 
     return(
         <div className='leg-info-div'>
-            <LegInfo tripInfo={tripInfo} />
+            <LegInfo className='leg-info' tripInfo={tripInfo} />
         </div>
         
     )

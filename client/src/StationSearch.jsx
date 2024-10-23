@@ -37,6 +37,7 @@ function StationSearch({getStations, position, stations}) {
     return (
         <div>
             <Select
+                className="select"
                 styles={customStyles}
                 value={selectedOption}
                 onChange={handleChange}

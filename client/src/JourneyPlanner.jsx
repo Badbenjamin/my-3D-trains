@@ -51,14 +51,12 @@ function JourneyPlanner() {
     return (
         <div>
             <div className='journey-planner'>
-                <h2>Start Station</h2>
-                <StationSearch stations={stations} getStations={getStations} position={"start"}/>
-                <h2>End Station</h2>
-                <StationSearch stations={stations} getStations={getStations} position={"end"}/>
+                <StationSearch className='station_search' stations={stations} getStations={getStations} position={"start"}/>
+                <StationSearch className='station_search' stations={stations} getStations={getStations} position={"end"}/>
                 <br></br>
-                <button onClick={planTrip}>Plan Trip</button>
+                <button className="plan-trip-button" onClick={planTrip}>Plan Trip</button>
             </div>
-            {tripInfo[0] !== undefined ? <TripInfo tripInfo={tripInfo}/> : ""}
+            {tripInfo[0] !== undefined ? <TripInfo className='trip-info' tripInfo={tripInfo}/> : ""}
         </div>
 
     )

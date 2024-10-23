@@ -13,7 +13,7 @@ function Station( {id, key,setStatus, status, nodes, materials, mesh, index}){
 
         const [readableName, setReadableName] = useState("")
 
-        console.log(status['name'], status['status'], id)
+        // console.log(status['name'], status['status'], id)
     
      
         const red = new THREE.MeshBasicMaterial({color:'red'})
@@ -39,11 +39,11 @@ function Station( {id, key,setStatus, status, nodes, materials, mesh, index}){
             
         })
         if (status['status']){
-            console.log(newName, "i am true")
+            // console.log(newName, "i am true")
             color = blue
         }
         if (!status['status']){
-            console.log(newName, "i am false")
+            // console.log(newName, "i am false")
             color = newMaterial
         }
      

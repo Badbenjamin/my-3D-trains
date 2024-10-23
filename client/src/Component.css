@@ -1,11 +1,13 @@
 .journey-planner {
   border-style: dotted;
   padding: 5px;
+  display: inline-flex;
+  /* width: 100%; */
 }
 
  h1{
   border-style: dotted;
-  padding: 5px;
+  padding: 1px;
  }
 
  .navbar{
@@ -15,7 +17,7 @@
  }
 
  .navbar a.active{
-  color:white;
+  color:black;
  }
 
 a:visited{
@@ -61,4 +63,27 @@ a:visited{
 .bottom{
   grid-row-start: 3;
   grid-row-end: 4;
+}
+
+.station_search{
+  align-items: right;
+}
+
+.select{
+  /* align-items: flex-end; */
+  width: 100%;
+}
+
+.plan-trip-button{
+  background-color: grey;
+  border: 2px;
+  color: black;
+}
+
+.trip-info{
+  border-style: dotted ;
+}
+
+.leg-info{
+  color: blue;
 }

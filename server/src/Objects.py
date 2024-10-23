@@ -250,7 +250,8 @@ class TrainData:
                 "transfer_station" : None,
                 "route" : train.route(),
                 "direction_label" : None,
-                "schedule" : stop_schedule
+                "schedule" : stop_schedule,
+                "number_of_stops" : "number goes here"
             }
             if train.direction() == "N":
                 train_for_react['direction_label'] = journey_object.start_station.north_direction_label
