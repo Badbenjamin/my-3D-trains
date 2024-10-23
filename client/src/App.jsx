@@ -26,19 +26,19 @@ function App() {
   const [tripInfo, setTripInfo] = useState([])
 
   // console.log(tripInfo)
-  console.log(statusArray)
+  console.log("SA", statusArray)
 
   // get station info for trip planner
   useEffect(() => {
     fetch("http://127.0.0.1:5555/api/stations")
       .then(response => response.json())
       .then(stationsData => setStations(stationsData))
-      console.log('fetch')
+      // console.log('fetch')
   }, [])
 
   // build stationArray for LinesAndMap
   useEffect(()=>{
-    
+    console.log("station objects being built")
     const newStationObj ={}
     const newStatusArray = []
 
@@ -89,15 +89,18 @@ function App() {
         })
       const startIndex = justStationIds.indexOf(startStation)
       const endIndex = justStationIds.indexOf(endStation)
-      const stationArray = justStationIds.slice(startIndex, endIndex + 1)
+      const selectedStationArray = justStationIds.slice(startIndex, endIndex + 1)
       const direction = tripInfo[0].schedule[0]['stop_id'].slice(3,4)
       
       // need to add status['name'] to array if it contatns stationAndDirection
       // console.log(statusArray)
-      const justTrackIds = stationArray.map((stationId) => {
+      console.log("SA inside useEffect", statusArray)
+      const justTrackIds = selectedStationArray.map((stationId) => {
         const stationAndDirection = stationId + direction
         // use this variable to match to track mesh id
         // console.log(stationAndDirection)
+        
+        
         for (const status of statusArray){
           if (status['name'].includes(stationAndDirection)){
             return status['name']
@@ -105,70 +108,119 @@ function App() {
         }
       })
       
-      const allIdsArray = stationArray.concat(justTrackIds)
-      selectStations(allIdsArray)
-    }
-  
-  }, [tripInfo])
-
-  function selectStations(array){
-    function updateVersion(){
-        setVersion(version + 1)
-    }
-    updateVersion()
-    console.log(array)
-
-    // WHAT IS GOING ON HERE?
-    const newStatusArray = [...statusArray]
-    for (const status of newStatusArray){
-      status['status'] = false
-    }
-    // console.log(newStatusArray)
-    // is this re-setting?
-    // console.log('before' , statusArray)
-    // const empty = []
-    // for (let statusObj of statusArray){
-        
-    //     // status['status'] = false
-    //     const cpy = {...statusObj}
-    //     cpy.status = false
-    //     empty.push(statusObj)
-    //     console.log(statusObj)
-    // }
-    // console.log("after", empty)
-    // const newStatusArray = [...statusArray]
-    // const resetStatusArray = statusArray.map((status) =>{status['status'] = false; return status})
-    // console.log("Reset", resetStatusArray)
-    for (const name of array){
-        for (const status of newStatusArray){
-            
-            if (name === status['name']){
-                status['status'] = true
-            } else if (name === status['name'].slice(0,4)){
-              status['status'] = true
-            } 
+      const allIdsArray = selectedStationArray.concat(justTrackIds)
+      // define functon here to have the same scope?
+      function selectStations(array){
+        function updateVersion(){
+            setVersion(version + 1)
         }
-    }
-    setStatusArray(newStatusArray)
-
-    const newStationArray = [...stationArray]
-    // console.log(statusArray)
-    const alteredStationArray = newStationArray.map((station, i) => {
-        // console.log(station)
-        const newStation = {...station}
-        const newStationName = newStation['props']['name']
-        let newStationStatus = newStation['props']['status']['status']
+        updateVersion()
+        console.log("stations to select array, inside selectStations" ,array)
+        console.log("SA inside selectStations", statusArray)
+        // WHAT IS GOING ON HERE?
+        const newStatusArray = [...statusArray]
         for (const status of newStatusArray){
-            if (status['name'] === newStationName){
-                newStationStatus = status['status']
-                // console.log(newStation['key'])
-                newStation['key'] =  version
+    
+          status['status'] = false
+        }
+        console.log("NSA", newStatusArray)
+        for (const name of array){
+            for (const status of newStatusArray){
+                
+                if (name === status['name']){
+                    status['status'] = true
+                } else if (name === status['name'].slice(0,4)){
+                  status['status'] = true
+                } 
             }
         }
-        return newStation
+        setStatusArray(newStatusArray)
+    
+        const newStationArray = [...stationArray]
+        // console.log(statusArray)
+        const alteredStationArray = newStationArray.map((station, i) => {
+            console.log("altered_station array station", station)
+            const newStation = {...station}
+            const newStationName = newStation['props']['name']
+            let newStationStatus = newStation['props']['status']['status']
+            console.log('new station key', newStation['key'])
+            for (const status of newStatusArray){
+                if (status['name'] === newStationName){
+                    newStationStatus = status['status']
+                    // console.log(newStation['key'])
+                    newStation['key'] =  version
+                } else {
+                    newStation['key'] = version
+                }
+            }
+            return newStation
+        })
+        console.log("altered station array ", alteredStationArray)
+        setStationArray(alteredStationArray)
+      }
+      selectStations(allIdsArray)
+    }
+  // resetStatusArrayToFalse()
+  }, [tripInfo])
+
+  // this function fires when tripInfo is updated
+  function resetStatusArrayToFalse(){
+    console.log("reset", statusArray)
+    const resetStatusArray = statusArray.map((statusObj) => {
+      const newStatusObj = {
+        "name" : statusObj['name'],
+        "status" : false
+      }
+      return newStatusObj
     })
-    setStationArray(alteredStationArray)
   }
+
+  // function selectStations(array){
+  //   function updateVersion(){
+  //       setVersion(version + 1)
+  //   }
+  //   updateVersion()
+  //   console.log("stations to select array, inside selectStations" ,array)
+  //   console.log("SA inside selectStations", statusArray)
+  //   // WHAT IS GOING ON HERE?
+  //   const newStatusArray = [...statusArray]
+  //   for (const status of newStatusArray){
+
+  //     // status['status'] = false
+  //   }
+  //   console.log("NSA", newStatusArray)
+  //   for (const name of array){
+  //       for (const status of newStatusArray){
+            
+  //           if (name === status['name']){
+  //               status['status'] = true
+  //           } else if (name === status['name'].slice(0,4)){
+  //             status['status'] = true
+  //           } 
+  //       }
+  //   }
+  //   setStatusArray(newStatusArray)
+
+  //   const newStationArray = [...stationArray]
+  //   // console.log(statusArray)
+  //   const alteredStationArray = newStationArray.map((station, i) => {
+  //       console.log("altered_station array station", station)
+  //       const newStation = {...station}
+  //       const newStationName = newStation['props']['name']
+  //       let newStationStatus = newStation['props']['status']['status']
+  //       for (const status of newStatusArray){
+  //           if (status['name'] === newStationName){
+  //               newStationStatus = status['status']
+  //               // console.log(newStation['key'])
+  //               newStation['key'] =  version
+  //           }
+  //       }
+  //       return newStation
+  //   })
+  //   console.log("altered station array ", alteredStationArray)
+  //   setStationArray(alteredStationArray)
+  // }
+
   if (!nodes || !stationArray){
     return (
       <>loading</>

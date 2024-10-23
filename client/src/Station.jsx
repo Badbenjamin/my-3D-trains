@@ -5,7 +5,7 @@ import { Html } from "@react-three/drei"
 
 import './App.css'
 
-function Station( {setStatus, status, nodes, materials, mesh}){
+function Station( {key,setStatus, status, nodes, materials, mesh}){
 
    
         const materialName = Object.keys(materials)
@@ -13,7 +13,7 @@ function Station( {setStatus, status, nodes, materials, mesh}){
 
         const [readableName, setReadableName] = useState("")
 
-        // console.log(status['status'])
+        // console.log(status['name'], status['status'])
     
      
         const red = new THREE.MeshBasicMaterial({color:'red'})
@@ -36,6 +36,9 @@ function Station( {setStatus, status, nodes, materials, mesh}){
        
         if (status['status']){
             color = blue
+        } 
+        if (!status['status']){
+            color= newMaterial
         }
      
         useEffect(()=>{

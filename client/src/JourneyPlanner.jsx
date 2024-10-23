@@ -46,7 +46,7 @@ function JourneyPlanner() {
         }
     }
 
-    console.log(tripInfo)
+    // console.log(tripInfo)
 
     return (
         <div>

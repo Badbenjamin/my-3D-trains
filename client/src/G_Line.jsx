@@ -15,7 +15,7 @@ import Station from './Station'
 export default function GLine({stationList}) {
 
     const [nodes, materials, setStatusArray, setStationArray, statusArray, stationArray, version, setVersion, props] = useOutletContext()
-    console.log(setVersion)
+    // console.log(setVersion)
     // TURN LOADER ON 
     //  const { nodes, materials } = useGLTF('./public/subway_map_just_G_Line_Stations+Tracks.glb')
     // console.log(stationList)
