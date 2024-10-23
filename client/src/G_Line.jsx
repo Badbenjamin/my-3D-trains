@@ -111,9 +111,9 @@ export default function GLine({stationList}) {
 //   }
 //   console.log(statusArray)
 
-function groupClick(){
-    selectStations(stationList)
-}
+// function groupClick(){
+//     selectStations(stationList)
+// }
 
   if (stationArray == []){
     return(
@@ -122,7 +122,7 @@ function groupClick(){
   }
 
   return (
-    <group onClick={groupClick}  dispose={null}>
+    <group  dispose={null}>
         {stationArray}
     </group>
   )

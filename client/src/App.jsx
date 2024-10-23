@@ -26,7 +26,7 @@ function App() {
   const [tripInfo, setTripInfo] = useState([])
 
   // console.log(tripInfo)
-  console.log("SA", statusArray)
+  console.log("StA", stationArray)
 
   // get station info for trip planner
   useEffect(() => {
@@ -58,7 +58,7 @@ function App() {
         if (nodes[mesh].type === "Mesh"){
             let index = count 
             count += 1
-            newStationObj[mesh] = <Station setStatus={setStatus} name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
+            newStationObj[mesh] = <Station setStatus={setStatus} name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} id={nodes[mesh].name} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
             
         } 
       }
@@ -148,9 +148,11 @@ function App() {
                 if (status['name'] === newStationName){
                     newStationStatus = status['status']
                     // console.log(newStation['key'])
-                    newStation['key'] =  version
+                    newStation['key'] =  String(newStationName + version)
+                    newStation['id'] = String(newStationName + version)
                 } else {
-                    newStation['key'] = version
+                    newStation['key'] = String(newStationName + version)
+                    newStation['id'] = String(newStationName + version)
                 }
             }
             return newStation

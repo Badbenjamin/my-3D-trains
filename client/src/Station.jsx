@@ -5,15 +5,15 @@ import { Html } from "@react-three/drei"
 
 import './App.css'
 
-function Station( {key,setStatus, status, nodes, materials, mesh}){
+function Station( {id, key,setStatus, status, nodes, materials, mesh, index}){
 
-   
+        // console.log(index)
         const materialName = Object.keys(materials)
-        const stationRef = useRef()
+        let stationRef = useRef()
 
         const [readableName, setReadableName] = useState("")
 
-        // console.log(status['name'], status['status'])
+        console.log(status['name'], status['status'], id)
     
      
         const red = new THREE.MeshBasicMaterial({color:'red'})
@@ -34,13 +34,20 @@ function Station( {key,setStatus, status, nodes, materials, mesh}){
         let color = newMaterial
         // let 
        
+        useFrame((state, delta) => {
+             
+            
+        })
         if (status['status']){
+            console.log(newName, "i am true")
             color = blue
-        } 
+        }
         if (!status['status']){
-            color= newMaterial
+            console.log(newName, "i am false")
+            color = newMaterial
         }
      
+        // console.log(color)
         useEffect(()=>{
             if (newName.length < 5 ){
                 fetch(`http://127.0.0.1:5555/api/stationname/${newName}`)
@@ -50,11 +57,17 @@ function Station( {key,setStatus, status, nodes, materials, mesh}){
             }
         }, [])
 
+        // stationRef = stationRef[index]
+        function handleClick(){
+            console.log("click")
+            // stationRef.current.material.color.set(0.5,0.0,0.0)
+        }
+
     return(
         <group>
             <mesh       
-                //   onClick={handleClick}   
-                  ref={stationRef}
+                  onClick={handleClick}   
+                  ref={stationRef[index]}
                   name={newName}
                   castShadow={newCastShadow}
                   receiveShadow={newRecieveShadow}
