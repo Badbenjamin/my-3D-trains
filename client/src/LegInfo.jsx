@@ -13,7 +13,7 @@ function LegInfo({tripInfo}){
                 <div className="bottom">Departs {tripInfo[0].start_station_arrival.slice(10,-3)}</div>
             </div>
             <div className="middle-info">
-                <div className="top">{tripInfo[0].number_of_stops}</div>
+                <div className="top">{tripInfo[0].number_of_stops} Stops</div>
                 <div className="middle">→</div>
                 <div className="bottom">lenght of trip in time</div>
             </div>

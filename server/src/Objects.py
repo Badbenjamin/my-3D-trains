@@ -238,7 +238,12 @@ class TrainData:
                     "departure" : stop.departure
                 }
                 stop_schedule.append(stop_obj)
-
+            stop_schedule_ids = []
+            for stop in stop_schedule:
+                stop_schedule_ids.append(stop['stop_id'][:-1])
+            # print()
+            # print(stop_schedule_ids.index(journey_object.end_station.gtfs_stop_id) - stop_schedule_ids.index(journey_object.start_station.gtfs_stop_id))
+            
             train_for_react = {
                 "train_id" : train.trip_id,
                 "start_station" : journey_object.start_station.stop_name,
@@ -251,7 +256,7 @@ class TrainData:
                 "route" : train.route(),
                 "direction_label" : None,
                 "schedule" : stop_schedule,
-                "number_of_stops" : "number goes here"
+                "number_of_stops" : stop_schedule_ids.index(journey_object.end_station.gtfs_stop_id) - stop_schedule_ids.index(journey_object.start_station.gtfs_stop_id)
             }
             if train.direction() == "N":
                 train_for_react['direction_label'] = journey_object.start_station.north_direction_label
