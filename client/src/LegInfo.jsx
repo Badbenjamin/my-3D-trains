@@ -15,7 +15,7 @@ function LegInfo({tripInfo}){
             <div className="middle-info">
                 <div className="top">{tripInfo[0].number_of_stops} Stops</div>
                 <div className="middle">→</div>
-                <div className="bottom">lenght of trip in time</div>
+                <div className="bottom">{tripInfo[0].trip_time} Minutes</div>
             </div>
             <div className="end-station-info">
                 <div className="top">{tripInfo[0].end_station}</div>

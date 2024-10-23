@@ -256,7 +256,8 @@ class TrainData:
                 "route" : train.route(),
                 "direction_label" : None,
                 "schedule" : stop_schedule,
-                "number_of_stops" : stop_schedule_ids.index(journey_object.end_station.gtfs_stop_id) - stop_schedule_ids.index(journey_object.start_station.gtfs_stop_id)
+                "number_of_stops" : stop_schedule_ids.index(journey_object.end_station.gtfs_stop_id) - stop_schedule_ids.index(journey_object.start_station.gtfs_stop_id),
+                "trip_time" : (train.arrival_time(journey_object.end_station.gtfs_stop_id) - train.arrival_time(journey_object.start_station.gtfs_stop_id)) / 60
             }
             if train.direction() == "N":
                 train_for_react['direction_label'] = journey_object.start_station.north_direction_label
