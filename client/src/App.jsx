@@ -1,11 +1,9 @@
 import { Outlet } from 'react-router-dom'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect} from 'react'
 import { useGLTF } from '@react-three/drei'
 
 
 import './App.css'
-import MapExperience from './MapExperience'
-import NavBar from './NavBar'
 import Station from './Station'
 
 
@@ -13,38 +11,25 @@ import Station from './Station'
 function App() {
 
   const { nodes, materials } = useGLTF('./public/subway_map_G_7.glb')
-  
-  console.log(materials)
-  
 
   const [stations, setStations] = useState([])
-
-  // from GLine, pass functions down!
   const [stationArray, setStationArray] = useState([])
   const [statusArray, setStatusArray] = useState([])
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
 
-  // console.log(tripInfo)
-  // console.log("StA", stationArray)
-
-  // get station info for trip planner
+  // get station info for trip planner for station search. 
   useEffect(() => {
     fetch("http://127.0.0.1:5555/api/stations")
       .then(response => response.json())
       .then(stationsData => setStations(stationsData))
-      // console.log('fetch')
   }, [])
 
   // build stationArray for LinesAndMap
+  // 
   useEffect(()=>{
-    console.log("station objects being built")
     const newStationObj ={}
     const newStatusArray = []
-
-    function setStatus(func){
-        console.log(func)
-    }
 
     let count = 0
     for (const mesh in nodes){
@@ -58,7 +43,7 @@ function App() {
         if (nodes[mesh].type === "Mesh"){
             let index = count 
             count += 1
-            newStationObj[mesh] = <Station setStatus={setStatus} name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} id={nodes[mesh].name} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
+            newStationObj[mesh] = <Station name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} id={nodes[mesh].name} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
             
         } 
       }
@@ -75,32 +60,33 @@ function App() {
     
   }, [])
 
+  // This useEffect listens for a change in tripInfo, which is an array of trains going from start station to end station, in order of soonest arrival time. 
+  // it creates new Station objects with status updated from statusArray. 
+  // False keeps stations their natural color. True highlights the trip route. 
+  // ADD INDEX to be able to switch to next train, maybe as state?
+  console.log("SA", statusArray)
   useEffect(()=>{
-    console.log("trip_info", tripInfo)
     if (tripInfo == []){
       return 
     } else if (tripInfo[0]?.schedule){
-      // console.log(tripInfo[0])
+      // tripInfo[0] is the first train to arrive at our chosen start station
       const currentTripSchedule = tripInfo[0].schedule
       const startStation = tripInfo[0].start_station_gtfs
       const endStation = tripInfo[0].end_station_gtfs
+      // gtfs ids without N or S 
       const justStationIds = currentTripSchedule.map((station) => {
           return station['stop_id'].slice(0,3)
         })
       const startIndex = justStationIds.indexOf(startStation)
       const endIndex = justStationIds.indexOf(endStation)
+      // Only stations between start statio and end station
       const selectedStationArray = justStationIds.slice(startIndex, endIndex + 1)
       const direction = tripInfo[0].schedule[0]['stop_id'].slice(3,4)
       
-      // need to add status['name'] to array if it contatns stationAndDirection
-      // console.log(statusArray)
-      // console.log("SA inside useEffect", statusArray)
+      // Only tracks between start station and end station
       const justTrackIds = selectedStationArray.map((stationId) => {
         const stationAndDirection = stationId + direction
-        // use this variable to match to track mesh id
-        // console.log(stationAndDirection)
-        
-        
+   
         for (const status of statusArray){
           if (status['name'].includes(stationAndDirection)){
             return status['name']
@@ -108,22 +94,25 @@ function App() {
         }
       })
       
+      // complete array of all meshes to be selected, stations + tracks
       const allIdsArray = selectedStationArray.concat(justTrackIds)
-      // define functon here to have the same scope?
+      
+      // put this function here for scope to local variables
       function selectStations(array){
+        // version must update to change key and trigger re render
         function updateVersion(){
             setVersion(version + 1)
         }
         updateVersion()
-        // console.log("stations to select array, inside selectStations" ,array)
-        // console.log("SA inside selectStations", statusArray)
-        // WHAT IS GOING ON HERE?
+        
         const newStatusArray = [...statusArray]
+        
+        // reset statuses to false 
         for (const status of newStatusArray){
-    
           status['status'] = false
         }
-        // console.log("NSA", newStatusArray)
+        
+        // if station is included in array, set station or track status to true
         for (const name of array){
             for (const status of newStatusArray){
                 
@@ -137,18 +126,17 @@ function App() {
         setStatusArray(newStatusArray)
     
         const newStationArray = [...stationArray]
-        // console.log(statusArray)
+      
         const alteredStationArray = newStationArray.map((station, i) => {
-            // console.log("altered_station array station", station)
+  
             const newStation = {...station}
             const newStationName = newStation['props']['name']
             let newStationStatus = newStation['props']['status']['status']
-            // console.log('new station key', newStation['key'])
+            
             // IMPORTANT TO UPDATE KEY TO TRIGGER RE RENDER
             for (const status of newStatusArray){
                 if (status['name'] === newStationName){
                     newStationStatus = status['status']
-                    // console.log(newStation['key'])
                     newStation['key'] =  String(newStationName + version)
                     newStation['id'] = String(newStationName + version)
                 } else {
@@ -158,12 +146,10 @@ function App() {
             }
             return newStation
         })
-        // console.log("altered station array ", alteredStationArray)
         setStationArray(alteredStationArray)
       }
       selectStations(allIdsArray)
     }
-  // resetStatusArrayToFalse()
   }, [tripInfo])
 
   if (!nodes || !stationArray){
@@ -171,10 +157,11 @@ function App() {
       <>loading</>
     )
   }
-  // console.log(stations)
+ 
   return (
     <>
-      <NavBar/>
+      <h2>MY 3D TRAINS</h2>
+      {/* <NavBar/> */}
       {/* destructure the context later */}
       <Outlet context={[stations, version, setVersion, statusArray, setStatusArray, stationArray, setStationArray ,nodes, materials, tripInfo, setTripInfo]}/>
     </>
