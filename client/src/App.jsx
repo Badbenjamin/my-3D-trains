@@ -25,8 +25,7 @@ function App() {
       .then(stationsData => setStations(stationsData))
   }, [])
 
-  // build stationArray for LinesAndMap
-  // 
+  // build stationArray of 3D station components for LinesAndMap
   useEffect(()=>{
     const newStationObj ={}
     const newStatusArray = []
@@ -60,11 +59,10 @@ function App() {
     
   }, [])
 
-  // This useEffect listens for a change in tripInfo, which is an array of trains going from start station to end station, in order of soonest arrival time. 
-  // it creates new Station objects with status updated from statusArray. 
-  // False keeps stations their natural color. True highlights the trip route. 
+  // This useEffect listens for a change in tripInfo, which is an array of trains going from start station to end station, in order of closest destination arrival time. 
+  // It takes the stations from the first train and creates an array of GTFS ids that will be passed to the selectStations function
+  // selectStations takes an array of gtfs ids and uses it to change the status of the stations in stationArray.
   // ADD INDEX to be able to switch to next train, maybe as state?
-  console.log("SA", statusArray)
   useEffect(()=>{
     if (tripInfo == []){
       return 
@@ -95,10 +93,11 @@ function App() {
       })
       
       // complete array of all meshes to be selected, stations + tracks
+      // this is the arg that gets passed to selectStations function
       const allIdsArray = selectedStationArray.concat(justTrackIds)
       
       // put this function here for scope to local variables
-      function selectStations(array){
+      function selectStations(selectedIdArray){
         // version must update to change key and trigger re render
         function updateVersion(){
             setVersion(version + 1)
@@ -112,12 +111,13 @@ function App() {
           status['status'] = false
         }
         
-        // if station is included in array, set station or track status to true
-        for (const name of array){
+        // if station is included in array of stations in trip, set station or track status to true
+        for (const name of selectedIdArray){
             for (const status of newStatusArray){
-                
+                // for station meshes
                 if (name === status['name']){
                     status['status'] = true
+                // for track meshes
                 } else if (name === status['name'].slice(0,4)){
                   status['status'] = true
                 } 
@@ -125,15 +125,15 @@ function App() {
         }
         setStatusArray(newStatusArray)
     
-        const newStationArray = [...stationArray]
-      
-        const alteredStationArray = newStationArray.map((station, i) => {
+        // alteredStationArray will contain stations with updated status.
+        const alteredStationArray = stationArray.map((station, i) => {
   
             const newStation = {...station}
             const newStationName = newStation['props']['name']
             let newStationStatus = newStation['props']['status']['status']
             
             // IMPORTANT TO UPDATE KEY TO TRIGGER RE RENDER
+            // look for match between station gtfs id and gtfs id's in statusArray
             for (const status of newStatusArray){
                 if (status['name'] === newStationName){
                     newStationStatus = status['status']

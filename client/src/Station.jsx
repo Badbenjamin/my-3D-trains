@@ -38,7 +38,6 @@ function Station( { status, nodes, materials, mesh, index}){
                 fetch(`http://127.0.0.1:5555/api/stationname/${newName}`)
                 .then(response => response.json())
                 .then(decodedName => {setReadableName(decodedName.name + " " + decodedName.daytime_routes)})
-                console.log('fetch')
             }
         }, [])
 
