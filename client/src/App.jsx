@@ -163,7 +163,20 @@ function App() {
       <h2>MY 3D TRAINS</h2>
       {/* <NavBar/> */}
       {/* destructure the context later */}
-      <Outlet context={[stations, version, setVersion, statusArray, setStatusArray, stationArray, setStationArray ,nodes, materials, tripInfo, setTripInfo]}/>
+      {/* <Outlet context={{stations : stations, version, setVersion, statusArray, setStatusArray, stationArray, setStationArray ,nodes, materials, tripInfo, setTripInfo}}/> */}
+      <Outlet context={{
+        stations : stations, 
+        version : version, 
+        setVersion : setVersion, 
+        statusArray : statusArray, 
+        setStatusArray : setStatusArray, 
+        stationArray : stationArray, 
+        setStationArray : setStationArray,
+        nodes : nodes,
+        materials : materials,
+        tripInfo : tripInfo,
+        setTripInfo : setTripInfo,
+        }}/>
     </>
   )
 }
