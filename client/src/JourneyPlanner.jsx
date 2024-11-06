@@ -9,20 +9,9 @@ import TripInfo from "./TripInfo";
 function JourneyPlanner() {
 
     const {tripInfo, stations, setTripInfo} = useOutletContext()
-    console.log(tripInfo)
-    
-    // const [tripInfo] = useOutletContext()
-    
-    // move tripInfo up to App. 
-    // const  [stations]  = useOutletContext()
-
-    // const setTripInfo = useOutletContext()[10]
-
-    // const tripInfo = useOutletContext()[9]
     
     const [journeyStations, setJourneyStations] = useState([null, null])
     
-  
     function getStations(station, position){
         console.log(station.pos.position)
         const journey = [...journeyStations]
@@ -46,7 +35,6 @@ function JourneyPlanner() {
         }
     }
 
-    // console.log(tripInfo)
 
     return (
         <div>

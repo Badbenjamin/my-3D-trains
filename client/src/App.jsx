@@ -10,6 +10,7 @@ import Station from './Station'
 
 function App() {
 
+  // load station and track model. destructure to nodes and materials to create Station component
   const { nodes, materials } = useGLTF('./public/subway_map_G_7.glb')
 
   const [stations, setStations] = useState([])
