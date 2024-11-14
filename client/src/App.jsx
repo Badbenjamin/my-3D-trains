@@ -136,14 +136,9 @@ function App() {
             // IMPORTANT TO UPDATE KEY TO TRIGGER RE RENDER
             // look for match between station gtfs id and gtfs id's in statusArray
             for (const status of newStatusArray){
-                if (status['name'] === newStationName){
-                    newStationStatus = status['status']
-                    newStation['key'] =  String(newStationName + version)
-                    newStation['id'] = String(newStationName + version)
-                } else {
-                    newStation['key'] = String(newStationName + version)
-                    newStation['id'] = String(newStationName + version)
-                }
+              newStationStatus = status['status']
+              newStation['key'] =  String(newStationName + version)
+              newStation['id'] = String(newStationName + version)
             }
             return newStation
         })
