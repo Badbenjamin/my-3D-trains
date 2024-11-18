@@ -10,6 +10,8 @@ from models import Station
 import pprint
 current_time = datetime.now()
 
+from collections import Counter
+
 # convert 10 digit POSIX timestamp used in feed to readable format
 def convert_timestamp(timestamp):
     return datetime.fromtimestamp(timestamp)
@@ -50,7 +52,19 @@ class Journey:
         self.start_station = Station.query.filter(Station.id == start_station_id).first()
         self.end_station = Station.query.filter(Station.id == end_station_id).first()
         self.time = time
-        
+        # print(self.start_station.daytime_routes)
+        # print(self.end_station.daytime_routes)
+        start_route_stations = Station.query.filter(Station.daytime_routes == self.start_station.daytime_routes).all()
+        end_route_stations = Station.query.filter(Station.daytime_routes == self.end_station.daytime_routes).all()
+        # print(start_route_stations)
+        # print(end_route_stations)
+        all_stations = start_route_stations + end_route_stations
+        # cnt = Counter(all_stations)
+        complex_ids = [station.complex_id for station in all_stations]
+        shared_complexes = set([complex_id for complex_id in complex_ids if complex_ids.count(complex_id)>1])
+        print(shared_complexes)
+
+
         start_station_endpoints = []
         for endpoint in self.start_station.station_endpoints:
             start_station_endpoints.append(endpoint.endpoint.endpoint)
