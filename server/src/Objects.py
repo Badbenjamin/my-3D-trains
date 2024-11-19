@@ -52,8 +52,8 @@ class Journey:
         self.start_station = Station.query.filter(Station.id == start_station_id).first()
         self.end_station = Station.query.filter(Station.id == end_station_id).first()
         self.time = time
-        # print(self.start_station.daytime_routes)
-        # print(self.end_station.daytime_routes)
+        
+        # GET SHARED STATIONS BETWEEN START AND END STATION ROUTES
         start_route_stations = Station.query.filter(Station.daytime_routes == self.start_station.daytime_routes).all()
         end_route_stations = Station.query.filter(Station.daytime_routes == self.end_station.daytime_routes).all()
         # print(start_route_stations)
@@ -61,9 +61,22 @@ class Journey:
         all_stations = start_route_stations + end_route_stations
         # cnt = Counter(all_stations)
         complex_ids = [station.complex_id for station in all_stations]
-        shared_complexes = set([complex_id for complex_id in complex_ids if complex_ids.count(complex_id)>1])
-        print(shared_complexes)
-
+        shared_complexes = list(set([complex_id for complex_id in complex_ids if complex_ids.count(complex_id)>1]))
+        complex_stations =  []
+        for complex_number in shared_complexes:
+            complexes = []
+            for complex in Station.query.filter(Station.complex_id == complex_number).all():
+                complexes.append(complex)
+            for complex in complexes:
+                complex_stations.append(complex)
+        shared_stations = []
+        for station in complex_stations:
+            # Modify to work with stations that have multiple daytime routes
+            if station.daytime_routes == self.start_station.daytime_routes or station.daytime_routes == self.end_station.daytime_routes:
+                shared_stations.append(station)
+        print(shared_stations)
+            
+            
 
         start_station_endpoints = []
         for endpoint in self.start_station.station_endpoints:
@@ -79,13 +92,13 @@ class Journey:
         self.end_station_endpoints = list(set(end_station_endpoints))
         
         # get shared stations or complexes
-        self.shared_stations = []
+        # self.shared_stations = []
         # for test, delete later!
         # self.shared_station_endpoints = ['https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace', 'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs']
         self.shared_station_endpoints = []
 
     def __repr__(self):
-        return f'<Journey {self.start_station.stop_name} to {self.end_station.stop_name} through{self.shared_stations} at {self.time}>'
+        return f'<Journey {self.start_station.stop_name} to {self.end_station.stop_name} through{"shared station"} at {self.time}>'
 
 class Train:
     def __init__(self, trip_id, start_time, start_date, route_id, schedule=[]):
@@ -152,7 +165,7 @@ class TrainData:
 
         self.start_station_name = journey_object.start_station.stop_name
         self.end_station_name = journey_object.end_station.stop_name
-        self.shared_station_names = journey_object.shared_stations
+        # self.shared_station_names = journey_object.shared_stations
         self.journey_object = journey_object
         
         
@@ -286,7 +299,7 @@ class TrainData:
             
 
     def __repr__(self):
-        return f'<TrainData {self.start_station_name} to {self.end_station_name} through {self.shared_station_names}>'
+        return f'<TrainData {self.start_station_name} to {self.end_station_name} through {"shared stations placeholder"}>'
 
 
 
