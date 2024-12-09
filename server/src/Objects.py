@@ -95,21 +95,25 @@ class Journey:
         start_station_endpoints = []
         for endpoint in self.start_station.station_endpoints:
             start_station_endpoints.append(endpoint.endpoint.endpoint)
-
+        
         self.start_station_endpoints = list(set(start_station_endpoints))
 
         # End station endpoints might not be needed 
         end_station_endpoints = []
         for endpoint in self.end_station.station_endpoints:
             end_station_endpoints.append(endpoint.endpoint.endpoint)
-
+        
         self.end_station_endpoints = list(set(end_station_endpoints))
         
         # get shared stations or complexes
         # self.shared_stations = []
         # for test, delete later!
         # self.shared_station_endpoints = ['https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace', 'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs']
-        self.shared_station_endpoints = []
+        # shared_station_endpoints = []
+        print(start_station_endpoints, end_station_endpoints)
+        # for endpoint in self.shared_stations.station_endpoints:
+        #     print("ep", endpoint.endpoint.enpoint)
+
 
     def __repr__(self):
         return f'<Journey {self.start_station.stop_name} to {self.end_station.stop_name} through{self.shared_stations} at {self.time}>'
@@ -187,8 +191,6 @@ class TrainData:
             self.shared_station_names = set([station.stop_name for station in journey_object.shared_stations]).pop()
             self.shared_stations = journey_object.shared_stations
         
-        
-        
         all_endpoints = []
 
         for endpoint in journey_object.start_station_endpoints:
@@ -197,32 +199,22 @@ class TrainData:
         for endpoint in journey_object.end_station_endpoints:
             all_endpoints.append(endpoint)
 
-        # not sure if I need this because shared stations will share endpoints with start end end stations
-        if journey_object.shared_station_endpoints != None:
-            for endpoint in journey_object.shared_station_endpoints:
-                all_endpoints.append(endpoint)
-
-        # get rid of identical endpoints from each station
         de_duplicated_endpoints = list(set(all_endpoints))
-
-        # get rid of endpoints that will not be used in the trip
-        # (endpoints that start and end do not share with shared station, or are not shared with start and end)
-        final_endpoints = []
-        for endpoint in de_duplicated_endpoints:
-            if journey_object.shared_station_endpoints == []:
-                if endpoint in journey_object.start_station_endpoints and endpoint in journey_object.end_station_endpoints:
-                    final_endpoints.append(endpoint)
-            elif journey_object.shared_station_endpoints != []:
-                if (endpoint in journey_object.start_station_endpoints and endpoint in journey_object.shared_station_endpoints) or (endpoint in journey_object.end_station_endpoints and endpoint in journey_object.shared_station_endpoints):
-                    final_endpoints.append(endpoint)
-        
+        # LEFT OFF HERE
+        # how should I handle a two leg trip?
+        # right now, i get train data back and filter until I just get trains going from start to end currently
+        # I'll need to run those functions twice, and return two trips
+        # trip two will need to begin after the trip 1 terminus arrival
         all_train_data = []
-
-        for endpoint in final_endpoints:
+        first_train_data = []
+        second_train_data = []
+       
+        for endpoint in de_duplicated_endpoints:
             feed = gtfs_realtime_pb2.FeedMessage()
             response = requests.get(endpoint)
             feed.ParseFromString(response.content)
             all_train_data.append(feed)
+        
 
         self.all_train_data = all_train_data
 
