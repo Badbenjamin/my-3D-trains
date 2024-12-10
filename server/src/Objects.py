@@ -51,6 +51,8 @@ class Journey:
     def __init__(self, start_station_id, end_station_id, time=None):
         self.start_station = Station.query.filter(Station.id == start_station_id).first()
         self.end_station = Station.query.filter(Station.id == end_station_id).first()
+        self.start_station_terminus = None
+        self.end_station_origin = None
         # self.transfer_stations = []
         self.shared_stations = []
         self.time = time
@@ -80,8 +82,7 @@ class Journey:
                     shared_stations.append(station)
             self.shared_stations = shared_stations
             # assign shared stations to start line and end line (might need to be list in future)
-            self.start_station_terminus = None
-            self.end_station_origin = None
+            
             # print(self.start_station.daytime_routes)
             if shared_stations:
                 for station in shared_stations:
@@ -110,7 +111,7 @@ class Journey:
         # for test, delete later!
         # self.shared_station_endpoints = ['https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace', 'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs']
         # shared_station_endpoints = []
-        print(start_station_endpoints, end_station_endpoints)
+        # print(start_station_endpoints, end_station_endpoints)
         # for endpoint in self.shared_stations.station_endpoints:
         #     print("ep", endpoint.endpoint.enpoint)
 
@@ -200,14 +201,13 @@ class TrainData:
             all_endpoints.append(endpoint)
 
         de_duplicated_endpoints = list(set(all_endpoints))
+        # print(de_duplicated_endpoints)
         # LEFT OFF HERE
         # how should I handle a two leg trip?
         # right now, i get train data back and filter until I just get trains going from start to end currently
         # I'll need to run those functions twice, and return two trips
         # trip two will need to begin after the trip 1 terminus arrival
         all_train_data = []
-        first_train_data = []
-        second_train_data = []
        
         for endpoint in de_duplicated_endpoints:
             feed = gtfs_realtime_pb2.FeedMessage()
@@ -215,7 +215,7 @@ class TrainData:
             feed.ParseFromString(response.content)
             all_train_data.append(feed)
         
-
+        print(self.shared_stations)
         self.all_train_data = all_train_data
 
     # returns all trains from provided endpoints
@@ -227,13 +227,19 @@ class TrainData:
                     all_trains.append(train)
         return all_trains
     
+    # UPDATE THIS TO HANDLE OTHER STATIONS BESIDES START AND END (FOR LEGS)
+    # THIS WILL NEED TO BE CALLED 2X!!!
     # returns list of current trains going from start station to end station
     def filter_trains_for_stations_direction_current(self):
-        # maybe make an optional branch that replaces end station with shared station, then replaces start station with shared station
-
         start_station_id = self.journey_object.start_station.gtfs_stop_id
         end_station_id = self.journey_object.end_station.gtfs_stop_id
-
+        start_station_terminuns_id = None
+        end_station_origin_id = None
+        if self.journey_object.start_station_terminus:
+            start_station_terminuns_id = self.journey_object.start_station_terminus.gtfs_stop_id
+        if self.journey_object.end_station_origin:
+            end_station_origin_id = self.journey_object.end_station_origin.gtfs_stop_id
+        print(start_station_terminuns_id, end_station_origin_id)
         filtered_trains = []
         for train_feed in self.all_train_data:
             for train in train_feed.entity: 
