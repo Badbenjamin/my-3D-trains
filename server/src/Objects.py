@@ -46,10 +46,9 @@ def trains_to_objects(train_list):
             train_object_list.append(new_train)
         return train_object_list
 
-def filter_trains_for_stations_direction_current_two(train_data, start_station_id, end_station_id):
+def filter_trains_for_stations_direction_current(train_data, start_station_id, end_station_id):
         
         filtered_trains = []
-        # where do I get train data?
         for train_feed in train_data:
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
@@ -64,6 +63,22 @@ def filter_trains_for_stations_direction_current_two(train_data, start_station_i
                             if stop.stop_id[:-1] == start_station_id and time_difference(current_time, convert_timestamp(stop.arrival.time)) > convert_seconds(30):
                                 filtered_trains.append(train)
         return trains_to_objects(filtered_trains)
+
+# LEFT OFF HERE
+# JUST RETURN ONE TRAIN, SINCE IT WILL BE USED TO DETERMINE DEPARTURE TIME OF 2ND LEG?
+def sort_trains_by_arrival_at_destination(filtered_train_data_object, start_station_id, end_station_id, time=current_time):
+        # will need time!
+        trains_with_arrival = []
+        # swapped self.filter_trains_for_stations_direction_current() for get_legInfo()
+        for train in filtered_train_data_object:
+            arrival_train = {"train" : train, "dest_arrival_time" : None}
+            for stop in train.schedule:
+                if stop.stop_id[:-1] == end_station_id:
+                    arrival_train['dest_arrival_time'] = stop.arrival
+            trains_with_arrival.append(arrival_train)
+        trains_by_dest_arrival = sorted(trains_with_arrival, key=lambda d: d['dest_arrival_time'])
+        # print(trains_by_dest_arrival)
+        return [arrival_train["train"] for arrival_train in trains_by_dest_arrival]
 
 class Journey:
 
@@ -124,16 +139,6 @@ class Journey:
             end_station_endpoints.append(endpoint.endpoint.endpoint)
         
         self.end_station_endpoints = list(set(end_station_endpoints))
-        
-        # get shared stations or complexes
-        # self.shared_stations = []
-        # for test, delete later!
-        # self.shared_station_endpoints = ['https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace', 'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs']
-        # shared_station_endpoints = []
-        # print(start_station_endpoints, end_station_endpoints)
-        # for endpoint in self.shared_stations.station_endpoints:
-        #     print("ep", endpoint.endpoint.enpoint)
-
 
     def __repr__(self):
         return f'<Journey {self.start_station.stop_name} to {self.end_station.stop_name} through{self.shared_stations} at {self.time}>'
@@ -210,6 +215,15 @@ class TrainData:
             # just working with one shared station now!
             self.shared_station_names = set([station.stop_name for station in journey_object.shared_stations]).pop()
             self.shared_stations = journey_object.shared_stations
+
+        self.start_station_id = self.journey_object.start_station.gtfs_stop_id
+        self.end_station_id = self.journey_object.end_station.gtfs_stop_id
+        self.start_station_terminuns_id = None
+        self.end_station_origin_id = None
+        if self.journey_object.start_station_terminus:
+            self.start_station_terminuns_id = self.journey_object.start_station_terminus.gtfs_stop_id
+        if self.journey_object.end_station_origin:
+            self.end_station_origin_id = self.journey_object.end_station_origin.gtfs_stop_id
         
         all_endpoints = []
 
@@ -220,15 +234,9 @@ class TrainData:
             all_endpoints.append(endpoint)
 
         de_duplicated_endpoints = list(set(all_endpoints))
-        # print(de_duplicated_endpoints)
-        # LEFT OFF HERE
-        # how should I handle a two leg trip?
-        # right now, i get train data back and filter until I just get trains going from start to end currently
-        # I'll need to run those functions twice, and return two trips
-        # trip two will need to begin after the trip 1 terminus arrival
+      
         all_train_data = []
         
-       
         for endpoint in de_duplicated_endpoints:
             feed = gtfs_realtime_pb2.FeedMessage()
             response = requests.get(endpoint)
@@ -249,82 +257,32 @@ class TrainData:
         return all_trains
     
     
-    # UPDATE THIS TO HANDLE OTHER STATIONS BESIDES START AND END (FOR LEGS)
-    # THIS WILL NEED TO BE CALLED 2X!!!
-    # returns list of current trains going from start station to end station
-    # ADD FILTER TRAINS HERE
-    # def filter_trains_for_stations_direction_current(self):
-    #     start_station_id = self.journey_object.start_station.gtfs_stop_id
-    #     end_station_id = self.journey_object.end_station.gtfs_stop_id
-    #     start_station_terminuns_id = None
-    #     end_station_origin_id = None
-    #     if self.journey_object.start_station_terminus:
-    #         start_station_terminuns_id = self.journey_object.start_station_terminus.gtfs_stop_id
-    #     if self.journey_object.end_station_origin:
-    #         end_station_origin_id = self.journey_object.end_station_origin.gtfs_stop_id
-    #     print(start_station_terminuns_id, end_station_origin_id)
-    #     filtered_trains = []
-    #     for train_feed in self.all_train_data:
-    #         for train in train_feed.entity: 
-    #             if train.HasField('trip_update'):
-    #                 stops = []
-    #                 # stops list contains each trains stop array. used to determine if start stop is before end stop
-    #                 for stop in train.trip_update.stop_time_update:
-    #                     stops.append(stop.stop_id[:-1])
-    #                 # checking if start stop is before end stop in stops array
-    #                 if (start_station_id in stops and end_station_id in stops and stops.index(start_station_id) < stops.index(end_station_id)):
-    #                     # filtering out trains that have already departed the start station (departure time in pase)
-    #                     for stop in train.trip_update.stop_time_update:
-    #                         if stop.stop_id[:-1] == start_station_id and time_difference(current_time, convert_timestamp(stop.arrival.time)) > convert_seconds(30):
-    #                             filtered_trains.append(train)
-    #     return trains_to_objects(filtered_trains)
-    
-    # LEFT OFF HERE 12/10 
-    # How do i reference self in a function that is outside of the class?
     def get_leg_info(self):
-        start_station_id = self.journey_object.start_station.gtfs_stop_id
-        end_station_id = self.journey_object.end_station.gtfs_stop_id
-        start_station_terminuns_id = None
-        end_station_origin_id = None
-        if self.journey_object.start_station_terminus:
-            start_station_terminuns_id = self.journey_object.start_station_terminus.gtfs_stop_id
-        if self.journey_object.end_station_origin:
-            end_station_origin_id = self.journey_object.end_station_origin.gtfs_stop_id
-        print(start_station_terminuns_id, end_station_origin_id)
+        filtered_leg_info_obj = {}
+        if self.start_station_terminuns_id == None and self.end_station_origin_id == None:
+            single_leg_data = filter_trains_for_stations_direction_current(self.all_train_data, self.start_station_id, self.end_station_id)
+            filtered_leg_info_obj = {"single_leg" : single_leg_data}
+        elif self.start_station_terminuns_id and self.end_station_origin_id:
+            first_leg_data =  filter_trains_for_stations_direction_current(self.all_train_data, self.start_station_id, self.start_station_terminuns_id)
+            second_leg_data = filter_trains_for_stations_direction_current(self.all_train_data, self.end_station_origin_id, self.end_station_id)
+            filtered_leg_info_obj = { "leg_one" :first_leg_data,"leg_two" : second_leg_data}
+        return filtered_leg_info_obj
 
-        if start_station_terminuns_id == None and end_station_origin_id == None:
-            print("i worked single")
-            single_leg_data = filter_trains_for_stations_direction_current_two(self.all_train_data, start_station_id, end_station_id)
-            return single_leg_data
-        elif start_station_terminuns_id and end_station_origin_id:
-            print("i worked double")
-            first_leg_data =  filter_trains_for_stations_direction_current_two(self.all_train_data, start_station_id, start_station_terminuns_id)
-            second_leg_data = filter_trains_for_stations_direction_current_two(self.all_train_data, end_station_origin_id, end_station_id)
-            return (first_leg_data, second_leg_data)
-        
-    
-    
-    
-    # takes filtered list of trains and sorts by arrival time at destination
-    def sort_trains_by_arrival_at_destination(self):
-        # self.get_leg_info()
-        end_station_id = self.journey_object.end_station.gtfs_stop_id
-        trains_with_arrival = []
-        # swapped self.filter_trains_for_stations_direction_current() for get_legInfo()
-        for train in self.get_leg_info():
-            arrival_train = {"train" : train, "dest_arrival_time" : None}
-            for stop in train.schedule:
-                if stop.stop_id[:-1] == end_station_id:
-                    arrival_train['dest_arrival_time'] = stop.arrival
-            trains_with_arrival.append(arrival_train)
-        trains_by_dest_arrival = sorted(trains_with_arrival, key=lambda d: d['dest_arrival_time'])
-        # print(trains_by_dest_arrival)
-        return [arrival_train["train"] for arrival_train in trains_by_dest_arrival]
+# LEFT OFF HERE
+# NEED TO GET ARRIVAL TIME OF FIRST LET, USE AS DEPARTURE TIME FOR 2ND LEG
+    def get_sorted_train_data(self):
+        leg_info = self.get_leg_info()
+        if "leg_two" in leg_info:
+            leg_one_sorted = sort_trains_by_arrival_at_destination(leg_info['leg_one'], self.start_station_id, self.end_station_id)
+            leg_one_arrival_time = None
+            leg_two_sorted = sort_trains_by_arrival_at_destination(leg_info['leg_two'], self.start_station_id, self.end_station_id, leg_one_arrival_time)
+        elif "single_leg" in leg_info:
+            single_leg_sorted = sort_trains_by_arrival_at_destination(leg_info['single_leg'], self.start_station_id, self.end_station_id)
        
     def format_for_react(self, journey_object):
         trains_for_react = []
-        
-        for train in self.sort_trains_by_arrival_at_destination():
+        # replace self.sort_trains_by_arrival_at_destination() with self.get_sorted_train_data():
+        for train in self.get_sorted_train_data():
             stop_schedule = []
             
             for stop in train.schedule:
