@@ -64,21 +64,33 @@ def filter_trains_for_stations_direction_current(train_data, start_station_id, e
                                 filtered_trains.append(train)
         return trains_to_objects(filtered_trains)
 
-# LEFT OFF HERE
-# JUST RETURN ONE TRAIN, SINCE IT WILL BE USED TO DETERMINE DEPARTURE TIME OF 2ND LEG?
-def sort_trains_by_arrival_at_destination(filtered_train_data_object, start_station_id, end_station_id, time=current_time):
+# LEFT OFF HERE 12/11
+# 
+def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_station_id, time=current_time):
         # will need time!
         trains_with_arrival = []
         # swapped self.filter_trains_for_stations_direction_current() for get_legInfo()
         for train in filtered_train_data_object:
             arrival_train = {"train" : train, "dest_arrival_time" : None}
             for stop in train.schedule:
-                if stop.stop_id[:-1] == end_station_id:
+                if stop.stop_id[:-1] == dest_station_id:
                     arrival_train['dest_arrival_time'] = stop.arrival
             trains_with_arrival.append(arrival_train)
-        trains_by_dest_arrival = sorted(trains_with_arrival, key=lambda d: d['dest_arrival_time'])
+        
+        # trains_by_arrival_time_close_to_target = []
+        next_train = None
+        time_timestamp = int(time.timestamp())
+        # print(time_timestamp)
+        for train in trains_with_arrival:
+            if next_train == None and train['dest_arrival_time'] > time_timestamp:
+                next_train = train
+            elif train['dest_arrival_time'] > time_timestamp and train['dest_arrival_time'] < next_train['dest_arrival_time']:
+                next_train = train
+        return next_train
+
+        # trains_by_dest_arrival = sorted(trains_with_arrival, key=lambda d: d['dest_arrival_time'])
         # print(trains_by_dest_arrival)
-        return [arrival_train["train"] for arrival_train in trains_by_dest_arrival]
+        # return [arrival_train["train"] for arrival_train in trains_by_arrival_time_close_to_target]
 
 class Journey:
 
@@ -268,18 +280,20 @@ class TrainData:
             filtered_leg_info_obj = { "leg_one" :first_leg_data,"leg_two" : second_leg_data}
         return filtered_leg_info_obj
 
-# LEFT OFF HERE
-# NEED TO GET ARRIVAL TIME OF FIRST LET, USE AS DEPARTURE TIME FOR 2ND LEG
+# LEFT OFF HERE 12/11
+
     def get_sorted_train_data(self):
         leg_info = self.get_leg_info()
         if "leg_two" in leg_info:
-            leg_one_sorted = sort_trains_by_arrival_at_destination(leg_info['leg_one'], self.start_station_id, self.end_station_id)
-            leg_one_arrival_time = None
-            leg_two_sorted = sort_trains_by_arrival_at_destination(leg_info['leg_two'], self.start_station_id, self.end_station_id, leg_one_arrival_time)
+            leg_one_train = sort_trains_by_arrival_at_destination(leg_info['leg_one'], self.start_station_terminuns_id)
+            leg_one_arrival_time = leg_one_train['dest_arrival_time']
+            leg_two_train = sort_trains_by_arrival_at_destination(leg_info['leg_two'],self.end_station_id, leg_one_arrival_time)
+            return print(leg_one_train, leg_two_train)
         elif "single_leg" in leg_info:
-            single_leg_sorted = sort_trains_by_arrival_at_destination(leg_info['single_leg'], self.start_station_id, self.end_station_id)
+            single_leg_sorted = sort_trains_by_arrival_at_destination(leg_info['single_leg'], self.end_station_id)
        
     def format_for_react(self, journey_object):
+        # print(self.get_sorted_train_data())
         trains_for_react = []
         # replace self.sort_trains_by_arrival_at_destination() with self.get_sorted_train_data():
         for train in self.get_sorted_train_data():
