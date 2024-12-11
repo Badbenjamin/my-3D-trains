@@ -253,7 +253,35 @@ class TrainData:
     # THIS WILL NEED TO BE CALLED 2X!!!
     # returns list of current trains going from start station to end station
     # ADD FILTER TRAINS HERE
-    def filter_trains_for_stations_direction_current(self):
+    # def filter_trains_for_stations_direction_current(self):
+    #     start_station_id = self.journey_object.start_station.gtfs_stop_id
+    #     end_station_id = self.journey_object.end_station.gtfs_stop_id
+    #     start_station_terminuns_id = None
+    #     end_station_origin_id = None
+    #     if self.journey_object.start_station_terminus:
+    #         start_station_terminuns_id = self.journey_object.start_station_terminus.gtfs_stop_id
+    #     if self.journey_object.end_station_origin:
+    #         end_station_origin_id = self.journey_object.end_station_origin.gtfs_stop_id
+    #     print(start_station_terminuns_id, end_station_origin_id)
+    #     filtered_trains = []
+    #     for train_feed in self.all_train_data:
+    #         for train in train_feed.entity: 
+    #             if train.HasField('trip_update'):
+    #                 stops = []
+    #                 # stops list contains each trains stop array. used to determine if start stop is before end stop
+    #                 for stop in train.trip_update.stop_time_update:
+    #                     stops.append(stop.stop_id[:-1])
+    #                 # checking if start stop is before end stop in stops array
+    #                 if (start_station_id in stops and end_station_id in stops and stops.index(start_station_id) < stops.index(end_station_id)):
+    #                     # filtering out trains that have already departed the start station (departure time in pase)
+    #                     for stop in train.trip_update.stop_time_update:
+    #                         if stop.stop_id[:-1] == start_station_id and time_difference(current_time, convert_timestamp(stop.arrival.time)) > convert_seconds(30):
+    #                             filtered_trains.append(train)
+    #     return trains_to_objects(filtered_trains)
+    
+    # LEFT OFF HERE 12/10 
+    # How do i reference self in a function that is outside of the class?
+    def get_leg_info(self):
         start_station_id = self.journey_object.start_station.gtfs_stop_id
         end_station_id = self.journey_object.end_station.gtfs_stop_id
         start_station_terminuns_id = None
@@ -263,37 +291,27 @@ class TrainData:
         if self.journey_object.end_station_origin:
             end_station_origin_id = self.journey_object.end_station_origin.gtfs_stop_id
         print(start_station_terminuns_id, end_station_origin_id)
-        filtered_trains = []
-        for train_feed in self.all_train_data:
-            for train in train_feed.entity: 
-                if train.HasField('trip_update'):
-                    stops = []
-                    # stops list contains each trains stop array. used to determine if start stop is before end stop
-                    for stop in train.trip_update.stop_time_update:
-                        stops.append(stop.stop_id[:-1])
-                    # checking if start stop is before end stop in stops array
-                    if (start_station_id in stops and end_station_id in stops and stops.index(start_station_id) < stops.index(end_station_id)):
-                        # filtering out trains that have already departed the start station (departure time in pase)
-                        for stop in train.trip_update.stop_time_update:
-                            if stop.stop_id[:-1] == start_station_id and time_difference(current_time, convert_timestamp(stop.arrival.time)) > convert_seconds(30):
-                                filtered_trains.append(train)
-        return trains_to_objects(filtered_trains)
-    
-    # LEFT OFF HERE 12/10 
-    # How do i reference self in a function that is outside of the class?
-    def get_leg_info(self):
-        data = filter_trains_for_stations_direction_current_two(self.all_train_data, "G22", "719")
-        print(data)
+
+        if start_station_terminuns_id == None and end_station_origin_id == None:
+            print("i worked single")
+            single_leg_data = filter_trains_for_stations_direction_current_two(self.all_train_data, start_station_id, end_station_id)
+            return single_leg_data
+        elif start_station_terminuns_id and end_station_origin_id:
+            print("i worked double")
+            first_leg_data =  filter_trains_for_stations_direction_current_two(self.all_train_data, start_station_id, start_station_terminuns_id)
+            second_leg_data = filter_trains_for_stations_direction_current_two(self.all_train_data, end_station_origin_id, end_station_id)
+            return (first_leg_data, second_leg_data)
         
     
     
     
     # takes filtered list of trains and sorts by arrival time at destination
     def sort_trains_by_arrival_at_destination(self):
-        self.get_leg_info()
+        # self.get_leg_info()
         end_station_id = self.journey_object.end_station.gtfs_stop_id
         trains_with_arrival = []
-        for train in self.filter_trains_for_stations_direction_current():
+        # swapped self.filter_trains_for_stations_direction_current() for get_legInfo()
+        for train in self.get_leg_info():
             arrival_train = {"train" : train, "dest_arrival_time" : None}
             for stop in train.schedule:
                 if stop.stop_id[:-1] == end_station_id:
