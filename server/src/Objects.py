@@ -79,9 +79,11 @@ def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_stati
         
         # trains_by_arrival_time_close_to_target = []
         next_train = None
-        time_timestamp = int(time.timestamp())
+        time_timestamp = round(time.timestamp())
+        
         # print(time_timestamp)
         for train in trains_with_arrival:
+            print("train ts", train["dest_arrival_time"])
             if next_train == None and train['dest_arrival_time'] > time_timestamp:
                 next_train = train
             elif train['dest_arrival_time'] > time_timestamp and train['dest_arrival_time'] < next_train['dest_arrival_time']:
