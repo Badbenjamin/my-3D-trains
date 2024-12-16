@@ -66,8 +66,8 @@ def filter_trains_for_stations_direction_current(train_data, start_station_id, e
 
 # LEFT OFF HERE 12/11
 # 
-def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_station_id, time=current_time):
-        # will need time!
+def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_station_id, time=(round(current_time.timestamp()))):
+    
         trains_with_arrival = []
         # swapped self.filter_trains_for_stations_direction_current() for get_legInfo()
         for train in filtered_train_data_object:
@@ -77,22 +77,14 @@ def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_stati
                     arrival_train['dest_arrival_time'] = stop.arrival
             trains_with_arrival.append(arrival_train)
         
-        # trains_by_arrival_time_close_to_target = []
         next_train = None
-        time_timestamp = round(time.timestamp())
-        
-        # print(time_timestamp)
+       
         for train in trains_with_arrival:
-            print("train ts", train["dest_arrival_time"])
-            if next_train == None and train['dest_arrival_time'] > time_timestamp:
+            if next_train == None and train['dest_arrival_time'] > time:
                 next_train = train
-            elif train['dest_arrival_time'] > time_timestamp and train['dest_arrival_time'] < next_train['dest_arrival_time']:
+            elif train['dest_arrival_time'] > time and train['dest_arrival_time'] < next_train['dest_arrival_time']:
                 next_train = train
         return next_train
-
-        # trains_by_dest_arrival = sorted(trains_with_arrival, key=lambda d: d['dest_arrival_time'])
-        # print(trains_by_dest_arrival)
-        # return [arrival_train["train"] for arrival_train in trains_by_arrival_time_close_to_target]
 
 class Journey:
 
@@ -282,23 +274,23 @@ class TrainData:
             filtered_leg_info_obj = { "leg_one" :first_leg_data,"leg_two" : second_leg_data}
         return filtered_leg_info_obj
 
-# LEFT OFF HERE 12/11
-
-    def get_sorted_train_data(self):
+    def get_next_train_data(self):
         leg_info = self.get_leg_info()
         if "leg_two" in leg_info:
             leg_one_train = sort_trains_by_arrival_at_destination(leg_info['leg_one'], self.start_station_terminuns_id)
             leg_one_arrival_time = leg_one_train['dest_arrival_time']
             leg_two_train = sort_trains_by_arrival_at_destination(leg_info['leg_two'],self.end_station_id, leg_one_arrival_time)
-            return print(leg_one_train, leg_two_train)
+            return [leg_one_train['train'], leg_two_train['train']]
         elif "single_leg" in leg_info:
-            single_leg_sorted = sort_trains_by_arrival_at_destination(leg_info['single_leg'], self.end_station_id)
-       
+            single_leg_train = sort_trains_by_arrival_at_destination(leg_info['single_leg'], self.end_station_id)
+            return [single_leg_train['train']]
+        
     def format_for_react(self, journey_object):
-        # print(self.get_sorted_train_data())
+        
         trains_for_react = []
-        # replace self.sort_trains_by_arrival_at_destination() with self.get_sorted_train_data():
-        for train in self.get_sorted_train_data():
+        
+        for train in self.get_next_train_data():
+            # print("t",train)
             stop_schedule = []
             
             for stop in train.schedule:
@@ -318,16 +310,16 @@ class TrainData:
                 "train_id" : train.trip_id,
                 "start_station" : journey_object.start_station.stop_name,
                 "start_station_gtfs" : journey_object.start_station.gtfs_stop_id,
-                "start_station_arrival" : str(convert_timestamp(train.arrival_time(journey_object.start_station.gtfs_stop_id))),
+                # "start_station_arrival" : str(convert_timestamp(train.arrival_time(journey_object.start_station.gtfs_stop_id))),
                 "end_station" : journey_object.end_station.stop_name,
                 "end_station_gtfs" : journey_object.end_station.gtfs_stop_id,
-                "end_station_arrival" : str(convert_timestamp(train.arrival_time(journey_object.end_station.gtfs_stop_id))),
+                # "end_station_arrival" : str(convert_timestamp(train.arrival_time(journey_object.end_station.gtfs_stop_id))),
                 "transfer_station" : None,
                 "route" : train.route(),
                 "direction_label" : None,
                 "schedule" : stop_schedule,
-                "number_of_stops" : stop_schedule_ids.index(journey_object.end_station.gtfs_stop_id) - stop_schedule_ids.index(journey_object.start_station.gtfs_stop_id),
-                "trip_time" : (train.arrival_time(journey_object.end_station.gtfs_stop_id) - train.arrival_time(journey_object.start_station.gtfs_stop_id)) / 60
+                # "number_of_stops" : stop_schedule_ids.index(journey_object.end_station.gtfs_stop_id) - stop_schedule_ids.index(journey_object.start_station.gtfs_stop_id),
+                # "trip_time" : (train.arrival_time(journey_object.end_station.gtfs_stop_id) - train.arrival_time(journey_object.start_station.gtfs_stop_id)) / 60
             }
             if train.direction() == "N":
                 train_for_react['direction_label'] = journey_object.start_station.north_direction_label
