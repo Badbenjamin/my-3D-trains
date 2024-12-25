@@ -18,6 +18,8 @@ function App() {
   const [statusArray, setStatusArray] = useState([])
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
+  console.log("app trip info", tripInfo)
+  
 
   // get station info for trip planner for station search. 
   useEffect(() => {

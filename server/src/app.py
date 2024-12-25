@@ -26,7 +26,7 @@ ct = datetime.now()
 def plan_trip(start_station_id, end_station_id):
     new_journey = Journey(start_station_id, end_station_id)
     new_data = TrainData(new_journey)
-    print(new_data)
+    # pprint.pprint(new_data.format_for_react(new_journey))
     return new_data.format_for_react(new_journey), 200
 
 @app.route('/api/stations')
