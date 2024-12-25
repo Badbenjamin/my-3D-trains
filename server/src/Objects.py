@@ -131,7 +131,7 @@ class Journey:
                         self.start_station_terminus = station
                     if station.daytime_routes == self.end_station.daytime_routes:
                         self.end_station_origin = station
-            print(self.start_station_terminus, self.end_station_origin)
+        
 
         start_station_endpoints = []
         for endpoint in self.start_station.station_endpoints:
@@ -145,6 +145,8 @@ class Journey:
             end_station_endpoints.append(endpoint.endpoint.endpoint)
         
         self.end_station_endpoints = list(set(end_station_endpoints))
+
+        
 
     def __repr__(self):
         return f'<Journey {self.start_station.stop_name} to {self.end_station.stop_name} through{self.shared_stations} at {self.time}>'
@@ -311,7 +313,7 @@ class TrainData:
                 "start_station" : journey_object.start_station.stop_name,
                 "start_station_gtfs" : journey_object.start_station.gtfs_stop_id,
                 # "start_station_arrival" : str(convert_timestamp(train.arrival_time(journey_object.start_station.gtfs_stop_id))),
-                "end_station" : journey_object.end_station.stop_name,
+                "end_station" : journey_object.start_station_terminus.stop_name,
                 "end_station_gtfs" : journey_object.end_station.gtfs_stop_id,
                 # "end_station_arrival" : str(convert_timestamp(train.arrival_time(journey_object.end_station.gtfs_stop_id))),
                 "transfer_station" : None,
