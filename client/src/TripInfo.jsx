@@ -10,7 +10,7 @@ function TripInfo({tripInfo}){
                 <LegInfo className='leg-info' tripInfo={tripInfo[0]} />
             </div>
         )
-    } else {
+    } else if (tripInfo.length == 2) {
         return (
             <div className='leg-info-div'>
                 <LegInfo className='leg-info' tripInfo={tripInfo[0]} />
