@@ -98,21 +98,27 @@ class Journey:
         
         if self.start_station.daytime_routes != self.end_station.daytime_routes:
             # get all statiions for daytime routes on line to look for overlap
+            # need to SPLIT daytime routes into individual lines
+            # right now "A C" would not match with "C"
             start_route_stations = Station.query.filter(Station.daytime_routes == self.start_station.daytime_routes).all()
             end_route_stations = Station.query.filter(Station.daytime_routes == self.end_station.daytime_routes).all()
             all_stations = start_route_stations + end_route_stations
+            
             # all the complex ids for each station on the lines involved in the trip
             complex_ids = [station.complex_id for station in all_stations]
             # only return complex ids that appear more than once in the list
             # this means they appear both in start station and end station complexes
             # all other complex ids are unique to individual lines, and not shared
             shared_complexes = list(set([complex_id for complex_id in complex_ids if complex_ids.count(complex_id)>1]))
+            print("cid",complex_ids)
+            # HERE IS WHERE THINGS BREAK DOWN IN CWASH TO GCENTRAL
             # these are the stations in the shared complex or complexes
             complex_stations =  []
             for complex_number in shared_complexes:
                 complexes = Station.query.filter(Station.complex_id == complex_number).all()
                 for complex in complexes:
                     complex_stations.append(complex)
+            
             # these are the stations that share the daytime routes with the start and end stations
             shared_stations = []
             for station in complex_stations:
@@ -120,6 +126,7 @@ class Journey:
                 if station.daytime_routes == self.start_station.daytime_routes or station.daytime_routes == self.end_station.daytime_routes:
                     shared_stations.append(station)
             self.shared_stations = shared_stations
+            
             # assign shared stations to start line and end line (might need to be list in future)
             
             # print(self.start_station.daytime_routes)
@@ -328,11 +335,12 @@ class TrainData:
                 "transfer_station" : None,
                 "route" : train['train'].route(),
                 "direction_label" : None,
-                # "schedule" : train['train'].stop_schedule,
+                "schedule" : stop_schedule,
                 # "number_of_stops" : stop_schedule_ids.index(journey_object.end_station.gtfs_stop_id) - stop_schedule_ids.index(journey_object.start_station.gtfs_stop_id),
                 # "trip_time" : (train.arrival_time(journey_object.end_station.gtfs_stop_id) - train.arrival_time(journey_object.start_station.gtfs_stop_id)) / 60
             }
-            
+            # DIRECTION LABEL NEEDS WORK
+            # Do I want to query db again to get info or pass that info down from the start?
             if train['train'].direction() == "N":
                 train_for_react['direction_label'] = journey_object.start_station.north_direction_label
             if train['train'].direction() == "S":
