@@ -64,8 +64,7 @@ def filter_trains_for_stations_direction_current(train_data, start_station_id, e
                                 filtered_trains.append(train)
         return trains_to_objects(filtered_trains)
 
-# LEFT OFF HERE 12/11
-# 
+
 def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_station_id, time=(round(current_time.timestamp()))):
     
         trains_with_arrival = []
@@ -98,7 +97,7 @@ class Journey:
         self.time = time
         
         if self.start_station.daytime_routes != self.end_station.daytime_routes:
-            # get all statiions to look for overlap
+            # get all statiions for daytime routes on line to look for overlap
             start_route_stations = Station.query.filter(Station.daytime_routes == self.start_station.daytime_routes).all()
             end_route_stations = Station.query.filter(Station.daytime_routes == self.end_station.daytime_routes).all()
             all_stations = start_route_stations + end_route_stations
@@ -206,6 +205,10 @@ class Stop:
 
     def __repr__(self):
         return f'<Stop {self.stop_id} {str(convert_timestamp(self.arrival))[11:-3]}>'
+    
+class Schedule:
+    # make a train schedule class
+    pass
 
 
 # accepts journey object as arg
@@ -213,6 +216,7 @@ class Stop:
 class TrainData:
 
     def __init__(self, journey_object):
+        print(journey_object)
 
         self.start_station_name = journey_object.start_station.stop_name
         self.end_station_name = journey_object.end_station.stop_name
@@ -226,10 +230,10 @@ class TrainData:
 
         self.start_station_id = self.journey_object.start_station.gtfs_stop_id
         self.end_station_id = self.journey_object.end_station.gtfs_stop_id
-        self.start_station_terminuns_id = None
+        self.start_station_terminus_id = None
         self.end_station_origin_id = None
         if self.journey_object.start_station_terminus:
-            self.start_station_terminuns_id = self.journey_object.start_station_terminus.gtfs_stop_id
+            self.start_station_terminus_id = self.journey_object.start_station_terminus.gtfs_stop_id
         if self.journey_object.end_station_origin:
             self.end_station_origin_id = self.journey_object.end_station_origin.gtfs_stop_id
         
@@ -267,11 +271,11 @@ class TrainData:
     
     def get_leg_info(self):
         filtered_leg_info_obj = {}
-        if self.start_station_terminuns_id == None and self.end_station_origin_id == None:
+        if self.start_station_terminus_id == None and self.end_station_origin_id == None:
             single_leg_data = filter_trains_for_stations_direction_current(self.all_train_data, self.start_station_id, self.end_station_id)
             filtered_leg_info_obj = {"single_leg" : single_leg_data}
-        elif self.start_station_terminuns_id and self.end_station_origin_id:
-            first_leg_data =  filter_trains_for_stations_direction_current(self.all_train_data, self.start_station_id, self.start_station_terminuns_id)
+        elif self.start_station_terminus_id and self.end_station_origin_id:
+            first_leg_data =  filter_trains_for_stations_direction_current(self.all_train_data, self.start_station_id, self.start_station_terminus_id)
             second_leg_data = filter_trains_for_stations_direction_current(self.all_train_data, self.end_station_origin_id, self.end_station_id)
             filtered_leg_info_obj = { "leg_one" :first_leg_data,"leg_two" : second_leg_data}
         return filtered_leg_info_obj
@@ -279,23 +283,26 @@ class TrainData:
     def get_next_train_data(self):
         leg_info = self.get_leg_info()
         if "leg_two" in leg_info:
-            leg_one_train = sort_trains_by_arrival_at_destination(leg_info['leg_one'], self.start_station_terminuns_id)
+            leg_one_train = sort_trains_by_arrival_at_destination(leg_info['leg_one'], self.start_station_terminus_id)
             leg_one_arrival_time = leg_one_train['dest_arrival_time']
             leg_two_train = sort_trains_by_arrival_at_destination(leg_info['leg_two'],self.end_station_id, leg_one_arrival_time)
-            return [leg_one_train['train'], leg_two_train['train']]
+            return [{"train":leg_one_train['train'], "start": self.start_station_id, "end":self.start_station_terminus_id}, {"train":leg_two_train['train'], "start":self.end_station_origin_id, "end": self.end_station_id}]
         elif "single_leg" in leg_info:
             single_leg_train = sort_trains_by_arrival_at_destination(leg_info['single_leg'], self.end_station_id)
-            return [single_leg_train['train']]
+            return [{"train" : single_leg_train['train'], "start":self.start_station_id, "end":self.end_station_id}]
         
     def format_for_react(self, journey_object):
-        
+        print('ntd',self.get_next_train_data())
         trains_for_react = []
-        
+        # get correct start and end stations depending on single leg, first leg, second leg...
         for train in self.get_next_train_data():
-            # print("t",train)
+            print("t",train)
+            # print("j", journey_object.end_station)
+            print(journey_object.start_station_terminus)
             stop_schedule = []
             
-            for stop in train.schedule:
+            # should Schedule be replaced with a class?
+            for stop in train['train'].schedule:
                 stop_obj = {
                     "stop_id" : stop.stop_id,
                     "arrival" : stop.arrival,
@@ -309,26 +316,30 @@ class TrainData:
             # print(stop_schedule_ids.index(journey_object.end_station.gtfs_stop_id) - stop_schedule_ids.index(journey_object.start_station.gtfs_stop_id))
             
             train_for_react = {
-                "train_id" : train.trip_id,
-                "start_station" : journey_object.start_station.stop_name,
-                "start_station_gtfs" : journey_object.start_station.gtfs_stop_id,
+                "train_id" : train['train'].trip_id,
+                # START STATION CHANGES 
+                "start_station" : train['start'],
+                # "start_station_gtfs" : journey_object.start_station.gtfs_stop_id,
                 # "start_station_arrival" : str(convert_timestamp(train.arrival_time(journey_object.start_station.gtfs_stop_id))),
-                "end_station" : journey_object.start_station_terminus.stop_name,
-                "end_station_gtfs" : journey_object.end_station.gtfs_stop_id,
+                # END STATION CHANGES
+                "end_station" : train['end'],
+                # "end_station_gtfs" : journey_object.end_station.gtfs_stop_id,
                 # "end_station_arrival" : str(convert_timestamp(train.arrival_time(journey_object.end_station.gtfs_stop_id))),
                 "transfer_station" : None,
-                "route" : train.route(),
+                "route" : train['train'].route(),
                 "direction_label" : None,
-                "schedule" : stop_schedule,
+                # "schedule" : train['train'].stop_schedule,
                 # "number_of_stops" : stop_schedule_ids.index(journey_object.end_station.gtfs_stop_id) - stop_schedule_ids.index(journey_object.start_station.gtfs_stop_id),
                 # "trip_time" : (train.arrival_time(journey_object.end_station.gtfs_stop_id) - train.arrival_time(journey_object.start_station.gtfs_stop_id)) / 60
             }
-            if train.direction() == "N":
+            
+            if train['train'].direction() == "N":
                 train_for_react['direction_label'] = journey_object.start_station.north_direction_label
-            if train.direction() == "S":
+            if train['train'].direction() == "S":
                 train_for_react['direction_label'] = journey_object.start_station.south_direction_label
             trains_for_react.append(train_for_react)
             # print(train_for_react['start_station_arrival'])
+        # print(trains_for_react)
         return trains_for_react
 
 
