@@ -101,27 +101,31 @@ class Journey:
             # need to SPLIT daytime routes into individual lines
             # right now "A C" would not match with "C"
             # 
-            start_line_stations = []
+            start_line_complex_ids = []
             for route in (self.start_station.daytime_routes):
                 if route != " ":
                     for station in Station.query.filter(Station.daytime_routes.contains(route)).all():
-                        if station not in start_line_stations:
-                            start_line_stations.append(station)
-            end_line_stations = []
+                        if station.complex_id not in start_line_complex_ids:
+                            start_line_complex_ids.append(station.complex_id)
+            end_line_complex_ids = []
             for route in (self.end_station.daytime_routes):
                 if route != " ":
                     for station in Station.query.filter(Station.daytime_routes.contains(route)).all():
-                        if station not in end_line_stations:
-                            end_line_stations.append(station)
-            all_stations = start_line_stations + end_line_stations
-            
+                        if station.complex_id not in end_line_complex_ids:
+                            end_line_complex_ids.append(station.complex_id)
+            # all_stations = start_line_stations + end_line_stations
+
+            # print("sls", start_line_stations)
+            print([id for id in end_line_complex_ids])
+            # print("els", end_line_stations)
             
             # start_route_stations = Station.query.filter(Station.daytime_routes == self.start_station.daytime_routes).all()
             # end_route_stations = Station.query.filter(Station.daytime_routes == self.end_station.daytime_routes).all()
             # all_stations = start_route_stations + end_route_stations
             
             # all the complex ids for each station on the lines involved in the trip
-            complex_ids = [station.complex_id for station in all_stations]
+            complex_ids = start_line_complex_ids + end_line_complex_ids
+            # complex_ids = [station.complex_id for station in all_stations]
             
             # only return complex ids that appear more than once in the list
             # this means they appear both in start station and end station complexes
