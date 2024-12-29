@@ -100,19 +100,36 @@ class Journey:
             # get all statiions for daytime routes on line to look for overlap
             # need to SPLIT daytime routes into individual lines
             # right now "A C" would not match with "C"
-            start_route_stations = Station.query.filter(Station.daytime_routes == self.start_station.daytime_routes).all()
-            end_route_stations = Station.query.filter(Station.daytime_routes == self.end_station.daytime_routes).all()
-            all_stations = start_route_stations + end_route_stations
+            # 
+            start_line_stations = []
+            for route in (self.start_station.daytime_routes):
+                if route != " ":
+                    for station in Station.query.filter(Station.daytime_routes.contains(route)).all():
+                        if station not in start_line_stations:
+                            start_line_stations.append(station)
+            end_line_stations = []
+            for route in (self.end_station.daytime_routes):
+                if route != " ":
+                    for station in Station.query.filter(Station.daytime_routes.contains(route)).all():
+                        if station not in end_line_stations:
+                            end_line_stations.append(station)
+            all_stations = start_line_stations + end_line_stations
+            
+            
+            # start_route_stations = Station.query.filter(Station.daytime_routes == self.start_station.daytime_routes).all()
+            # end_route_stations = Station.query.filter(Station.daytime_routes == self.end_station.daytime_routes).all()
+            # all_stations = start_route_stations + end_route_stations
             
             # all the complex ids for each station on the lines involved in the trip
             complex_ids = [station.complex_id for station in all_stations]
+            
             # only return complex ids that appear more than once in the list
             # this means they appear both in start station and end station complexes
             # all other complex ids are unique to individual lines, and not shared
             shared_complexes = list(set([complex_id for complex_id in complex_ids if complex_ids.count(complex_id)>1]))
-            print("cid",complex_ids)
-            # HERE IS WHERE THINGS BREAK DOWN IN CWASH TO GCENTRAL
-            # these are the stations in the shared complex or complexes
+            print("scx",shared_complexes)
+            # LEFT OFF HERE 12/28 returning 603? instead of 628 for fulton st transfer
+
             complex_stations =  []
             for complex_number in shared_complexes:
                 complexes = Station.query.filter(Station.complex_id == complex_number).all()
