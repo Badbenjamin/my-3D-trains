@@ -97,10 +97,7 @@ class Journey:
         self.time = time
         
         if self.start_station.daytime_routes != self.end_station.daytime_routes:
-            # get all statiions for daytime routes on line to look for overlap
-            # need to SPLIT daytime routes into individual lines
-            # right now "A C" would not match with "C"
-            # 
+            # split up daytime route strings, add complex ids to list 
             start_line_complex_ids = []
             for route in (self.start_station.daytime_routes):
                 if route != " ":
@@ -113,15 +110,6 @@ class Journey:
                     for station in Station.query.filter(Station.daytime_routes.contains(route)).all():
                         if station.complex_id not in end_line_complex_ids:
                             end_line_complex_ids.append(station.complex_id)
-            # all_stations = start_line_stations + end_line_stations
-
-            # print("sls", start_line_stations)
-            print([id for id in end_line_complex_ids])
-            # print("els", end_line_stations)
-            
-            # start_route_stations = Station.query.filter(Station.daytime_routes == self.start_station.daytime_routes).all()
-            # end_route_stations = Station.query.filter(Station.daytime_routes == self.end_station.daytime_routes).all()
-            # all_stations = start_route_stations + end_route_stations
             
             # all the complex ids for each station on the lines involved in the trip
             complex_ids = start_line_complex_ids + end_line_complex_ids
@@ -131,22 +119,30 @@ class Journey:
             # this means they appear both in start station and end station complexes
             # all other complex ids are unique to individual lines, and not shared
             shared_complexes = list(set([complex_id for complex_id in complex_ids if complex_ids.count(complex_id)>1]))
-            print("scx",shared_complexes)
-            # LEFT OFF HERE 12/28 returning 603? instead of 628 for fulton st transfer
-
+            
             complex_stations =  []
             for complex_number in shared_complexes:
                 complexes = Station.query.filter(Station.complex_id == complex_number).all()
                 for complex in complexes:
                     complex_stations.append(complex)
             
+            # NEED TO MODIFY THIS TO TAKE INDIVIDUAL ROUTES
             # these are the stations that share the daytime routes with the start and end stations
+            # make list of routes for start and end stations
+            routes = []
+            for route in (self.start_station.daytime_routes + self.end_station.daytime_routes):
+                if route != " ":
+                    routes.append(route)
+            print("routes", routes)
             shared_stations = []
             for station in complex_stations:
                 # Modify to work with stations that have multiple daytime routes
-                if station.daytime_routes == self.start_station.daytime_routes or station.daytime_routes == self.end_station.daytime_routes:
-                    shared_stations.append(station)
-            self.shared_stations = shared_stations
+                complex_station_routes = []
+                for route in station.daytime_routes:
+                    if route != " " and route in routes:
+                        shared_stations.append(station)    
+            self.shared_stations = list(set(shared_stations))
+            print('ss',self.shared_stations)
             
             # assign shared stations to start line and end line (might need to be list in future)
             
