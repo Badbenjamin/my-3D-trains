@@ -142,19 +142,22 @@ class Journey:
                     if route != " " and route in routes:
                         shared_stations.append(station)    
             self.shared_stations = list(set(shared_stations))
-            print('ss',self.shared_stations)
-            
             # assign shared stations to start line and end line (might need to be list in future)
             
             # print(self.start_station.daytime_routes)
+            # MODIFY THIS TO LOOK FOR INDIVIDUAL LINES
             if shared_stations:
+                start_station_routes = self.start_station.daytime_routes.split()
+                end_station_routes = self.end_station.daytime_routes.split()
                 for station in shared_stations:
-                    # print(self.start_station.daytime_routes)
-                    if station.daytime_routes == self.start_station.daytime_routes:
-                        self.start_station_terminus = station
-                    if station.daytime_routes == self.end_station.daytime_routes:
-                        self.end_station_origin = station
-        
+                    shared_station_routes = station.daytime_routes.split()
+                    for route in start_station_routes:
+                        if route in shared_station_routes:
+                            self.start_station_terminus = station
+                    for route in end_station_routes:
+                        if route in shared_station_routes:
+                            self.end_station_origin = station
+        print("term/origin",self.start_station_terminus, self.end_station_origin)
 
         start_station_endpoints = []
         for endpoint in self.start_station.station_endpoints:
