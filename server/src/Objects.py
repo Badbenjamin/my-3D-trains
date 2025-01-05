@@ -85,6 +85,14 @@ def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_stati
                 next_train = train
         return next_train
 
+def get_station_routes(start_station_daytime_routes, end_station_daytime_routes):
+    routes = []
+    for route in (start_station_daytime_routes + end_station_daytime_routes):
+        if route != " ":
+            routes.append(route)
+    return routes
+    
+
 class Journey:
 
     def __init__(self, start_station_id, end_station_id, time=None):
@@ -113,11 +121,9 @@ class Journey:
             
             # all the complex ids for each station on the lines involved in the trip
             complex_ids = start_line_complex_ids + end_line_complex_ids
-            # complex_ids = [station.complex_id for station in all_stations]
             
             # only return complex ids that appear more than once in the list
             # this means they appear both in start station and end station complexes
-            # all other complex ids are unique to individual lines, and not shared
             shared_complexes = list(set([complex_id for complex_id in complex_ids if complex_ids.count(complex_id)>1]))
             
             complex_stations =  []
@@ -126,26 +132,19 @@ class Journey:
                 for complex in complexes:
                     complex_stations.append(complex)
             
-            # NEED TO MODIFY THIS TO TAKE INDIVIDUAL ROUTES
-            # these are the stations that share the daytime routes with the start and end stations
-            # make list of routes for start and end stations
-            routes = []
-            for route in (self.start_station.daytime_routes + self.end_station.daytime_routes):
-                if route != " ":
-                    routes.append(route)
+            routes = get_station_routes(self.start_station.daytime_routes, self.end_station.daytime_routes)
             print("routes", routes)
+
+
             shared_stations = []
             for station in complex_stations:
-                # Modify to work with stations that have multiple daytime routes
-                complex_station_routes = []
                 for route in station.daytime_routes:
                     if route != " " and route in routes:
                         shared_stations.append(station)    
+
             self.shared_stations = list(set(shared_stations))
-            # assign shared stations to start line and end line (might need to be list in future)
             
-            # print(self.start_station.daytime_routes)
-            # MODIFY THIS TO LOOK FOR INDIVIDUAL LINES
+            # Assign correct shared station to start_terminus and end_origin
             if shared_stations:
                 start_station_routes = self.start_station.daytime_routes.split()
                 end_station_routes = self.end_station.daytime_routes.split()
