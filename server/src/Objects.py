@@ -47,7 +47,7 @@ def trains_to_objects(train_list):
         return train_object_list
 
 def filter_trains_for_stations_direction_current(train_data, start_station_id, end_station_id):
-        
+        print('train data', train_data)
         filtered_trains = []
         for train_feed in train_data:
             for train in train_feed.entity: 
@@ -85,9 +85,16 @@ def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_stati
                 next_train = train
         return next_train
 
-def get_station_routes(start_station_daytime_routes, end_station_daytime_routes):
+# def get_station_routes(start_station_daytime_routes, end_station_daytime_routes):
+#     routes = []
+#     for route in (start_station_daytime_routes + end_station_daytime_routes):
+#         if route != " ":
+#             routes.append(route)
+#     return routes
+
+def get_station_routes(station_daytime_routes):
     routes = []
-    for route in (start_station_daytime_routes + end_station_daytime_routes):
+    for route in station_daytime_routes:
         if route != " ":
             routes.append(route)
     return routes
@@ -100,11 +107,24 @@ class Journey:
         self.end_station = Station.query.filter(Station.id == end_station_id).first()
         self.start_station_terminus = None
         self.end_station_origin = None
-        # self.transfer_stations = []
         self.shared_stations = []
         self.time = time
+        start_station_routes = self.start_station.daytime_routes.split()
+        end_station_routes = self.end_station.daytime_routes.split()
+        # am i using the routes variable correctly? is it needed?
+        routes = list(set(start_station_routes + end_station_routes))
+        print('routes',routes)
+        # check if start station routes are in end station routes
+        # if not, go to complex path
         
-        if self.start_station.daytime_routes != self.end_station.daytime_routes:
+        # left off here 1/5 1pm
+        same_line = True
+        for route in start_station_routes:
+            if route not in end_station_routes:
+                same_line = False
+        print('same line', same_line)
+
+        if same_line == False:
             # split up daytime route strings, add complex ids to list 
             start_line_complex_ids = []
             for route in (self.start_station.daytime_routes):
@@ -132,9 +152,11 @@ class Journey:
                 for complex in complexes:
                     complex_stations.append(complex)
             
-            routes = get_station_routes(self.start_station.daytime_routes, self.end_station.daytime_routes)
-            print("routes", routes)
-
+            
+            # start_station_routes = self.start_station.daytime_routes.split()
+            # end_station_routes = self.end_station.daytime_routes.split()
+            # routes = start_station_routes + end_station_routes
+            
 
             shared_stations = []
             for station in complex_stations:
@@ -146,8 +168,8 @@ class Journey:
             
             # Assign correct shared station to start_terminus and end_origin
             if shared_stations:
-                start_station_routes = self.start_station.daytime_routes.split()
-                end_station_routes = self.end_station.daytime_routes.split()
+                # start_station_routes = self.start_station.daytime_routes.split()
+                # end_station_routes = self.end_station.daytime_routes.split()
                 for station in shared_stations:
                     shared_station_routes = station.daytime_routes.split()
                     for route in start_station_routes:
@@ -156,7 +178,7 @@ class Journey:
                     for route in end_station_routes:
                         if route in shared_station_routes:
                             self.end_station_origin = station
-        print("term/origin",self.start_station_terminus, self.end_station_origin)
+            print("term/origin",self.start_station_terminus, self.end_station_origin)
 
         start_station_endpoints = []
         for endpoint in self.start_station.station_endpoints:
@@ -242,7 +264,7 @@ class Schedule:
 class TrainData:
 
     def __init__(self, journey_object):
-        print(journey_object)
+        # print(journey_object)
 
         self.start_station_name = journey_object.start_station.stop_name
         self.end_station_name = journey_object.end_station.stop_name
@@ -281,7 +303,7 @@ class TrainData:
             feed.ParseFromString(response.content)
             all_train_data.append(feed)
         
-        print(self.shared_stations)
+        print("shared Stations",self.shared_stations)
         self.all_train_data = all_train_data
         
 
@@ -294,7 +316,7 @@ class TrainData:
                     all_trains.append(train)
         return all_trains
     
-    
+    # Leg info is coming up blank? for CWash to PAuth
     def get_leg_info(self):
         filtered_leg_info_obj = {}
         if self.start_station_terminus_id == None and self.end_station_origin_id == None:
@@ -305,9 +327,13 @@ class TrainData:
             second_leg_data = filter_trains_for_stations_direction_current(self.all_train_data, self.end_station_origin_id, self.end_station_id)
             filtered_leg_info_obj = { "leg_one" :first_leg_data,"leg_two" : second_leg_data}
         return filtered_leg_info_obj
-
+    
+    
+    # not working on single leg trip (cwash c to pe ACE)
+    # single leg but no data? []
     def get_next_train_data(self):
         leg_info = self.get_leg_info()
+        print("leg info", leg_info)
         if "leg_two" in leg_info:
             leg_one_train = sort_trains_by_arrival_at_destination(leg_info['leg_one'], self.start_station_terminus_id)
             leg_one_arrival_time = leg_one_train['dest_arrival_time']
@@ -318,13 +344,14 @@ class TrainData:
             return [{"train" : single_leg_train['train'], "start":self.start_station_id, "end":self.end_station_id}]
         
     def format_for_react(self, journey_object):
+        print('does it arrive?')
         print('ntd',self.get_next_train_data())
         trains_for_react = []
         # get correct start and end stations depending on single leg, first leg, second leg...
         for train in self.get_next_train_data():
-            print("t",train)
+            # print("t",train)
             # print("j", journey_object.end_station)
-            print(journey_object.start_station_terminus)
+            # print(journey_object.start_station_terminus)
             stop_schedule = []
             
             # should Schedule be replaced with a class?
