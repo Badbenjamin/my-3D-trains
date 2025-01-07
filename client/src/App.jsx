@@ -19,7 +19,7 @@ function App() {
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
   console.log("app trip info", tripInfo)
-  
+  console.log("sa", statusArray)
 
   // get station info for trip planner for station search. 
   useEffect(() => {
@@ -71,6 +71,7 @@ function App() {
       return 
     } else if (tripInfo[0]?.schedule){
       // tripInfo[0] is the first train to arrive at our chosen start station
+      console.log('ti', tripInfo)
       const currentTripSchedule = tripInfo[0].schedule
       const startStation = tripInfo[0].start_station_gtfs
       const endStation = tripInfo[0].end_station_gtfs

@@ -47,7 +47,6 @@ def trains_to_objects(train_list):
         return train_object_list
 
 def filter_trains_for_stations_direction_current(train_data, start_station_id, end_station_id):
-        print('train data', train_data)
         filtered_trains = []
         for train_feed in train_data:
             for train in train_feed.entity: 
@@ -316,7 +315,7 @@ class TrainData:
                     all_trains.append(train)
         return all_trains
     
-    # Leg info is coming up blank? for CWash to PAuth
+    
     def get_leg_info(self):
         filtered_leg_info_obj = {}
         if self.start_station_terminus_id == None and self.end_station_origin_id == None:
@@ -344,14 +343,11 @@ class TrainData:
             return [{"train" : single_leg_train['train'], "start":self.start_station_id, "end":self.end_station_id}]
         
     def format_for_react(self, journey_object):
-        print('does it arrive?')
-        print('ntd',self.get_next_train_data())
         trains_for_react = []
         # get correct start and end stations depending on single leg, first leg, second leg...
         for train in self.get_next_train_data():
-            # print("t",train)
-            # print("j", journey_object.end_station)
-            # print(journey_object.start_station_terminus)
+            start_station = Station.query.filter(Station.gtfs_stop_id == train['start']).first()
+            end_station = Station.query.filter(Station.gtfs_stop_id == train['end']).first()
             stop_schedule = []
             
             # should Schedule be replaced with a class?
@@ -367,16 +363,17 @@ class TrainData:
                 stop_schedule_ids.append(stop['stop_id'][:-1])
             # print()
             # print(stop_schedule_ids.index(journey_object.end_station.gtfs_stop_id) - stop_schedule_ids.index(journey_object.start_station.gtfs_stop_id))
-            
+            print("train",train)
             train_for_react = {
+                
                 "train_id" : train['train'].trip_id,
                 # START STATION CHANGES 
-                "start_station" : train['start'],
-                # "start_station_gtfs" : journey_object.start_station.gtfs_stop_id,
+                "start_station" : start_station.stop_name,
+                "start_station_gtfs" : train['start'],
                 # "start_station_arrival" : str(convert_timestamp(train.arrival_time(journey_object.start_station.gtfs_stop_id))),
                 # END STATION CHANGES
-                "end_station" : train['end'],
-                # "end_station_gtfs" : journey_object.end_station.gtfs_stop_id,
+                "end_station" : end_station.stop_name,
+                "end_station_gtfs" : train['end'],
                 # "end_station_arrival" : str(convert_timestamp(train.arrival_time(journey_object.end_station.gtfs_stop_id))),
                 "transfer_station" : None,
                 "route" : train['train'].route(),
@@ -388,9 +385,9 @@ class TrainData:
             # DIRECTION LABEL NEEDS WORK
             # Do I want to query db again to get info or pass that info down from the start?
             if train['train'].direction() == "N":
-                train_for_react['direction_label'] = journey_object.start_station.north_direction_label
+                train_for_react['direction_label'] = start_station.north_direction_label
             if train['train'].direction() == "S":
-                train_for_react['direction_label'] = journey_object.start_station.south_direction_label
+                train_for_react['direction_label'] = start_station.south_direction_label
             trains_for_react.append(train_for_react)
             # print(train_for_react['start_station_arrival'])
         # print(trains_for_react)
