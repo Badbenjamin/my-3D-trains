@@ -37,18 +37,16 @@ function App() {
     for (const mesh in nodes){
         if (nodes[mesh].type === "Mesh"){
             const status = {"name": nodes[mesh].name, "status": false}
-            newStatusArray.push(status)
-            
+            newStatusArray.push(status)   
         } 
-      }
+      };
     for (const mesh in nodes){
         if (nodes[mesh].type === "Mesh"){
             let index = count 
             count += 1
             newStationObj[mesh] = <Station name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} id={nodes[mesh].name} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
-            
         } 
-      }
+      };
      const newStationArray = [...stationArray]
 
      for (const station in newStationObj){
@@ -56,7 +54,7 @@ function App() {
         if (!newStationArray.includes(station)){
             newStationArray.push(newStationObj[station])
         }
-     }
+     };
     setStatusArray(newStatusArray)
     setStationArray(newStationArray)
     
@@ -66,11 +64,13 @@ function App() {
   // It takes the stations from the first train and creates an array of GTFS ids that will be passed to the selectStations function
   // selectStations takes an array of gtfs ids and uses it to change the status of the stations in stationArray.
   // ADD INDEX to be able to switch to next train, maybe as state?
+  // I WILL NEED TO CLEAN THIS UP, PUT EVERYTHING INTO FUNCTIONS, AND REBUILD.
   useEffect(()=>{
+    // trip info contains trains, which contain schedules
     if (tripInfo == []){
       return 
     } else if (tripInfo[0]?.schedule){
-      // tripInfo[0] is the first train to arrive at our chosen start station
+      // tripInfo[0] is the first (or only) train of our trip. [1] would be second leg
       console.log('ti', tripInfo)
       const currentTripSchedule = tripInfo[0].schedule
       const startStation = tripInfo[0].start_station_gtfs
@@ -88,12 +88,11 @@ function App() {
       // Only tracks between start station and end station
       const justTrackIds = selectedStationArray.map((stationId) => {
         const stationAndDirection = stationId + direction
-   
         for (const status of statusArray){
-          if (status['name'].includes(stationAndDirection)){
-            return status['name']
+            if (status['name'].includes(stationAndDirection)){
+              return status['name']
+            }
           }
-        }
       })
       
       // complete array of all meshes to be selected, stations + tracks

@@ -3,7 +3,7 @@ import './Component.css'
 
 function LegInfo({tripInfo}){
 
-        console.log(tripInfo)
+        // console.log(tripInfo)
 
     return(
         <div className="leg-info-grid-cointainer">
