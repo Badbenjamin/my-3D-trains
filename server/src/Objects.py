@@ -63,21 +63,15 @@ def filter_trains_for_stations_direction_current(train_data, start_station_id, e
                                 filtered_trains.append(train)
         return trains_to_objects(filtered_trains)
 
-
-# function is called twice
-# i need to add departure time as an option, i need to add departure station id to function
-# not sure how i fixed this. go for a walk and then come back and look at the function
 def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_station_id, time=(round(current_time.timestamp()))):
         print('time', convert_timestamp(time))
         trains_with_arrival = []
         # swapped self.filter_trains_for_stations_direction_current() for get_legInfo()
         for train in filtered_train_data_object:
-            arrival_train = {"train" : train, "dest_arrival_time" : None, "departure_time" : None}
+            arrival_train = {"train" : train, "dest_arrival_time" : None}
             for stop in train.schedule:
                 if stop.stop_id[:-1] == dest_station_id:
                     arrival_train['dest_arrival_time'] = stop.arrival
-                # if stop.stop_id[:-1] == origin_station_id:
-                #     train['departure_time'] = stop.arrival
             trains_with_arrival.append(arrival_train)
         
         next_train = None
@@ -90,13 +84,6 @@ def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_stati
         print('ntat', convert_timestamp(next_train['dest_arrival_time']))
         return next_train
 
-# def get_station_routes(start_station_daytime_routes, end_station_daytime_routes):
-#     routes = []
-#     for route in (start_station_daytime_routes + end_station_daytime_routes):
-#         if route != " ":
-#             routes.append(route)
-#     return routes
-
 def get_station_routes(station_daytime_routes):
     routes = []
     for route in station_daytime_routes:
@@ -105,6 +92,8 @@ def get_station_routes(station_daytime_routes):
     return routes
     
 
+# the journey object takes a start and end station
+# it will contain endpoints for the start and end station, as well as the transfer station if applicable
 class Journey:
 
     def __init__(self, start_station_id, end_station_id, time=None):
@@ -118,17 +107,14 @@ class Journey:
         end_station_routes = self.end_station.daytime_routes.split()
         # am i using the routes variable correctly? is it needed?
         routes = list(set(start_station_routes + end_station_routes))
-        print('routes',routes)
-        # check if start station routes are in end station routes
-        # if not, go to complex path
         
-        # left off here 1/5 1pm
+        # if start station routes are not present in end station routes, it is a multi leg trip
         same_line = True
         for route in start_station_routes:
             if route not in end_station_routes:
                 same_line = False
-        print('same line', same_line)
 
+        # split this into functions?
         if same_line == False:
             # split up daytime route strings, add complex ids to list 
             start_line_complex_ids = []
@@ -157,12 +143,6 @@ class Journey:
                 for complex in complexes:
                     complex_stations.append(complex)
             
-            
-            # start_station_routes = self.start_station.daytime_routes.split()
-            # end_station_routes = self.end_station.daytime_routes.split()
-            # routes = start_station_routes + end_station_routes
-            
-
             shared_stations = []
             for station in complex_stations:
                 for route in station.daytime_routes:
@@ -173,8 +153,6 @@ class Journey:
             
             # Assign correct shared station to start_terminus and end_origin
             if shared_stations:
-                # start_station_routes = self.start_station.daytime_routes.split()
-                # end_station_routes = self.end_station.daytime_routes.split()
                 for station in shared_stations:
                     shared_station_routes = station.daytime_routes.split()
                     for route in start_station_routes:
@@ -183,7 +161,6 @@ class Journey:
                     for route in end_station_routes:
                         if route in shared_station_routes:
                             self.end_station_origin = station
-            print("term/origin",self.start_station_terminus, self.end_station_origin)
 
         start_station_endpoints = []
         for endpoint in self.start_station.station_endpoints:
@@ -237,14 +214,6 @@ class Train:
             "length_of_trip" : convert_seconds(self.schedule[1].arrival - self.schedule[0].departure)
         }
         return location
-
-            
-    # work on this later
-    def number_of_stops(self, start_station_gtfs_id, end_station_gtfs_id):
-        pass
-
-    def time_between_stops(self, start_station_gtfs_id, end_station_gtfs_id):
-        pass
 
     def __repr__(self):
         return f'<Train {self.trip_id}>'
@@ -308,7 +277,6 @@ class TrainData:
             feed.ParseFromString(response.content)
             all_train_data.append(feed)
         
-        print("shared Stations",self.shared_stations)
         self.all_train_data = all_train_data
         
 
@@ -322,6 +290,8 @@ class TrainData:
         return all_trains
     
     
+    # get all trains heading in the correct direction and stopping at start and end stations
+    # OR going to and from shared station (has start station terminus and end station origin)
     def get_leg_info(self):
         filtered_leg_info_obj = {}
         if self.start_station_terminus_id == None and self.end_station_origin_id == None:
@@ -333,26 +303,24 @@ class TrainData:
             filtered_leg_info_obj = { "leg_one" :first_leg_data,"leg_two" : second_leg_data}
         return filtered_leg_info_obj
     
-    
-    # not working on single leg trip (cwash c to pe ACE)
-    # single leg but no data? []
+    # find the train that is arriving closest to current time
+    # if two leg trip, "time" arg is current time by default, but is replaced by leg 1 dest arrival time in second function call.
+    # in the future, I'll add a feature to change the departure time, or find the next train. 
     def get_next_train_data(self):
         leg_info = self.get_leg_info()
         print("leg info", leg_info)
         if "leg_two" in leg_info:
             leg_one_train = sort_trains_by_arrival_at_destination(leg_info['leg_one'], self.start_station_terminus_id)
             leg_one_arrival_time = leg_one_train['dest_arrival_time'] + 120
-            print('l1at', convert_timestamp(leg_one_arrival_time))
             leg_two_train = sort_trains_by_arrival_at_destination(leg_info['leg_two'],self.end_station_origin_id, leg_one_arrival_time)
-            # print('l2at', leg_two_train[])
             return [{"train":leg_one_train['train'], "start": self.start_station_id, "end":self.start_station_terminus_id}, {"train":leg_two_train['train'], "start":self.end_station_origin_id, "end": self.end_station_id}]
         elif "single_leg" in leg_info:
             single_leg_train = sort_trains_by_arrival_at_destination(leg_info['single_leg'], self.start_station_id, self.end_station_id)
             return [{"train" : single_leg_train['train'], "start":self.start_station_id, "end":self.end_station_id}]
         
-    def format_for_react(self, journey_object):
+    def format_for_react(self):
         trains_for_react = []
-        # get correct start and end stations depending on single leg, first leg, second leg...
+        
         for train in self.get_next_train_data():
             start_station = Station.query.filter(Station.gtfs_stop_id == train['start']).first()
             end_station = Station.query.filter(Station.gtfs_stop_id == train['end']).first()

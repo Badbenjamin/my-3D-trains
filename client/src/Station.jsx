@@ -33,13 +33,13 @@ function Station( { status, nodes, materials, mesh, index}){
         }
      
         // Get Station Names for HTML text
-        // useEffect(()=>{
-        //     if (newName.length < 5 ){
-        //         fetch(`http://127.0.0.1:5555/api/stationname/${newName}`)
-        //         .then(response => response.json())
-        //         .then(decodedName => {setReadableName(decodedName.name + " " + decodedName.daytime_routes)})
-        //     }
-        // }, [])
+        useEffect(()=>{
+            if (newName.length < 5 ){
+                fetch(`http://127.0.0.1:5555/api/stationname/${newName}`)
+                .then(response => response.json())
+                .then(decodedName => {setReadableName(decodedName.name + " " + decodedName.daytime_routes)})
+            }
+        }, [])
 
         function handleClick(){
             console.log("click")
