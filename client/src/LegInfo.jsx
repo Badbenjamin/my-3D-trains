@@ -10,7 +10,7 @@ function LegInfo({tripInfo}){
             <div className="start-station-info">
                 <div className="top">{tripInfo.start_station}</div>
                 <div className="middle">{tripInfo.direction_label} Bound {tripInfo.route}</div>
-                {/* <div className="bottom">Departs {tripInfo.start_station_arrival.slice(10,-3)}</div> */}
+                <div className="bottom">Departs {tripInfo.start_station_arrival.slice(10,-3)}</div>
             </div>
             <div className="middle-info">
                 <div className="top">{tripInfo.number_of_stops} Stops</div>
@@ -19,7 +19,7 @@ function LegInfo({tripInfo}){
             </div>
             <div className="end-station-info">
                 <div className="top">{tripInfo.end_station}</div>
-                {/* <div className="middle">Arrives {tripInfo.end_station_arrival.slice(10,-3)}</div> */}
+                <div className="middle">Arrives {tripInfo.end_station_arrival.slice(10,-3)}</div>
                 {/* <div className="bottom">transfer or destination</div> */}
             </div>
         </div>
