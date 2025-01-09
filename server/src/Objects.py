@@ -370,17 +370,17 @@ class TrainData:
                 # START STATION CHANGES 
                 "start_station" : start_station.stop_name,
                 "start_station_gtfs" : train['start'],
-                "start_station_arrival" : str(convert_timestamp(train['train'].arrival_time(train['start']))),
+                "start_station_arrival" : str(convert_timestamp(train['train'].arrival_time(train['start'])))[10:16],
                 # END STATION CHANGES
                 "end_station" : end_station.stop_name,
                 "end_station_gtfs" : train['end'],
-                "end_station_arrival" : str(convert_timestamp(train['train'].arrival_time(train['end']))),
+                "end_station_arrival" : str(convert_timestamp(train['train'].arrival_time(train['end'])))[10:16],
                 "transfer_station" : None,
                 "route" : train['train'].route(),
                 "direction_label" : None,
                 "schedule" : stop_schedule,
                 "number_of_stops" : stop_schedule_ids.index(train['end']) - stop_schedule_ids.index(train['start']),
-                "trip_time" : (train['train'].arrival_time(train['end']) - train['train'].arrival_time(train['start'])) / 60
+                "trip_time" : round((train['train'].arrival_time(train['end']) - train['train'].arrival_time(train['start'])) / 60)
             }
             # DIRECTION LABEL NEEDS WORK
             # Do I want to query db again to get info or pass that info down from the start?
