@@ -3,6 +3,23 @@ import LegInfo from './LegInfo'
 
 function TripInfo({tripInfo}){
 
+    console.log("ti", tripInfo[0])
+    if (tripInfo.length === 1){
+        return(
+            <div className='leg-info-div'>
+                <LegInfo className='leg-info' tripInfo={tripInfo[0]} />
+            </div>
+        )
+    } else if (tripInfo.length == 2) {
+        return (
+            <div className='leg-info-div'>
+                <LegInfo className='leg-info' tripInfo={tripInfo[0]} />
+                <LegInfo className='leg-info' tripInfo={tripInfo[1]} />
+            </div>
+        )
+    }
+
+
     return(
         <div className='leg-info-div'>
             <LegInfo className='leg-info' tripInfo={tripInfo} />

@@ -29,6 +29,7 @@ function JourneyPlanner() {
         if (journeyStations[0] == null || journeyStations[1] == null){
             console.log('enter start and end stations')
         } else{
+            console.log("fetching")
             fetch(`api/plan_trip/${journeyStations[0]}/${journeyStations[1]}`)
             .then(response => response.json())
             .then(stopData => setTripInfo(stopData))
@@ -44,7 +45,7 @@ function JourneyPlanner() {
                 <br></br>
                 <button className="plan-trip-button" onClick={planTrip}>Plan Trip</button>
             </div>
-            {tripInfo[0] !== undefined ? <TripInfo className='trip-info' tripInfo={tripInfo}/> : ""}
+            {tripInfo != undefined ? <TripInfo className='trip-info' tripInfo={tripInfo}/> : ""}
         </div>
 
     )
