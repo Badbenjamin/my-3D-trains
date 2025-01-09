@@ -64,15 +64,20 @@ def filter_trains_for_stations_direction_current(train_data, start_station_id, e
         return trains_to_objects(filtered_trains)
 
 
+# function is called twice
+# i need to add departure time as an option, i need to add departure station id to function
+# not sure how i fixed this. go for a walk and then come back and look at the function
 def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_station_id, time=(round(current_time.timestamp()))):
-    
+        print('time', convert_timestamp(time))
         trains_with_arrival = []
         # swapped self.filter_trains_for_stations_direction_current() for get_legInfo()
         for train in filtered_train_data_object:
-            arrival_train = {"train" : train, "dest_arrival_time" : None}
+            arrival_train = {"train" : train, "dest_arrival_time" : None, "departure_time" : None}
             for stop in train.schedule:
                 if stop.stop_id[:-1] == dest_station_id:
                     arrival_train['dest_arrival_time'] = stop.arrival
+                # if stop.stop_id[:-1] == origin_station_id:
+                #     train['departure_time'] = stop.arrival
             trains_with_arrival.append(arrival_train)
         
         next_train = None
@@ -80,8 +85,9 @@ def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_stati
         for train in trains_with_arrival:
             if next_train == None and train['dest_arrival_time'] > time:
                 next_train = train
-            elif train['dest_arrival_time'] > time and train['dest_arrival_time'] < next_train['dest_arrival_time']:
+            elif train['dest_arrival_time'] > time and (train['dest_arrival_time'] < next_train['dest_arrival_time']):
                 next_train = train
+        print('ntat', convert_timestamp(next_train['dest_arrival_time']))
         return next_train
 
 # def get_station_routes(start_station_daytime_routes, end_station_daytime_routes):
@@ -335,11 +341,13 @@ class TrainData:
         print("leg info", leg_info)
         if "leg_two" in leg_info:
             leg_one_train = sort_trains_by_arrival_at_destination(leg_info['leg_one'], self.start_station_terminus_id)
-            leg_one_arrival_time = leg_one_train['dest_arrival_time']
-            leg_two_train = sort_trains_by_arrival_at_destination(leg_info['leg_two'],self.end_station_id, leg_one_arrival_time)
+            leg_one_arrival_time = leg_one_train['dest_arrival_time'] + 120
+            print('l1at', convert_timestamp(leg_one_arrival_time))
+            leg_two_train = sort_trains_by_arrival_at_destination(leg_info['leg_two'],self.end_station_origin_id, leg_one_arrival_time)
+            # print('l2at', leg_two_train[])
             return [{"train":leg_one_train['train'], "start": self.start_station_id, "end":self.start_station_terminus_id}, {"train":leg_two_train['train'], "start":self.end_station_origin_id, "end": self.end_station_id}]
         elif "single_leg" in leg_info:
-            single_leg_train = sort_trains_by_arrival_at_destination(leg_info['single_leg'], self.end_station_id)
+            single_leg_train = sort_trains_by_arrival_at_destination(leg_info['single_leg'], self.start_station_id, self.end_station_id)
             return [{"train" : single_leg_train['train'], "start":self.start_station_id, "end":self.end_station_id}]
         
     def format_for_react(self, journey_object):
