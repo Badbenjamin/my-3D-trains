@@ -5,7 +5,7 @@ import { useGLTF } from '@react-three/drei'
 
 import './App.css'
 import Station from './Station'
-
+import { getAllIds } from './ModularFunctions'
 
 
 function App() {
@@ -67,37 +67,16 @@ function App() {
   // I WILL NEED TO CLEAN THIS UP, PUT EVERYTHING INTO FUNCTIONS, AND REBUILD.
   useEffect(()=>{
     // trip info contains trains, which contain schedules
+    console.log("tilen",tripInfo.length)
     if (tripInfo == []){
       return 
     } else if (tripInfo[0]?.schedule){
-      // tripInfo[0] is the first (or only) train of our trip. [1] would be second leg
-      console.log('ti', tripInfo)
-      const currentTripSchedule = tripInfo[0].schedule
-      const startStation = tripInfo[0].start_station_gtfs
-      const endStation = tripInfo[0].end_station_gtfs
-      // gtfs ids without N or S 
-      const justStationIds = currentTripSchedule.map((station) => {
-          return station['stop_id'].slice(0,3)
-        })
-      const startIndex = justStationIds.indexOf(startStation)
-      const endIndex = justStationIds.indexOf(endStation)
-      // Only stations between start statio and end station
-      const selectedStationArray = justStationIds.slice(startIndex, endIndex + 1)
-      const direction = tripInfo[0].schedule[0]['stop_id'].slice(3,4)
-      
-      // Only tracks between start station and end station
-      const justTrackIds = selectedStationArray.map((stationId) => {
-        const stationAndDirection = stationId + direction
-        for (const status of statusArray){
-            if (status['name'].includes(stationAndDirection)){
-              return status['name']
-            }
-          }
-      })
-      
-      // complete array of all meshes to be selected, stations + tracks
-      // this is the arg that gets passed to selectStations function
-      const allIdsArray = selectedStationArray.concat(justTrackIds)
+      let allIdsArray = []
+      if (tripInfo.length == 1){
+        allIdsArray = getAllIds(tripInfo[0], statusArray);
+      } else if (tripInfo.length == 2){
+        allIdsArray = getAllIds(tripInfo[0], statusArray).concat(getAllIds(tripInfo[1], statusArray));
+      }
       
       // put this function here for scope to local variables
       function selectStations(selectedIdArray){

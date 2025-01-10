@@ -63,8 +63,9 @@ def filter_trains_for_stations_direction_current(train_data, start_station_id, e
                                 filtered_trains.append(train)
         return trains_to_objects(filtered_trains)
 
+
 def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_station_id, time=(round(current_time.timestamp()))):
-        print('time', convert_timestamp(time))
+        print('time', time)
         trains_with_arrival = []
         # swapped self.filter_trains_for_stations_direction_current() for get_legInfo()
         for train in filtered_train_data_object:
@@ -315,7 +316,7 @@ class TrainData:
             leg_two_train = sort_trains_by_arrival_at_destination(leg_info['leg_two'],self.end_station_origin_id, leg_one_arrival_time)
             return [{"train":leg_one_train['train'], "start": self.start_station_id, "end":self.start_station_terminus_id}, {"train":leg_two_train['train'], "start":self.end_station_origin_id, "end": self.end_station_id}]
         elif "single_leg" in leg_info:
-            single_leg_train = sort_trains_by_arrival_at_destination(leg_info['single_leg'], self.start_station_id, self.end_station_id)
+            single_leg_train = sort_trains_by_arrival_at_destination(leg_info['single_leg'],  self.end_station_id)
             return [{"train" : single_leg_train['train'], "start":self.start_station_id, "end":self.end_station_id}]
         
     def format_for_react(self):
