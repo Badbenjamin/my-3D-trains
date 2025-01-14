@@ -67,7 +67,6 @@ function App() {
   // I WILL NEED TO CLEAN THIS UP, PUT EVERYTHING INTO FUNCTIONS, AND REBUILD.
   useEffect(()=>{
     // trip info contains trains, which contain schedules
-    console.log("tilen",tripInfo.length)
     if (tripInfo == []){
       return 
     } else if (tripInfo[0]?.schedule){
@@ -79,6 +78,7 @@ function App() {
       }
       
       // put this function here for scope to local variables
+      // examine whether or not I can move this to ModularFunctions
       function selectStations(selectedIdArray){
         // version must update to change key and trigger re render
         function updateVersion(){

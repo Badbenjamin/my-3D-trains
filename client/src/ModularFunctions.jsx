@@ -1,4 +1,6 @@
 
+// takes a train (tripInfo) and statusArray as args, returns a list of station and track ids
+// these are used to update the status array and highlight a route
 export function getAllIds(tripInfo, statusArray){
     console.log('ti', tripInfo)
       const currentTripSchedule = tripInfo.schedule

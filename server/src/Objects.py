@@ -12,18 +12,9 @@ current_time = datetime.now()
 
 from collections import Counter
 
-# convert 10 digit POSIX timestamp used in feed to readable format
-def convert_timestamp(timestamp):
-    return datetime.fromtimestamp(timestamp)
+import modules
 
-# converts seconds to delta time type
-def convert_seconds(seconds):
-    return timedelta(seconds = seconds)
-
-def time_difference(first_time, second_time):
-    detla_time = second_time - first_time
-    return detla_time
-
+# Converts JSON train into a easier to read object
 def trains_to_objects(train_list):
         train_object_list = []
         for train in train_list:
@@ -45,53 +36,6 @@ def trains_to_objects(train_list):
             )
             train_object_list.append(new_train)
         return train_object_list
-
-def filter_trains_for_stations_direction_current(train_data, start_station_id, end_station_id):
-        filtered_trains = []
-        for train_feed in train_data:
-            for train in train_feed.entity: 
-                if train.HasField('trip_update'):
-                    stops = []
-                    # stops list contains each trains stop array. used to determine if start stop is before end stop
-                    for stop in train.trip_update.stop_time_update:
-                        stops.append(stop.stop_id[:-1])
-                    # checking if start stop is before end stop in stops array
-                    if (start_station_id in stops and end_station_id in stops and stops.index(start_station_id) < stops.index(end_station_id)):
-                        # filtering out trains that have already departed the start station (departure time in pase)
-                        for stop in train.trip_update.stop_time_update:
-                            if stop.stop_id[:-1] == start_station_id and time_difference(current_time, convert_timestamp(stop.arrival.time)) > convert_seconds(30):
-                                filtered_trains.append(train)
-        return trains_to_objects(filtered_trains)
-
-
-def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_station_id, time=(round(current_time.timestamp()))):
-        print('time', time)
-        trains_with_arrival = []
-        # swapped self.filter_trains_for_stations_direction_current() for get_legInfo()
-        for train in filtered_train_data_object:
-            arrival_train = {"train" : train, "dest_arrival_time" : None}
-            for stop in train.schedule:
-                if stop.stop_id[:-1] == dest_station_id:
-                    arrival_train['dest_arrival_time'] = stop.arrival
-            trains_with_arrival.append(arrival_train)
-        
-        next_train = None
-       
-        for train in trains_with_arrival:
-            if next_train == None and train['dest_arrival_time'] > time:
-                next_train = train
-            elif train['dest_arrival_time'] > time and (train['dest_arrival_time'] < next_train['dest_arrival_time']):
-                next_train = train
-        print('ntat', convert_timestamp(next_train['dest_arrival_time']))
-        return next_train
-
-def get_station_routes(station_daytime_routes):
-    routes = []
-    for route in station_daytime_routes:
-        if route != " ":
-            routes.append(route)
-    return routes
-    
 
 # the journey object takes a start and end station
 # it will contain endpoints for the start and end station, as well as the transfer station if applicable
@@ -212,7 +156,7 @@ class Train:
             "last_stop_departure" : self.schedule[0].departure,
             "next_stop" : self.schedule[1].stop_id,
             "next_stop_arrival" : self.schedule[1].arrival,
-            "length_of_trip" : convert_seconds(self.schedule[1].arrival - self.schedule[0].departure)
+            "length_of_trip" : modules.convert_seconds(self.schedule[1].arrival - self.schedule[0].departure)
         }
         return location
 
@@ -227,7 +171,7 @@ class Stop:
         self.stop_id = stop_id
 
     def __repr__(self):
-        return f'<Stop {self.stop_id} {str(convert_timestamp(self.arrival))[11:-3]}>'
+        return f'<Stop {self.stop_id} {str(modules.convert_timestamp(self.arrival))[11:-3]}>'
     
 class Schedule:
     # make a train schedule class
@@ -296,11 +240,11 @@ class TrainData:
     def get_leg_info(self):
         filtered_leg_info_obj = {}
         if self.start_station_terminus_id == None and self.end_station_origin_id == None:
-            single_leg_data = filter_trains_for_stations_direction_current(self.all_train_data, self.start_station_id, self.end_station_id)
+            single_leg_data = trains_to_objects(modules.filter_trains_for_stations_direction_current(self.all_train_data, self.start_station_id, self.end_station_id))
             filtered_leg_info_obj = {"single_leg" : single_leg_data}
         elif self.start_station_terminus_id and self.end_station_origin_id:
-            first_leg_data =  filter_trains_for_stations_direction_current(self.all_train_data, self.start_station_id, self.start_station_terminus_id)
-            second_leg_data = filter_trains_for_stations_direction_current(self.all_train_data, self.end_station_origin_id, self.end_station_id)
+            first_leg_data =  trains_to_objects(modules.filter_trains_for_stations_direction_current(self.all_train_data, self.start_station_id, self.start_station_terminus_id))
+            second_leg_data = trains_to_objects(modules.filter_trains_for_stations_direction_current(self.all_train_data, self.end_station_origin_id, self.end_station_id))
             filtered_leg_info_obj = { "leg_one" :first_leg_data,"leg_two" : second_leg_data}
         return filtered_leg_info_obj
     
@@ -311,12 +255,12 @@ class TrainData:
         leg_info = self.get_leg_info()
         print("leg info", leg_info)
         if "leg_two" in leg_info:
-            leg_one_train = sort_trains_by_arrival_at_destination(leg_info['leg_one'], self.start_station_terminus_id)
+            leg_one_train = modules.sort_trains_by_arrival_at_destination(leg_info['leg_one'], self.start_station_terminus_id)
             leg_one_arrival_time = leg_one_train['dest_arrival_time'] + 120
-            leg_two_train = sort_trains_by_arrival_at_destination(leg_info['leg_two'],self.end_station_origin_id, leg_one_arrival_time)
+            leg_two_train = modules.sort_trains_by_arrival_at_destination(leg_info['leg_two'],self.end_station_origin_id, leg_one_arrival_time)
             return [{"train":leg_one_train['train'], "start": self.start_station_id, "end":self.start_station_terminus_id}, {"train":leg_two_train['train'], "start":self.end_station_origin_id, "end": self.end_station_id}]
         elif "single_leg" in leg_info:
-            single_leg_train = sort_trains_by_arrival_at_destination(leg_info['single_leg'],  self.end_station_id)
+            single_leg_train = modules.sort_trains_by_arrival_at_destination(leg_info['single_leg'],  self.end_station_id)
             return [{"train" : single_leg_train['train'], "start":self.start_station_id, "end":self.end_station_id}]
         
     def format_for_react(self):
@@ -347,11 +291,11 @@ class TrainData:
                 # START STATION CHANGES 
                 "start_station" : start_station.stop_name,
                 "start_station_gtfs" : train['start'],
-                "start_station_arrival" : str(convert_timestamp(train['train'].arrival_time(train['start'])))[10:16],
+                "start_station_arrival" : str(modules.convert_timestamp(train['train'].arrival_time(train['start'])))[10:16],
                 # END STATION CHANGES
                 "end_station" : end_station.stop_name,
                 "end_station_gtfs" : train['end'],
-                "end_station_arrival" : str(convert_timestamp(train['train'].arrival_time(train['end'])))[10:16],
+                "end_station_arrival" : str(modules.convert_timestamp(train['train'].arrival_time(train['end'])))[10:16],
                 "transfer_station" : None,
                 "route" : train['train'].route(),
                 "direction_label" : None,
