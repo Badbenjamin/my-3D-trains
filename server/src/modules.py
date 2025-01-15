@@ -76,6 +76,7 @@ def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_stati
                 next_train = train
             elif train['dest_arrival_time'] > time and (train['dest_arrival_time'] < next_train['dest_arrival_time']):
                 next_train = train
+        print('next train', next_train)
         print('ntat', convert_timestamp(next_train['dest_arrival_time']))
         return next_train
 

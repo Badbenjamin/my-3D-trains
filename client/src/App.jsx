@@ -5,12 +5,13 @@ import { useGLTF } from '@react-three/drei'
 
 import './App.css'
 import Station from './Station'
-import { getAllIds } from './ModularFunctions'
+import { getAllIds, fillStatusArray } from './ModularFunctions'
 
 
 function App() {
 
   // load station and track model. destructure to nodes and materials to create Station component
+  // nodes correspond to each geometry in the model
   const { nodes, materials } = useGLTF('./public/subway_map_G_7.glb')
 
   const [stations, setStations] = useState([])
@@ -30,40 +31,45 @@ function App() {
 
   // build stationArray of 3D station components for LinesAndMap
   useEffect(()=>{
-    const newStationObj ={}
+    // newMapModelObj is an object that conains the info for all the 
+    // LEFT OFF HERE, UNPACK AND UNDERSTAND WHAT IS HAPPENING HERE
+    const newMapModelObj ={}
     const newStatusArray = []
-
-    let count = 0
+    console.log("NMMO", newMapModelObj)
+    console.log("mesh", nodes)
+    // this loop creates a status object for each mesh in nodes from our model import
     for (const mesh in nodes){
         if (nodes[mesh].type === "Mesh"){
             const status = {"name": nodes[mesh].name, "status": false}
             newStatusArray.push(status)   
         } 
       };
+    
+    // this loop creates Station components for every mesh in the nodes from our model import.
+    let count = 0
     for (const mesh in nodes){
         if (nodes[mesh].type === "Mesh"){
             let index = count 
             count += 1
-            newStationObj[mesh] = <Station name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} id={nodes[mesh].name} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
+            newMapModelObj[mesh] = <Station name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} id={nodes[mesh].name} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
         } 
       };
      const newStationArray = [...stationArray]
 
-     for (const station in newStationObj){
-        // why is station array an object?
-        if (!newStationArray.includes(station)){
-            newStationArray.push(newStationObj[station])
-        }
-     };
+    
+    for (const station in newMapModelObj){
+      if (!newStationArray.includes(station)){
+          newStationArray.push(newMapModelObj[station])
+      }
+    };
     setStatusArray(newStatusArray)
     setStationArray(newStationArray)
     
   }, [])
 
-  // This useEffect listens for a change in tripInfo, which is an array of trains going from start station to end station, in order of closest destination arrival time. 
-  // It takes the stations from the first train and creates an array of GTFS ids that will be passed to the selectStations function
+  // This useEffect listens for a change in tripInfo. 
+  // It takes the stations from ttrain schedule and creates an array of GTFS ids that will be passed to the selectStations function
   // selectStations takes an array of gtfs ids and uses it to change the status of the stations in stationArray.
-  // ADD INDEX to be able to switch to next train, maybe as state?
   // I WILL NEED TO CLEAN THIS UP, PUT EVERYTHING INTO FUNCTIONS, AND REBUILD.
   useEffect(()=>{
     // trip info contains trains, which contain schedules
