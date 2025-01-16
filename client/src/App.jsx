@@ -48,14 +48,25 @@ function App() {
       };
     
     // this loop creates Station components for every mesh in the nodes from our model import.
+    // what are count and index doing here? Might be assigning a status from newStatusArray?
     let count = 0
     for (const mesh in nodes){
         if (nodes[mesh].type === "Mesh"){
             let index = count 
             count += 1
-            newMapModelObj[mesh] = <Station name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} id={nodes[mesh].name} key={nodes[mesh].name} mesh={nodes[mesh]} materials={materials}/>
+            newMapModelObj[mesh] = <Station name={nodes[mesh].name} 
+                                            status={newStatusArray[index]} 
+                                            // index={[index]} 
+                                            id={nodes[mesh].name} 
+                                            key={nodes[mesh].name} 
+                                            mesh={nodes[mesh]} 
+                                            materials={materials}/>
+            console.log("nmmo mesh",newMapModelObj[mesh])
         } 
+        
       };
+
+      // LEFT OFF HERE. WHAT IS GOING ON HERE?
      const newStationArray = [...stationArray]
 
     
