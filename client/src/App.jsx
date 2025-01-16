@@ -20,8 +20,8 @@ function App() {
   const [statusArray, setStatusArray] = useState([])
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
-  console.log("app trip info", tripInfo)
-  console.log("sa", statusArray)
+  // console.log("app trip info", tripInfo)
+  console.log("sta", stationArray)
 
   // get station info for trip planner for station search. 
   useEffect(() => {
@@ -34,12 +34,11 @@ function App() {
   // this useEffect creates Station objects for each geometry in our model
   useEffect(()=>{
     // newMapModelObj is an object that conains the info for all the 
-    
     const newMapModelObj ={}
+    // newStatusArray is an array of objects with names of stations/meshes and a boolean to determine whether they are selected or not
     const newStatusArray = []
-    console.log("NMMO", newMapModelObj)
     
-    // this loop creates a status object for each mesh in nodes from our model import
+    // this loop creates a status object for each mesh in nodes from our model import and pushes to newStatusArray
     for (const mesh in nodes){
         if (nodes[mesh].type === "Mesh"){
             const status = {"name": nodes[mesh].name, "status": false}
@@ -156,8 +155,6 @@ function App() {
     <>
       <h2>MY 3D TRAINS</h2>
       {/* <NavBar/> */}
-      {/* destructure the context later */}
-      {/* <Outlet context={{stations : stations, version, setVersion, statusArray, setStatusArray, stationArray, setStationArray ,nodes, materials, tripInfo, setTripInfo}}/> */}
       <Outlet context={{
         stations : stations, 
         version : version, 

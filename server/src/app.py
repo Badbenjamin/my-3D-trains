@@ -32,3 +32,8 @@ def get_all_stations():
 def get_station_name(gtfs_id): 
     station = Station.query.filter(Station.gtfs_stop_id == gtfs_id).first()
     return {"name" : station.stop_name, "daytime_routes" : station.daytime_routes}, 200
+
+# get train locations 
+@app.route('/api/trainlocations')
+def get_train_locations():
+    pass

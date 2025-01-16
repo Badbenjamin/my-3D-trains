@@ -15,6 +15,7 @@ from collections import Counter
 import modules
 
 # Converts JSON train into a easier to read object
+# circular import issue, couldn't move to modules
 def trains_to_objects(train_list):
         train_object_list = []
         for train in train_list:
