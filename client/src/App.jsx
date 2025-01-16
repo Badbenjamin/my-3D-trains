@@ -12,6 +12,7 @@ function App() {
 
   // load station and track model. destructure to nodes and materials to create Station component
   // nodes correspond to each geometry in the model
+  // each node contains a mesh, which has the properties for that geometry 
   const { nodes, materials } = useGLTF('./public/subway_map_G_7.glb')
 
   const [stations, setStations] = useState([])
@@ -30,13 +31,14 @@ function App() {
   }, [])
 
   // build stationArray of 3D station components for LinesAndMap
+  // this useEffect creates Station objects for each geometry in our model
   useEffect(()=>{
     // newMapModelObj is an object that conains the info for all the 
-    // LEFT OFF HERE, UNPACK AND UNDERSTAND WHAT IS HAPPENING HERE
+    
     const newMapModelObj ={}
     const newStatusArray = []
     console.log("NMMO", newMapModelObj)
-    console.log("mesh", nodes)
+    
     // this loop creates a status object for each mesh in nodes from our model import
     for (const mesh in nodes){
         if (nodes[mesh].type === "Mesh"){
@@ -51,7 +53,7 @@ function App() {
         if (nodes[mesh].type === "Mesh"){
             let index = count 
             count += 1
-            newMapModelObj[mesh] = <Station name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} id={nodes[mesh].name} key={nodes[mesh].name} nodes={nodes} mesh={nodes[mesh]} materials={materials}/>
+            newMapModelObj[mesh] = <Station name={nodes[mesh].name} status={newStatusArray[index]} index={[index]} id={nodes[mesh].name} key={nodes[mesh].name} mesh={nodes[mesh]} materials={materials}/>
         } 
       };
      const newStationArray = [...stationArray]

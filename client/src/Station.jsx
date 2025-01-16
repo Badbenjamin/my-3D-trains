@@ -4,7 +4,7 @@ import { Html } from "@react-three/drei"
 
 import './App.css'
 
-function Station( { status, nodes, materials, mesh, index}){
+function Station( { status, materials, mesh, index}){
 
         const materialName = Object.keys(materials)
         let stationRef = useRef()
@@ -14,7 +14,7 @@ function Station( { status, nodes, materials, mesh, index}){
         const blue = new THREE.MeshBasicMaterial({color:'blue'})
         
         const newName = mesh['name']
-        const newGeometry = nodes[newName].geometry
+        const newGeometry = mesh.geometry
         // CHANGE THIS FOR OTHER LINES!
         const newMaterial =  mesh['name'][0] !== "7" ? materials[materialName[0]] : materials[materialName[2]];
         const newCastShadow = true
