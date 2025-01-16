@@ -5,7 +5,7 @@ import { useGLTF } from '@react-three/drei'
 
 import './App.css'
 import Station from './Station'
-import { getAllIds, fillStatusArray } from './ModularFunctions'
+import { getAllIds, } from './ModularFunctions'
 
 
 function App() {
@@ -67,9 +67,7 @@ function App() {
       };
 
       // LEFT OFF HERE. WHAT IS GOING ON HERE?
-     const newStationArray = [...stationArray]
-
-    
+    const newStationArray = [...stationArray]
     for (const station in newMapModelObj){
       if (!newStationArray.includes(station)){
           newStationArray.push(newMapModelObj[station])

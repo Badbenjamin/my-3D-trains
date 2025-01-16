@@ -33,11 +33,3 @@ export function getAllIds(tripInfo, statusArray){
       return allIdsArray
 }
 
-export function fillStatusArray(mesh, nodes){
-    for (const mesh in nodes){
-      if (nodes[mesh].type === "Mesh"){
-          const status = {"name": nodes[mesh].name, "status": false}
-          newStatusArray.push(status)   
-      } 
-    };
-  }
