@@ -20,9 +20,7 @@ function App() {
   const [statusArray, setStatusArray] = useState([])
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
-  // console.log("app trip info", tripInfo)
-  console.log("sta", stationArray)
-
+  
   // get station info for trip planner for station search. 
   useEffect(() => {
     fetch("http://127.0.0.1:5555/api/stations")
@@ -32,8 +30,10 @@ function App() {
 
   // build stationArray of 3D station components for LinesAndMap
   // this useEffect creates Station objects for each geometry in our model
+  // basically, we loop through our model and create Station components (with status attatched), and store them in our mapModelObject.
+  // then we loop 
   useEffect(()=>{
-    // newMapModelObj is an object that conains the info for all the 
+    // newMapModelObj is an object that contains the info for all the station and track geometries in our scene
     const newMapModelObj ={}
     // newStatusArray is an array of objects with names of stations/meshes and a boolean to determine whether they are selected or not
     const newStatusArray = []
@@ -47,40 +47,41 @@ function App() {
       };
     
     // this loop creates Station components for every mesh in the nodes from our model import.
-    // what are count and index doing here? Might be assigning a status from newStatusArray?
+    // count and index are used to assign status from newStatusArray to each Station
     let count = 0
     for (const mesh in nodes){
         if (nodes[mesh].type === "Mesh"){
             let index = count 
             count += 1
-            newMapModelObj[mesh] = <Station name={nodes[mesh].name} 
-                                            status={newStatusArray[index]} 
-                                            // index={[index]} 
-                                            id={nodes[mesh].name} 
-                                            key={nodes[mesh].name} 
-                                            mesh={nodes[mesh]} 
-                                            materials={materials}/>
-            console.log("nmmo mesh",newMapModelObj[mesh])
+            // mesh (name of station) is used as key for mapModelObject
+            newMapModelObj[mesh] = 
+                <Station name={nodes[mesh].name} 
+                      status={newStatusArray[index]} 
+                      // index={[index]} 
+                      id={nodes[mesh].name} 
+                      key={nodes[mesh].name} 
+                      mesh={nodes[mesh]} 
+                      materials={materials}/>
         } 
-        
       };
 
-      // LEFT OFF HERE. WHAT IS GOING ON HERE?
+    // this loop populates stationArray with meshes
+    // Do I need this or could I just use the object instead of an array?
+    // I think that I loop through the array to create compnents in another component. 
     const newStationArray = [...stationArray]
     for (const station in newMapModelObj){
-      if (!newStationArray.includes(station)){
-          newStationArray.push(newMapModelObj[station])
-      }
-    };
+      newStationArray.push(newMapModelObj[station])
+      };
+    // statusArray is set (should be all false, unselected)
     setStatusArray(newStatusArray)
+    // stationArray is set with our newly created Station components from newMapModelObject
     setStationArray(newStationArray)
-    
   }, [])
 
   // This useEffect listens for a change in tripInfo. 
   // It takes the stations from ttrain schedule and creates an array of GTFS ids that will be passed to the selectStations function
   // selectStations takes an array of gtfs ids and uses it to change the status of the stations in stationArray.
-  // I WILL NEED TO CLEAN THIS UP, PUT EVERYTHING INTO FUNCTIONS, AND REBUILD.
+  // CHECK ON THIS TOMORROW. 
   useEffect(()=>{
     // trip info contains trains, which contain schedules
     if (tripInfo == []){
