@@ -62,42 +62,35 @@ function App() {
         allIdsArray = getAllIds(tripInfo[0], statusArray).concat(getAllIds(tripInfo[1], statusArray));
       }
       
-      // put this function here for scope to local variables
-      // examine whether or not I can move this to ModularFunctions
-      function selectStations(selectedIdArray){
-        // version must update to change key and trigger re render
-        setVersion(version + 1)
+      // version must update to change key and trigger re render
+      setVersion(version + 1)
+      
+      const newStatusArray = [...statusArray]
+      // reset statuses to false 
+      // retunrs meshes from previously highlighted trip to normal state
+      for (const status of newStatusArray){
+        status['status'] = false
+      }
         
-        const newStatusArray = [...statusArray]
-        // reset statuses to false 
-        // retunrs meshes from previously highlighted trip to normal state
-        for (const status of newStatusArray){
-          status['status'] = false
-        }
-        
-        // set statusArray state to updated version
-        setStatusArray(updateStatusArray(selectedIdArray, newStatusArray))
+      // set statusArray state to updated version
+      setStatusArray(updateStatusArray(allIdsArray, newStatusArray))
     
-        // alteredStationArray will contain stations with updated status.
-        const alteredStationArray = stationArray.map((station, i) => {
-  
+      // alteredStationArray will contain stations with updated status.
+      const alteredStationArray = stationArray.map((station) => {
         const newStation = {...station}
         const newStationName = newStation['props']['name']
         let newStationStatus = newStation['props']['status']['status']
-        
+          
         // IMPORTANT TO UPDATE KEY TO TRIGGER RE RENDER
         // look for match between station gtfs id and gtfs id's in statusArray
         for (const status of newStatusArray){
-          newStationStatus = status['status']
-          newStation['key'] =  String(newStationName + version)
-          newStation['id'] = String(newStationName + version)
-        }
+            newStationStatus = status['status']
+            newStation['key'] =  String(newStationName + version)
+            // newStation['id'] = String(newStationName + version)
+          }
         return newStation
-        })
-        setStationArray(alteredStationArray)
-      }
-
-      selectStations(allIdsArray)
+      })
+      setStationArray(alteredStationArray)
     }
   }, [tripInfo])
 

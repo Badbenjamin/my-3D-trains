@@ -70,6 +70,8 @@ export function createStationComponentsObj(nodes, materials, newStatusArray){
     return newMapModelObj
 }
 
+// if station is included in array of stations in trip, set station or track status to true
+// 
 export function updateStatusArray(selectedIdArray, newStatusArray){
   let updatedStatusArray = [...newStatusArray]
   for (const name of selectedIdArray){
