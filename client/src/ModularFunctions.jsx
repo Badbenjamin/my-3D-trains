@@ -48,7 +48,7 @@ export function createStatusObjectArray(nodes){
 }
 
 export function createStationComponentsObj(nodes, materials, newStatusArray){
-  // this loop creates Station components for every mesh in the nodes from our model import.
+    // this loop creates Station components for every mesh in the nodes from our model import.
     // count and index are used to assign status from newStatusArray to each Station
     let newMapModelObj = {}
     let count = 0
@@ -60,7 +60,6 @@ export function createStationComponentsObj(nodes, materials, newStatusArray){
             newMapModelObj[mesh] = 
                 <Station name={nodes[mesh].name} 
                       status={newStatusArray[index]} 
-                      // index={[index]} 
                       id={nodes[mesh].name} 
                       key={nodes[mesh].name} 
                       mesh={nodes[mesh]} 
@@ -69,4 +68,20 @@ export function createStationComponentsObj(nodes, materials, newStatusArray){
       };
     console.log("nmmo func", newMapModelObj)
     return newMapModelObj
+}
+
+export function updateStatusArray(selectedIdArray, newStatusArray){
+  let updatedStatusArray = [...newStatusArray]
+  for (const name of selectedIdArray){
+    for (const status of updatedStatusArray){
+        // for station meshes
+        if (name === status['name']){
+            status['status'] = true
+        // for track meshes
+        } else if (name === status['name'].slice(0,4)){
+          status['status'] = true
+        } 
+    }
+  }
+  return updatedStatusArray
 }

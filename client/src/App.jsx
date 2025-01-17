@@ -5,7 +5,7 @@ import { useGLTF } from '@react-three/drei'
 
 import './App.css'
 import Station from './Station'
-import { getAllIds, createStatusObjectArray, createStationComponentsObj } from './ModularFunctions'
+import { getAllIds, createStatusObjectArray, createStationComponentsObj, updateStatusArray } from './ModularFunctions'
 
 
 function App() {
@@ -30,18 +30,12 @@ function App() {
 
   // build stationArray of 3D station components for LinesAndMap
   // this useEffect creates Station objects for each geometry in our model
-  // basically, we loop through our model and create Station components (with status attatched), and store them in our mapModelObject.
-  // then we loop 
   useEffect(()=>{
-    
     // newStatusArray is an array of objects with names of stations/meshes and a boolean to determine whether they are selected or not
     const newStatusArray = createStatusObjectArray(nodes)
     // newMapModelObj contains the info for all the station and track geometries in our scene
     const newMapModelObj = createStationComponentsObj(nodes, materials, newStatusArray)
-  
-    // this loop populates stationArray with meshes
-    // Do I need this or could I just use the object instead of an array?
-    // I think that I loop through the array to create compnents in another component. 
+    // this loop populates newStationArray with meshes from our newMapModelObject
     const newStationArray = [...stationArray]
     for (const station in newMapModelObj){
       newStationArray.push(newMapModelObj[station])
@@ -55,9 +49,9 @@ function App() {
   // This useEffect listens for a change in tripInfo. 
   // It takes the stations from ttrain schedule and creates an array of GTFS ids that will be passed to the selectStations function
   // selectStations takes an array of gtfs ids and uses it to change the status of the stations in stationArray.
-  // CHECK ON THIS TOMORROW. 
   useEffect(()=>{
-    // trip info contains trains, which contain schedules
+    // trip info contains trains, which contain schedules.
+    // schedules are used to select meshes to be highlighted in our map.
     if (tripInfo == []){
       return 
     } else if (tripInfo[0]?.schedule){
@@ -72,50 +66,37 @@ function App() {
       // examine whether or not I can move this to ModularFunctions
       function selectStations(selectedIdArray){
         // version must update to change key and trigger re render
-        function updateVersion(){
-            setVersion(version + 1)
-        }
-        updateVersion()
+        setVersion(version + 1)
         
         const newStatusArray = [...statusArray]
-        
         // reset statuses to false 
+        // retunrs meshes from previously highlighted trip to normal state
         for (const status of newStatusArray){
           status['status'] = false
         }
         
-        // if station is included in array of stations in trip, set station or track status to true
-        for (const name of selectedIdArray){
-            for (const status of newStatusArray){
-                // for station meshes
-                if (name === status['name']){
-                    status['status'] = true
-                // for track meshes
-                } else if (name === status['name'].slice(0,4)){
-                  status['status'] = true
-                } 
-            }
-        }
-        setStatusArray(newStatusArray)
+        // set statusArray state to updated version
+        setStatusArray(updateStatusArray(selectedIdArray, newStatusArray))
     
         // alteredStationArray will contain stations with updated status.
         const alteredStationArray = stationArray.map((station, i) => {
   
-            const newStation = {...station}
-            const newStationName = newStation['props']['name']
-            let newStationStatus = newStation['props']['status']['status']
-            
-            // IMPORTANT TO UPDATE KEY TO TRIGGER RE RENDER
-            // look for match between station gtfs id and gtfs id's in statusArray
-            for (const status of newStatusArray){
-              newStationStatus = status['status']
-              newStation['key'] =  String(newStationName + version)
-              newStation['id'] = String(newStationName + version)
-            }
-            return newStation
+        const newStation = {...station}
+        const newStationName = newStation['props']['name']
+        let newStationStatus = newStation['props']['status']['status']
+        
+        // IMPORTANT TO UPDATE KEY TO TRIGGER RE RENDER
+        // look for match between station gtfs id and gtfs id's in statusArray
+        for (const status of newStatusArray){
+          newStationStatus = status['status']
+          newStation['key'] =  String(newStationName + version)
+          newStation['id'] = String(newStationName + version)
+        }
+        return newStation
         })
         setStationArray(alteredStationArray)
       }
+
       selectStations(allIdsArray)
     }
   }, [tripInfo])
