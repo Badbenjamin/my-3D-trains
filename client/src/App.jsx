@@ -5,7 +5,7 @@ import { useGLTF } from '@react-three/drei'
 
 import './App.css'
 import Station from './Station'
-import { getAllIds, } from './ModularFunctions'
+import { getAllIds, createStatusObjectArray, createStationComponentsObj } from './ModularFunctions'
 
 
 function App() {
@@ -33,38 +33,12 @@ function App() {
   // basically, we loop through our model and create Station components (with status attatched), and store them in our mapModelObject.
   // then we loop 
   useEffect(()=>{
-    // newMapModelObj is an object that contains the info for all the station and track geometries in our scene
-    const newMapModelObj ={}
+    
     // newStatusArray is an array of objects with names of stations/meshes and a boolean to determine whether they are selected or not
-    const newStatusArray = []
-    
-    // this loop creates a status object for each mesh in nodes from our model import and pushes to newStatusArray
-    for (const mesh in nodes){
-        if (nodes[mesh].type === "Mesh"){
-            const status = {"name": nodes[mesh].name, "status": false}
-            newStatusArray.push(status)   
-        } 
-      };
-    
-    // this loop creates Station components for every mesh in the nodes from our model import.
-    // count and index are used to assign status from newStatusArray to each Station
-    let count = 0
-    for (const mesh in nodes){
-        if (nodes[mesh].type === "Mesh"){
-            let index = count 
-            count += 1
-            // mesh (name of station) is used as key for mapModelObject
-            newMapModelObj[mesh] = 
-                <Station name={nodes[mesh].name} 
-                      status={newStatusArray[index]} 
-                      // index={[index]} 
-                      id={nodes[mesh].name} 
-                      key={nodes[mesh].name} 
-                      mesh={nodes[mesh]} 
-                      materials={materials}/>
-        } 
-      };
-
+    const newStatusArray = createStatusObjectArray(nodes)
+    // newMapModelObj contains the info for all the station and track geometries in our scene
+    const newMapModelObj = createStationComponentsObj(nodes, materials, newStatusArray)
+  
     // this loop populates stationArray with meshes
     // Do I need this or could I just use the object instead of an array?
     // I think that I loop through the array to create compnents in another component. 
