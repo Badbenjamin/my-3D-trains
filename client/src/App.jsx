@@ -61,13 +61,12 @@ function App() {
       } else if (tripInfo.length == 2){
         allIdsArray = getAllIds(tripInfo[0], statusArray).concat(getAllIds(tripInfo[1], statusArray));
       }
-      
       // version must update to change key and trigger re render
+      // does version need to be saved in state?
       setVersion(version + 1)
       
       const newStatusArray = [...statusArray]
       // reset statuses to false 
-      // retunrs meshes from previously highlighted trip to normal state
       for (const status of newStatusArray){
         status['status'] = false
       }

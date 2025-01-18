@@ -14,7 +14,7 @@ function TimeDate(){
     });
 
     return(
-        <p>NYC {timeDate.toLocaleTimeString()}</p>
+        <p>NYC{timeDate.toLocaleTimeString()}</p>
     )
 }
 
