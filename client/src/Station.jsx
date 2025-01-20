@@ -4,8 +4,9 @@ import { Html } from "@react-three/drei"
 
 import './App.css'
 
-function Station( { status, materials, mesh, index}){
-
+function Station( { status, materials, mesh, index, getStationCode}){
+        console.log('mesh', mesh)
+        console.log("mat", materials)
         const materialName = Object.keys(materials)
         let stationRef = useRef()
 
@@ -16,7 +17,7 @@ function Station( { status, materials, mesh, index}){
         const newName = mesh['name']
         const newGeometry = mesh.geometry
         // CHANGE THIS FOR OTHER LINES!
-        const newMaterial =  mesh['name'][0] !== "7" ? materials[materialName[0]] : materials[materialName[2]];
+        const newMaterial =  mesh['material'];
         const newCastShadow = true
         const newRecieveShadow = true
         const newPosition = mesh['position']
@@ -42,7 +43,8 @@ function Station( { status, materials, mesh, index}){
         }, [])
 
         function handleClick(){
-            console.log("click")
+            // getStationCode(newName)
+            console.log(newName)
         }
 
     return(

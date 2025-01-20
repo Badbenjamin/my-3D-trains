@@ -5,7 +5,7 @@ import { useGLTF } from '@react-three/drei'
 
 import './App.css'
 import Station from './Station'
-import { getAllIds, createStatusObjectArray, createStationComponentsObj, updateStatusArray } from './ModularFunctions'
+import { getAllIds, createStatusObjectArray, createStationComponentsObj, updateStatusArray, getStationCode } from './ModularFunctions'
 
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
   // load station and track model. destructure to nodes and materials to create Station component
   // nodes correspond to each geometry in the model
   // each node contains a mesh, which has the properties for that geometry 
-  const { nodes, materials } = useGLTF('./public/subway_map_G_7.glb')
+  const { nodes, materials } = useGLTF('./subway_map_G_7_L.glb')
 
   const [stations, setStations] = useState([])
   const [stationArray, setStationArray] = useState([])
@@ -92,6 +92,8 @@ function App() {
       setStationArray(alteredStationArray)
     }
   }, [tripInfo])
+
+  
 
   if (!nodes || !stationArray){
     return (

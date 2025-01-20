@@ -1,5 +1,8 @@
 import Station from "./Station"
 
+export  function getStationCode(newName){
+  console.log(newName)
+}
 // takes a train (tripInfo) and statusArray as args, returns a list of station and track ids
 // these are used to update the status array and highlight a route
 export function getAllIds(tripInfo, statusArray){
@@ -63,7 +66,8 @@ export function createStationComponentsObj(nodes, materials, newStatusArray){
                       id={nodes[mesh].name} 
                       key={nodes[mesh].name} 
                       mesh={nodes[mesh]} 
-                      materials={materials}/>
+                      materials={materials}
+                      getStationCode={getStationCode}/>
         } 
       };
     console.log("nmmo func", newMapModelObj)
@@ -87,3 +91,4 @@ export function updateStatusArray(selectedIdArray, newStatusArray){
   }
   return updatedStatusArray
 }
+
