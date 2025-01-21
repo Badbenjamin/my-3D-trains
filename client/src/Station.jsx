@@ -5,14 +5,14 @@ import { Html } from "@react-three/drei"
 import './App.css'
 
 function Station( { status, materials, mesh, index, getStationCode}){
-        console.log('mesh', mesh)
-        console.log("mat", materials)
+        // console.log('mesh', mesh)
+        // console.log("mat", materials)
         const materialName = Object.keys(materials)
         let stationRef = useRef()
 
         const [readableName, setReadableName] = useState("")
 
-        const blue = new THREE.MeshBasicMaterial({color:'blue'})
+        const white = new THREE.MeshBasicMaterial({color:'white'})
         
         const newName = mesh['name']
         const newGeometry = mesh.geometry
@@ -25,9 +25,11 @@ function Station( { status, materials, mesh, index, getStationCode}){
         const newScale = mesh['scale']
        
         let color = newMaterial
+
      
         if (status['status']){
-            color = blue
+            // setInterval(()=>{color = white, 1000})
+            color = white
         }
         if (!status['status']){
             color = newMaterial
