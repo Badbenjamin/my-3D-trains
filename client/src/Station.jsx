@@ -3,14 +3,18 @@ import * as THREE from 'three'
 import { Html } from "@react-three/drei"
 
 import './App.css'
+import { useFrame } from "@react-three/fiber"
+// import { is } from "@react-three/fiber/dist/declarations/src/core/utils"
 
-function Station( { status, materials, mesh, index, getStationCode}){
+function Station( { status, materials, mesh, index, getStationCode, id}){
         // console.log('mesh', mesh)
         // console.log("mat", materials)
-        const materialName = Object.keys(materials)
-        let stationRef = useRef()
+        // const materialName = Object.keys(materials)
+        // console.log(id)
+        // let stationRef = useRef()
 
         const [readableName, setReadableName] = useState("")
+        
 
         const white = new THREE.MeshBasicMaterial({color:'white'})
         
@@ -24,16 +28,26 @@ function Station( { status, materials, mesh, index, getStationCode}){
         const newRotation = mesh['rotation']
         const newScale = mesh['scale']
        
-        let color = newMaterial
+        // let color = newMaterial
 
-     
-        if (status['status']){
-            // setInterval(()=>{color = white, 1000})
-            color = white
-        }
-        if (!status['status']){
-            color = newMaterial
-        }
+        const [isWhite, setIsWhite] = useState(false)
+        console.log('is white', isWhite)
+        let color = !isWhite ? newMaterial : white
+        
+        // very odd
+        // if i update code and save, it works
+        // untill then it flips the color but does not change
+        useEffect(()=>{
+            if (status['status']){
+                setInterval(()=>{
+                    setIsWhite(!isWhite)
+                }, 1000)
+                // setIsWhite(isWhite)
+            }
+            if (!status['status']){
+                setIsWhite(false)
+            }
+        }, [])
      
         // Get Station Names for HTML text
         useEffect(()=>{
@@ -45,15 +59,22 @@ function Station( { status, materials, mesh, index, getStationCode}){
         }, [])
 
         function handleClick(){
-            // getStationCode(newName)
-            console.log(newName)
+            // if (materialColor === white){
+            //     setMaterialColor(newMaterial)
+            // } else {
+            //     setMaterialColor(white)
+            // }
+            console.log("click")
+            setIsWhite(!isWhite)
         }
+
+        
 
     return(
         <group>
             <mesh       
-                  onClick={handleClick}   
-                  ref={stationRef[index]}
+                //   onClick={handleClick}   
+                //   ref={stationRef}
                   name={newName}
                   castShadow={newCastShadow}
                   receiveShadow={newRecieveShadow}

@@ -19,6 +19,7 @@ convention = {
 }
 
 # init flask app
+# ADD STATIC FOLDER PATHS FOR DEPLOYMENT
 app = Flask(__name__)
 # pip install python-dotenv in command line 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URI']

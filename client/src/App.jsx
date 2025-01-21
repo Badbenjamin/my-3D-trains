@@ -13,7 +13,7 @@ function App() {
   // load station and track model. destructure to nodes and materials to create Station component
   // nodes correspond to each geometry in the model
   // each node contains a mesh, which has the properties for that geometry 
-  const { nodes, materials } = useGLTF('./subway_map_G_7_L_ACE.glb')
+  const { nodes, materials } = useGLTF('./subway_map_G_7_L_ACE_3.glb')
 
   const [stations, setStations] = useState([])
   const [stationArray, setStationArray] = useState([])
@@ -23,6 +23,7 @@ function App() {
   
   // get station info for trip planner for station search. 
   useEffect(() => {
+    // remove local host for deployment
     fetch("http://127.0.0.1:5555/api/stations")
       .then(response => response.json())
       .then(stationsData => setStations(stationsData))
