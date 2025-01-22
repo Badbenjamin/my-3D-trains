@@ -35,7 +35,7 @@ function App() {
     // newStatusArray is an array of objects with names of stations/meshes and a boolean to determine whether they are selected or not
     const newStatusArray = createStatusObjectArray(nodes)
     // newMapModelObj contains the info for all the station and track geometries in our scene
-    const newMapModelObj = createStationComponentsObj(nodes, materials, newStatusArray)
+    const newMapModelObj = createStationComponentsObj(nodes, materials, newStatusArray, setStatusArray)
     // this loop populates newStationArray with meshes from our newMapModelObject
     const newStationArray = [...stationArray]
     for (const station in newMapModelObj){

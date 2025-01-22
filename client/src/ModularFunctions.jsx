@@ -1,7 +1,7 @@
 import Station from "./Station"
 
-export  function getStationCode(newName){
-  console.log(newName)
+export  function getStationCode(name){
+  console.log('name',name)
 }
 // takes a train (tripInfo) and statusArray as args, returns a list of station and track ids
 // these are used to update the status array and highlight a route
@@ -43,7 +43,8 @@ export function createStatusObjectArray(nodes){
   let newStatusArray = []
     for (const mesh in nodes){
       if (nodes[mesh].type === "Mesh"){
-        const status = {"name": nodes[mesh].name, "status": false}
+        console.log('mat', nodes[mesh].material)
+        const status = {"name": nodes[mesh].name, "status": false, "color": nodes[mesh].material}
         newStatusArray.push(status)   
     } 
   }
@@ -62,7 +63,7 @@ export function createStationComponentsObj(nodes, materials, newStatusArray){
             // mesh (name of station) is used as key for mapModelObject
             newMapModelObj[mesh] = 
                 <Station name={nodes[mesh].name} 
-                      status={newStatusArray[index]} 
+                      status={newStatusArray[index]}
                       id={nodes[mesh].name} 
                       key={nodes[mesh].name} 
                       mesh={nodes[mesh]} 

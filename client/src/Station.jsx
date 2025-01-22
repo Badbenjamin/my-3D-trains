@@ -7,7 +7,7 @@ import { useFrame } from "@react-three/fiber"
 // import { is } from "@react-three/fiber/dist/declarations/src/core/utils"
 
 function Station( { status, materials, mesh, index, getStationCode, id}){
-        // console.log('mesh', mesh)
+        console.log('stat', status)
         // console.log("mat", materials)
         // const materialName = Object.keys(materials)
         // console.log(id)
@@ -21,7 +21,7 @@ function Station( { status, materials, mesh, index, getStationCode, id}){
         const newName = mesh['name']
         const newGeometry = mesh.geometry
         // CHANGE THIS FOR OTHER LINES!
-        const newMaterial =  mesh['material'];
+        const newMaterial =  status['color'];
         const newCastShadow = true
         const newRecieveShadow = true
         const newPosition = mesh['position']
@@ -31,7 +31,7 @@ function Station( { status, materials, mesh, index, getStationCode, id}){
         // let color = newMaterial
 
         const [isWhite, setIsWhite] = useState(false)
-        console.log('is white', isWhite)
+        // console.log('is white', isWhite)
         let color = !isWhite ? newMaterial : white
         
         // very odd
@@ -40,14 +40,15 @@ function Station( { status, materials, mesh, index, getStationCode, id}){
         useEffect(()=>{
             if (status['status']){
                 setInterval(()=>{
+                    // mesh.material.color.setHex( 0xffffff )
                     setIsWhite(!isWhite)
+                    // console.log(isWhite)
                 }, 1000)
-                // setIsWhite(isWhite)
             }
             if (!status['status']){
                 setIsWhite(false)
             }
-        }, [])
+        }, [status])
      
         // Get Station Names for HTML text
         useEffect(()=>{
@@ -59,13 +60,7 @@ function Station( { status, materials, mesh, index, getStationCode, id}){
         }, [])
 
         function handleClick(){
-            // if (materialColor === white){
-            //     setMaterialColor(newMaterial)
-            // } else {
-            //     setMaterialColor(white)
-            // }
-            console.log("click")
-            setIsWhite(!isWhite)
+            getStationCode(newName)
         }
 
         
@@ -73,7 +68,7 @@ function Station( { status, materials, mesh, index, getStationCode, id}){
     return(
         <group>
             <mesh       
-                //   onClick={handleClick}   
+                  onClick={handleClick}   
                 //   ref={stationRef}
                   name={newName}
                   castShadow={newCastShadow}
