@@ -45,6 +45,7 @@ class Journey:
     def __init__(self, start_station_id, end_station_id, time=None):
         self.start_station = Station.query.filter(Station.id == start_station_id).first()
         self.end_station = Station.query.filter(Station.id == end_station_id).first()
+        # these will be reset or used as base case for recursive version
         self.start_station_terminus = None
         self.end_station_origin = None
         self.shared_stations = []
@@ -52,51 +53,29 @@ class Journey:
         start_station_routes = self.start_station.daytime_routes.split()
         end_station_routes = self.end_station.daytime_routes.split()
         # am i using the routes variable correctly? is it needed?
-        routes = list(set(start_station_routes + end_station_routes))
+        start_and_end_routes = list(set(start_station_routes + end_station_routes))
         
-        # if start station routes are not present in end station routes, it is a multi leg trip
-        same_line = True
-        for route in start_station_routes:
-            if route not in end_station_routes:
-                same_line = False
+        # False if end station does not share a route with start station
+        # True if they share a route
+        same_line = modules.same_line(start_station_routes, end_station_routes)
 
-        # split this into functions?
         if same_line == False:
-            # split up daytime route strings, add complex ids to list 
-            start_line_complex_ids = []
-            for route in (self.start_station.daytime_routes):
-                if route != " ":
-                    for station in Station.query.filter(Station.daytime_routes.contains(route)).all():
-                        if station.complex_id not in start_line_complex_ids:
-                            start_line_complex_ids.append(station.complex_id)
-            end_line_complex_ids = []
-            for route in (self.end_station.daytime_routes):
-                if route != " ":
-                    for station in Station.query.filter(Station.daytime_routes.contains(route)).all():
-                        if station.complex_id not in end_line_complex_ids:
-                            end_line_complex_ids.append(station.complex_id)
-            
-            # all the complex ids for each station on the lines involved in the trip
-            complex_ids = start_line_complex_ids + end_line_complex_ids
+            # 
+            start_line_complex_ids = modules.find_complex_ids(self.start_station.daytime_routes)
+            end_line_complex_ids = modules.find_complex_ids(self.end_station.daytime_routes)
+
+            all_complex_ids = start_line_complex_ids + end_line_complex_ids
             
             # only return complex ids that appear more than once in the list
             # this means they appear both in start station and end station complexes
-            shared_complexes = list(set([complex_id for complex_id in complex_ids if complex_ids.count(complex_id)>1]))
+            shared_complexes = list(set([complex_id for complex_id in all_complex_ids if all_complex_ids.count(complex_id)>1]))
             
-            complex_stations =  []
-            for complex_number in shared_complexes:
-                complexes = Station.query.filter(Station.complex_id == complex_number).all()
-                for complex in complexes:
-                    complex_stations.append(complex)
+            # takes the complex_id list of shared_complexes and returns stations for each complex
+            stations_in_complexes =  modules.complex_ids_to_stations(shared_complexes)
             
-            shared_stations = []
-            for station in complex_stations:
-                for route in station.daytime_routes:
-                    if route != " " and route in routes:
-                        shared_stations.append(station)    
-
-            self.shared_stations = list(set(shared_stations))
-            
+            # return all stations that serve a route that is served by the start and end station
+            shared_stations = modules.get_shared_stations(stations_in_complexes, start_and_end_routes)
+            self.shared_stations = shared_stations
             # Assign correct shared station to start_terminus and end_origin
             if shared_stations:
                 for station in shared_stations:

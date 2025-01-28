@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 # CIRCULAR IMPORT ISSUE
 # from Objects import Train, Stop
 from Objects import current_time
+from Objects import Station
 
 # convert 10 digit POSIX timestamp used in feed to readable format
 def convert_timestamp(timestamp):
@@ -17,29 +18,7 @@ def time_difference(first_time, second_time):
     detla_time = second_time - first_time
     return detla_time
 
-# CIRCULAR IMPORT ISSUE?
-# def trains_to_objects(train_list):
-#         train_object_list = []
-#         for train in train_list:
-#             new_schedule = []
-#             for stop in train.trip_update.stop_time_update:
-#                 new_stop = Stop(
-#                     arrival= stop.arrival.time,
-#                     departure= stop.departure.time,
-#                     stop_id= stop.stop_id
-#                 )
-#                 new_schedule.append(new_stop)
-            
-#             new_train = Train(
-#                 trip_id= train.trip_update.trip.trip_id,
-#                 start_time= train.trip_update.trip.start_time,
-#                 start_date= train.trip_update.trip.start_date,
-#                 route_id= train.trip_update.trip.route_id,
-#                 schedule= new_schedule
-#             )
-#             train_object_list.append(new_train)
-#         return train_object_list
-
+# this could be split up further
 def filter_trains_for_stations_direction_current(train_data, start_station_id, end_station_id):
         filtered_trains = []
         for train_feed in train_data:
@@ -88,3 +67,39 @@ def get_station_routes(station_daytime_routes):
         if route != " ":
             routes.append(route)
     return routes
+
+# returns True if a route from the start station routes is present in the end station routes
+def same_line(start_station_routes, end_station_routes):
+    for route in start_station_routes:
+            if route not in end_station_routes:
+                return False
+            else:
+                 return True
+
+# takes daytime routes of a station (start or end), and returns the complex ids of all stations that are served by that route (eg. "G")
+def find_complex_ids(daytime_routes):
+     complex_ids = []
+     for route in (daytime_routes):
+                if route != " ":
+                    # look at each station that has a route from daytime routes
+                    for station in Station.query.filter(Station.daytime_routes.contains(route)).all():
+                        # add the complex id of that station to our result
+                        if station.complex_id not in complex_ids:
+                            complex_ids.append(station.complex_id)
+                return complex_ids
+     
+def complex_ids_to_stations(shared_complexes):
+    complex_stations =  []
+    for complex_number in shared_complexes:
+        complexes = Station.query.filter(Station.complex_id == complex_number).all()
+        for complex in complexes:
+            complex_stations.append(complex)
+    return complex_stations
+
+def get_shared_stations(stations_in_complexes, routes):
+    shared_stations = []
+    for station in stations_in_complexes:
+        for route in station.daytime_routes:
+            if route != " " and route in routes:
+                shared_stations.append(station) 
+    return list(set(shared_stations))

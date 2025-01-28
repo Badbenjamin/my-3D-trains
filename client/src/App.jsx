@@ -13,7 +13,7 @@ function App() {
   // load station and track model. destructure to nodes and materials to create Station component
   // nodes correspond to each geometry in the model
   // each node contains a mesh, which has the properties for that geometry 
-  const { nodes, materials } = useGLTF('./subway_map_G_7_L_ACE_3.glb')
+  const { nodes, materials } = useGLTF('./subway_map_G_7_L_ACE_BDFM_incomplete.glb')
 
   const [stations, setStations] = useState([])
   const [stationArray, setStationArray] = useState([])
@@ -35,7 +35,7 @@ function App() {
     // newStatusArray is an array of objects with names of stations/meshes and a boolean to determine whether they are selected or not
     const newStatusArray = createStatusObjectArray(nodes)
     // newMapModelObj contains the info for all the station and track geometries in our scene
-    const newMapModelObj = createStationComponentsObj(nodes, materials, newStatusArray, setStatusArray)
+    const newMapModelObj = createStationComponentsObj(nodes, materials, newStatusArray)
     // this loop populates newStationArray with meshes from our newMapModelObject
     const newStationArray = [...stationArray]
     for (const station in newMapModelObj){
@@ -104,7 +104,7 @@ function App() {
  
   return (
     <>
-      <h2>MY 3D TRAINS</h2>
+      {/* <h2>MY 3D TRAINS</h2> */}
       {/* <NavBar/> */}
       <Outlet context={{
         stations : stations, 

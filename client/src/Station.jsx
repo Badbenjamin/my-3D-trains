@@ -7,7 +7,7 @@ import { useFrame } from "@react-three/fiber"
 // import { is } from "@react-three/fiber/dist/declarations/src/core/utils"
 
 function Station( { status, materials, mesh, index, getStationCode, id}){
-        console.log('stat', status)
+        // console.log('stat', status)
         // console.log("mat", materials)
         // const materialName = Object.keys(materials)
         // console.log(id)
@@ -21,29 +21,23 @@ function Station( { status, materials, mesh, index, getStationCode, id}){
         const newName = mesh['name']
         const newGeometry = mesh.geometry
         // CHANGE THIS FOR OTHER LINES!
-        const newMaterial =  status['color'];
+        const newMaterial =  mesh.material;
         const newCastShadow = true
         const newRecieveShadow = true
         const newPosition = mesh['position']
         const newRotation = mesh['rotation']
         const newScale = mesh['scale']
        
-        // let color = newMaterial
-
+        // do i need this state or can I just have a variable?
         const [isWhite, setIsWhite] = useState(false)
-        // console.log('is white', isWhite)
         let color = !isWhite ? newMaterial : white
         
-        // very odd
-        // if i update code and save, it works
-        // untill then it flips the color but does not change
+        // odd behavior with setInterval
+        // only switches from origional state once 
         useEffect(()=>{
+         
             if (status['status']){
-                setInterval(()=>{
-                    // mesh.material.color.setHex( 0xffffff )
-                    setIsWhite(!isWhite)
-                    // console.log(isWhite)
-                }, 1000)
+                setIsWhite(true)
             }
             if (!status['status']){
                 setIsWhite(false)

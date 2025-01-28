@@ -44,7 +44,7 @@ export function createStatusObjectArray(nodes){
     for (const mesh in nodes){
       if (nodes[mesh].type === "Mesh"){
         console.log('mat', nodes[mesh].material)
-        const status = {"name": nodes[mesh].name, "status": false, "color": nodes[mesh].material}
+        const status = {"name": nodes[mesh].name, "status": false}
         newStatusArray.push(status)   
     } 
   }

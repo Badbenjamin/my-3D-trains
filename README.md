@@ -8,18 +8,5 @@ I'm currently working on the following features:
     -Save User Commutes And View Stats
     -Realtime Train Locations On Map
 
-## Launch App
 
-### Start Server
-CD to /server
-$ pipenv install
-$ pip env shell
-
-CD to /src
-$ flask run
-
-### Start Client
-CD to /client
-$ npm install
-$ npm run dev
 
