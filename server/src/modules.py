@@ -19,6 +19,7 @@ def time_difference(first_time, second_time):
     return detla_time
 
 # this could be split up further
+# WORK ON THIS FUNCTION
 def filter_trains_for_stations_direction_current(train_data, start_station_id, end_station_id):
         filtered_trains = []
         for train_feed in train_data:
@@ -35,8 +36,10 @@ def filter_trains_for_stations_direction_current(train_data, start_station_id, e
                             # might need to change this if moved to modules!
                             if stop.stop_id[:-1] == start_station_id and time_difference(current_time, convert_timestamp(stop.arrival.time)) > convert_seconds(30):
                                 filtered_trains.append(train)
+        # print("ft", filtered_trains)
         return filtered_trains
 
+# WORK ON THIS FUNCTION
 def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_station_id, time=(round(current_time.timestamp()))):
         print('time', time)
         trains_with_arrival = []
@@ -56,8 +59,12 @@ def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_stati
             elif train['dest_arrival_time'] > time and (train['dest_arrival_time'] < next_train['dest_arrival_time']):
                 next_train = train
         print('next train', next_train)
-        print('ntat', convert_timestamp(next_train['dest_arrival_time']))
-        return next_train
+        # print('ntat', convert_timestamp(next_train['dest_arrival_time']))
+        # Raise except try that here?
+        if next_train == None:
+             print("no trains arriving at", dest_station_id)
+        else:
+            return next_train
 
 # return a list of routes eg. [A,C,E] for a station
 # This doesn't appear to be used!

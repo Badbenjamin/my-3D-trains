@@ -76,6 +76,7 @@ class Journey:
             # return all stations that serve a route that is served by the start and end station
             shared_stations = modules.get_shared_stations(stations_in_complexes, start_and_end_routes)
             self.shared_stations = shared_stations
+            
             # Assign correct shared station to start_terminus and end_origin
             if shared_stations:
                 for station in shared_stations:
