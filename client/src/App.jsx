@@ -13,7 +13,7 @@ function App() {
   // load station and track model. destructure to nodes and materials to create Station component
   // nodes correspond to each geometry in the model
   // each node contains a mesh, which has the properties for that geometry 
-  const { nodes, materials } = useGLTF('./subway_map_G_7_ACE_L_BDFM.glb')
+  const { nodes, materials } = useGLTF('./subway_map_G_7_ACE_L_BDFM_v4.glb')
 
   const [stations, setStations] = useState([])
   const [stationArray, setStationArray] = useState([])

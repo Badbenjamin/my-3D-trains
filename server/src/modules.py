@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import math
 
 # CIRCULAR IMPORT ISSUE
 # from Objects import Train, Stop
@@ -18,42 +19,53 @@ def time_difference(first_time, second_time):
     detla_time = second_time - first_time
     return detla_time
 
-# this could be split up further
-# WORK ON THIS FUNCTION
+def create_stop_schedule(train):
+    stops = []
+    # stops list contains each trains stop array. used to determine if start stop is before end stop
+    stop_schedule = train.trip_update.stop_time_update
+    for stop in stop_schedule:
+        stops.append(stop.stop_id[:-1])
+    return stops
+
+# if filtered trains is NONE, then no trains are arriving at the start station in the future
+# or they skip either the start or end station
+# how do I raise an error and pass it to the front end?
 def filter_trains_for_stations_direction_current(train_data, start_station_id, end_station_id):
         filtered_trains = []
         for train_feed in train_data:
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
-                    stops = []
-                    # stops list contains each trains stop array. used to determine if start stop is before end stop
-                    for stop in train.trip_update.stop_time_update:
-                        stops.append(stop.stop_id[:-1])
-                    # checking if start stop is before end stop in stops array
-                    if (start_station_id in stops and end_station_id in stops and stops.index(start_station_id) < stops.index(end_station_id)):
-                        # filtering out trains that have already departed the start station (departure time in pase)
-                        for stop in train.trip_update.stop_time_update:
-                            # might need to change this if moved to modules!
-                            if stop.stop_id[:-1] == start_station_id and time_difference(current_time, convert_timestamp(stop.arrival.time)) > convert_seconds(30):
+                    stops = create_stop_schedule(train)
+                    # checking if start stop and end stop are present, and start stop is before end stop in stops array
+                    if ((start_station_id in stops and end_station_id in stops) and (stops.index(start_station_id) < stops.index(end_station_id))):
+                        stop_schedule = train.trip_update.stop_time_update
+                        for stop in stop_schedule:
+                            arrival_time = stop.arrival.time
+                            current_time_int = int(math.ceil(current_time.timestamp()))
+                            # only add train if it arrives at start station, and that arrival time is in the future
+                            if (stop.stop_id[:-1] == start_station_id) and (arrival_time > current_time_int):
                                 filtered_trains.append(train)
-        # print("ft", filtered_trains)
         return filtered_trains
 
-# WORK ON THIS FUNCTION
+def create_obj_array_with_train_and_arrival(filtered_train_data_object, dest_station_id):
+    trains_with_arrival = []
+    for train in filtered_train_data_object:
+        arrival_train = {"train" : train, "dest_arrival_time" : None}
+        for stop in train.schedule:
+            if stop.stop_id[:-1] == dest_station_id:
+                arrival_train['dest_arrival_time'] = stop.arrival
+        trains_with_arrival.append(arrival_train)
+    return trains_with_arrival
+
+
+# LEFT OFF HERE
 def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_station_id, time=(round(current_time.timestamp()))):
-        print('time', time)
-        trains_with_arrival = []
-        # swapped self.filter_trains_for_stations_direction_current() for get_legInfo()
-        for train in filtered_train_data_object:
-            arrival_train = {"train" : train, "dest_arrival_time" : None}
-            for stop in train.schedule:
-                if stop.stop_id[:-1] == dest_station_id:
-                    arrival_train['dest_arrival_time'] = stop.arrival
-            trains_with_arrival.append(arrival_train)
+        
+        trains_with_arrival_objs_array = create_obj_array_with_train_and_arrival(filtered_train_data_object, dest_station_id)
         
         next_train = None
        
-        for train in trains_with_arrival:
+        for train in trains_with_arrival_objs_array:
             if next_train == None and train['dest_arrival_time'] > time:
                 next_train = train
             elif train['dest_arrival_time'] > time and (train['dest_arrival_time'] < next_train['dest_arrival_time']):
