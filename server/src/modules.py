@@ -47,36 +47,43 @@ def filter_trains_for_stations_direction_current(train_data, start_station_id, e
                                 filtered_trains.append(train)
         return filtered_trains
 
-def create_obj_array_with_train_and_arrival(filtered_train_data_object, dest_station_id):
+def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id, ):
     trains_with_arrival = []
     for train in filtered_train_data_object:
-        arrival_train = {"train" : train, "dest_arrival_time" : None}
+        arrival_train = {"train" : train, "dest_arrival_time" : None, "origin_arrival_time" : None}
         for stop in train.schedule:
             if stop.stop_id[:-1] == dest_station_id:
                 arrival_train['dest_arrival_time'] = stop.arrival
+            elif stop.stop_id[:-1] == start_station_id:
+                 arrival_train['origin_arrival_time'] = stop.arrival
         trains_with_arrival.append(arrival_train)
     return trains_with_arrival
 
-
+def quick_sort_trains_by_arrival_time(train_obj_array):
+    new_train_obj_array = [*train_obj_array]
+    # print("ntoa", new_train_obj_array[0]['dest_arrival_time'])
+    if len(new_train_obj_array) < 2:
+         return new_train_obj_array
+    else:
+        #  print("ntoa",[convert_timestamp(at['dest_arrival_time']).strftime('%H:%M:%S') for at in new_train_obj_array])
+         pivot = new_train_obj_array[0]
+         less = [nto for nto in new_train_obj_array[1:] if nto['dest_arrival_time'] <= pivot['dest_arrival_time']]
+         greater = [nto for nto in new_train_obj_array[1:] if nto['dest_arrival_time'] > pivot['dest_arrival_time']]
+         return quick_sort_trains_by_arrival_time(less) + [pivot] + quick_sort_trains_by_arrival_time(greater)
+    
 # LEFT OFF HERE
-def sort_trains_by_arrival_at_destination(filtered_train_data_object, dest_station_id, time=(round(current_time.timestamp()))):
+def sort_trains_by_arrival_at_destination(filtered_train_data_object, start_station_id, dest_station_id, time=(round(current_time.timestamp()))):
         
-        trains_with_arrival_objs_array = create_obj_array_with_train_and_arrival(filtered_train_data_object, dest_station_id)
+        trains_with_arrival_objs_array = create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id)
         
-        next_train = None
-       
-        for train in trains_with_arrival_objs_array:
-            if next_train == None and train['dest_arrival_time'] > time:
-                next_train = train
-            elif train['dest_arrival_time'] > time and (train['dest_arrival_time'] < next_train['dest_arrival_time']):
-                next_train = train
-        print('next train', next_train)
-        # print('ntat', convert_timestamp(next_train['dest_arrival_time']))
+        sorted_trains = [train for train in quick_sort_trains_by_arrival_time(trains_with_arrival_objs_array) if train['origin_arrival_time'] > time]
+        
         # Raise except try that here?
-        if next_train == None:
+        # should raise exeption in filter_trains_for_station_direction_current
+        if len(sorted_trains) == 0:
              print("no trains arriving at", dest_station_id)
         else:
-            return next_train
+            return sorted_trains[0]
 
 # return a list of routes eg. [A,C,E] for a station
 # This doesn't appear to be used!

@@ -76,7 +76,7 @@ class Journey:
             # return all stations that serve a route that is served by the start and end station
             shared_stations = modules.get_shared_stations(stations_in_complexes, start_and_end_routes)
             self.shared_stations = shared_stations
-            
+
             # Assign correct shared station to start_terminus and end_origin
             if shared_stations:
                 for station in shared_stations:
@@ -236,12 +236,12 @@ class TrainData:
         leg_info = self.get_leg_info()
         print("leg info", leg_info)
         if "leg_two" in leg_info:
-            leg_one_train = modules.sort_trains_by_arrival_at_destination(leg_info['leg_one'], self.start_station_terminus_id)
+            leg_one_train = modules.sort_trains_by_arrival_at_destination(leg_info['leg_one'], self.start_station_id, self.start_station_terminus_id)
             leg_one_arrival_time = leg_one_train['dest_arrival_time'] + 120
-            leg_two_train = modules.sort_trains_by_arrival_at_destination(leg_info['leg_two'],self.end_station_origin_id, leg_one_arrival_time)
+            leg_two_train = modules.sort_trains_by_arrival_at_destination(leg_info['leg_two'], self.end_station_origin_id, self.end_station_id, leg_one_arrival_time)
             return [{"train":leg_one_train['train'], "start": self.start_station_id, "end":self.start_station_terminus_id}, {"train":leg_two_train['train'], "start":self.end_station_origin_id, "end": self.end_station_id}]
         elif "single_leg" in leg_info:
-            single_leg_train = modules.sort_trains_by_arrival_at_destination(leg_info['single_leg'],  self.end_station_id)
+            single_leg_train = modules.sort_trains_by_arrival_at_destination(leg_info['single_leg'], self.start_station_id, self.end_station_id)
             return [{"train" : single_leg_train['train'], "start":self.start_station_id, "end":self.end_station_id}]
         
     def format_for_react(self):
