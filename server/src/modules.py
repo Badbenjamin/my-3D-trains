@@ -27,6 +27,15 @@ def create_stop_schedule(train):
         stops.append(stop.stop_id[:-1])
     return stops
 
+# LEFT OFF HERE 1/30
+def check_for_station_service(train_data, station):
+     for train_feed in train_data:
+          for train in train_feed.entity:
+               if train.HasField('trip_update'):
+                    stops = create_stop_schedule(train)
+     print("check for station service")
+
+
 # if filtered trains is NONE, then no trains are arriving at the start station in the future
 # or they skip either the start or end station
 # how do I raise an error and pass it to the front end?
@@ -45,7 +54,11 @@ def filter_trains_for_stations_direction_current(train_data, start_station_id, e
                             # only add train if it arrives at start station, and that arrival time is in the future
                             if (stop.stop_id[:-1] == start_station_id) and (arrival_time > current_time_int):
                                 filtered_trains.append(train)
-        return filtered_trains
+        if len(filtered_trains) == 0:
+             print("no trains at start or dest station")
+             check_for_station_service(train_data, start_station_id)
+        else:
+            return filtered_trains
 
 def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id, ):
     trains_with_arrival = []
