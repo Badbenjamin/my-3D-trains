@@ -14,6 +14,7 @@ function Station( { status, materials, mesh, index, getStationCode, id}){
         // let stationRef = useRef()
 
         const [readableName, setReadableName] = useState("")
+        const [displayName, setDisplayName] = useState(false)
         
 
         const white = new THREE.MeshBasicMaterial({color:'white'})
@@ -45,13 +46,14 @@ function Station( { status, materials, mesh, index, getStationCode, id}){
         }, [status])
      
         // Get Station Names for HTML text
-        useEffect(()=>{
-            if (newName.length < 5 ){
-                fetch(`http://127.0.0.1:5555/api/stationname/${newName}`)
-                .then(response => response.json())
-                .then(decodedName => {setReadableName(decodedName.name + " " + decodedName.daytime_routes)})
-            }
-        }, [])
+        // useEffect(()=>{
+        //     if (newName.length < 5 ){
+        //         fetch(`http://127.0.0.1:5555/api/stationname/${newName}`)
+        //         .then(response => response.json())
+        //         .then(decodedName => {setReadableName(decodedName.name + " " + decodedName.daytime_routes), console.log(newName)})
+        //         .catch((error)=>{console.log(error, newName)})
+        //     }
+        // }, [])
 
         function handleClick(){
             getStationCode(newName)
@@ -74,7 +76,7 @@ function Station( { status, materials, mesh, index, getStationCode, id}){
                   scale={newScale}
                   
             />
-                {newName.length < 5 ?<Html wrapperClass="station_label" distanceFactor={10} position={newPosition}>{readableName}</Html>: <></>}
+                {<Html wrapperClass="station_label" distanceFactor={10} position={newPosition}>{readableName}</Html>}
         </group>
     )
 }

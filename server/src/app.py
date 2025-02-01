@@ -29,7 +29,8 @@ def get_all_stations():
 
 # get station names for HTML text on map
 @app.route('/api/stationname/<string:gtfs_id>')
-def get_station_name(gtfs_id): 
+def get_station_name(gtfs_id):
+    print(gtfs_id)
     station = Station.query.filter(Station.gtfs_stop_id == gtfs_id).first()
     return {"name" : station.stop_name, "daytime_routes" : station.daytime_routes}, 200
 
