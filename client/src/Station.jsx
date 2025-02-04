@@ -7,34 +7,32 @@ import { useFrame } from "@react-three/fiber"
 // import { is } from "@react-three/fiber/dist/declarations/src/core/utils"
 
 function Station( { status, materials, mesh, index, getStationCode, id}){
-        // console.log('stat', status)
-        // console.log("mat", materials)
-        // const materialName = Object.keys(materials)
-        // console.log(id)
-        let stationRef = useRef()
 
         const [readableName, setReadableName] = useState("")
         const [displayName, setDisplayName] = useState(false)
-        
+        let stationRef = useRef()
 
-        const white = new THREE.MeshStandardMaterial({color:'salmon'})
+        const selectedMaterial = new THREE.MeshStandardMaterial()
+        selectedMaterial.color =  new THREE.Color('white')
+
+        // const cube = new THREE.BoxGeometry()
+        // const cubeMat = newThree.MeshStandardMaterial()
+        // cubeMat.color = new THREE.Color('black')
         
-        const newName = mesh['name']
+        
+        const newName = mesh.name
         const newGeometry = mesh.geometry
-        // CHANGE THIS FOR OTHER LINES!
         const newMaterial =  mesh.material;
         const newCastShadow = true
         const newRecieveShadow = true
-        const newPosition = mesh['position']
-        const newRotation = mesh['rotation']
-        const newScale = mesh['scale']
+        const newPosition = mesh.position
+        const newRotation = mesh.rotation
+        const newScale = mesh.scale
        
         // do i need this state or can I just have a variable?
         const [isWhite, setIsWhite] = useState(false)
-        let color = !isWhite ? newMaterial : white
+        let color = !isWhite ? newMaterial : selectedMaterial
         
-        
-
         useFrame(({clock})=>{
             // setIsWhite(true)
             let a = clock.getElapsedTime()
