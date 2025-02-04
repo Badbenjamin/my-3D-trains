@@ -17,6 +17,8 @@ import modules
 # Converts JSON train into a easier to read object
 # circular import issue, couldn't move to modules
 def trains_to_objects(train_list):
+        if type(train_list) == str:
+            return train_list
         train_object_list = []
         for train in train_list:
             new_schedule = []
@@ -165,7 +167,7 @@ class TrainData:
 
     def __init__(self, journey_object):
         # print(journey_object)
-
+        self.missing_stations = None
         self.start_station_name = journey_object.start_station.stop_name
         self.end_station_name = journey_object.end_station.stop_name
         self.shared_station_names = None
@@ -216,13 +218,18 @@ class TrainData:
         return all_trains
     
     
+    # HERE IS WHERE TO CHECK FOR STATION
     # get all trains heading in the correct direction and stopping at start and end stations
     # OR going to and from shared station (has start station terminus and end station origin)
-    def get_leg_info(self):
+    def get_leg_trains(self):
         filtered_leg_info_obj = {}
         if self.start_station_terminus_id == None and self.end_station_origin_id == None:
+            # LEFT OFF HERE 2/4
             single_leg_data = trains_to_objects(modules.filter_trains_for_stations_direction_current(self.all_train_data, self.start_station_id, self.end_station_id))
-            filtered_leg_info_obj = {"single_leg" : single_leg_data}
+            if type(single_leg_data) == str:
+                self.missing_stations = single_leg_data
+            else:
+                filtered_leg_info_obj = {"single_leg" : single_leg_data}
         elif self.start_station_terminus_id and self.end_station_origin_id:
             first_leg_data =  trains_to_objects(modules.filter_trains_for_stations_direction_current(self.all_train_data, self.start_station_id, self.start_station_terminus_id))
             second_leg_data = trains_to_objects(modules.filter_trains_for_stations_direction_current(self.all_train_data, self.end_station_origin_id, self.end_station_id))
@@ -231,9 +238,9 @@ class TrainData:
     
     # find the train that is arriving closest to current time
     # if two leg trip, "time" arg is current time by default, but is replaced by leg 1 dest arrival time in second function call.
-    # in the future, I'll add a feature to change the departure time, or find the next train. 
+    # CHANGE FROM 
     def get_next_train_data(self):
-        leg_info = self.get_leg_info()
+        leg_info = self.get_leg_trains()
         print("leg info", leg_info)
         if "leg_two" in leg_info:
             leg_one_train = modules.sort_trains_by_arrival_at_destination(leg_info['leg_one'], self.start_station_id, self.start_station_terminus_id)

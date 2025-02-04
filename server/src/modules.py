@@ -5,6 +5,7 @@ import math
 # from Objects import Train, Stop
 from Objects import current_time
 from Objects import Station
+# from Objects import Stop
 
 # convert 10 digit POSIX timestamp used in feed to readable format
 def convert_timestamp(timestamp):
@@ -27,20 +28,21 @@ def create_stop_schedule(train):
         stops.append(stop.stop_id[:-1])
     return stops
 
-# LEFT OFF HERE 1/30
-def check_for_station_service(train_data, station):
-     for train_feed in train_data:
-          for train in train_feed.entity:
-               if train.HasField('trip_update'):
-                    stops = create_stop_schedule(train)
-     print("check for station service")
-
-
+# could I combine this into filter trains for station direction current?
+def check_for_station_service(train_array, station_id):
+    station_serivce = False
+    for train in train_array:
+        stops = create_stop_schedule(train)
+        if station_id in stops:
+            station_serivce = True
+    return station_serivce
+          
 # if filtered trains is NONE, then no trains are arriving at the start station in the future
 # or they skip either the start or end station
 # how do I raise an error and pass it to the front end?
 def filter_trains_for_stations_direction_current(train_data, start_station_id, end_station_id):
         filtered_trains = []
+        other_trains = []
         for train_feed in train_data:
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
@@ -54,11 +56,23 @@ def filter_trains_for_stations_direction_current(train_data, start_station_id, e
                             # only add train if it arrives at start station, and that arrival time is in the future
                             if (stop.stop_id[:-1] == start_station_id) and (arrival_time > current_time_int):
                                 filtered_trains.append(train)
-        if len(filtered_trains) == 0:
-             print("no trains at start or dest station")
-             check_for_station_service(train_data, start_station_id)
-        else:
+                            # else:
+                            #      other_trains.append(train)
+                    else:
+                        other_trains.append(train)
+        if filtered_trains != []:
             return filtered_trains
+        else:
+            message = ""
+            if check_for_station_service(other_trains, start_station_id) == False:
+                message = "There are no trains serving your start station"
+            elif check_for_station_service(other_trains, end_station_id) == False:
+                message = "There are no trains serving your start station"
+            elif  ((check_for_station_service(other_trains, start_station_id) == False) and (check_for_station_service(other_trains, end_station_id) == False)):
+                 message = "trains are not stopping at either of your chosen stations"
+            print('message', message)
+            return message
+             
 
 def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id, ):
     trains_with_arrival = []
@@ -83,14 +97,27 @@ def quick_sort_trains_by_arrival_time(train_obj_array):
          less = [nto for nto in new_train_obj_array[1:] if nto['dest_arrival_time'] <= pivot['dest_arrival_time']]
          greater = [nto for nto in new_train_obj_array[1:] if nto['dest_arrival_time'] > pivot['dest_arrival_time']]
          return quick_sort_trains_by_arrival_time(less) + [pivot] + quick_sort_trains_by_arrival_time(greater)
-    
+
+# def check_station_status(train_obj_array, start_station_id, end_station_id):
+#     #  include line info?
+#      for train_obj in train_obj_array:
+#           train_schedule = [stop.stop_id[0:-1] for stop in train_obj['train'].schedule]
+#           if start_station_id not in train_schedule:
+#                print("start station not in service")
+#           elif end_station_id not in train_schedule:
+#                print('end station not in service')
+#           else:
+#                print('both stations in service')
+               
+     
+
 # LEFT OFF HERE
 def sort_trains_by_arrival_at_destination(filtered_train_data_object, start_station_id, dest_station_id, time=(round(current_time.timestamp()))):
         
         trains_with_arrival_objs_array = create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id)
         
         sorted_trains = [train for train in quick_sort_trains_by_arrival_time(trains_with_arrival_objs_array) if train['origin_arrival_time'] > time]
-        
+        # print("check status", check_station_status(sorted_trains,start_station_id,dest_station_id))
         # Raise except try that here?
         # should raise exeption in filter_trains_for_station_direction_current
         if len(sorted_trains) == 0:
