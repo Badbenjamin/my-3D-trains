@@ -11,13 +11,13 @@ function Station( { status, materials, mesh, index, getStationCode, id}){
         // console.log("mat", materials)
         // const materialName = Object.keys(materials)
         // console.log(id)
-        // let stationRef = useRef()
+        let stationRef = useRef()
 
         const [readableName, setReadableName] = useState("")
         const [displayName, setDisplayName] = useState(false)
         
 
-        const white = new THREE.MeshBasicMaterial({color:'white'})
+        const white = new THREE.MeshStandardMaterial({color:'salmon'})
         
         const newName = mesh['name']
         const newGeometry = mesh.geometry
@@ -33,17 +33,21 @@ function Station( { status, materials, mesh, index, getStationCode, id}){
         const [isWhite, setIsWhite] = useState(false)
         let color = !isWhite ? newMaterial : white
         
-        // odd behavior with setInterval
-        // only switches from origional state once 
-        useEffect(()=>{
-         
+        
+
+        useFrame(({clock})=>{
+            // setIsWhite(true)
+            let a = clock.getElapsedTime()
             if (status['status']){
-                setIsWhite(true)
+                if (Math.round(a) % 2 == 0){
+                    setIsWhite(true)
+                } else {
+                    setIsWhite(false)
+                }
             }
-            if (!status['status']){
-                setIsWhite(false)
-            }
-        }, [status])
+           
+            
+        })
      
         // Get Station Names for HTML text
         // useEffect(()=>{
@@ -65,7 +69,7 @@ function Station( { status, materials, mesh, index, getStationCode, id}){
         <group>
             <mesh       
                   onClick={handleClick}   
-                //   ref={stationRef}
+                  ref={stationRef[index]}
                   name={newName}
                   castShadow={newCastShadow}
                   receiveShadow={newRecieveShadow}
