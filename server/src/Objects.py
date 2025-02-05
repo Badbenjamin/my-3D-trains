@@ -168,6 +168,7 @@ class Schedule:
 
 # accepts journey object as arg
 # all_train_data will provide every relevant train for a multi leg trip
+# GONNA SPLIT THIS B UP!
 class TrainData:
 
     def __init__(self, journey_object):
@@ -226,6 +227,7 @@ class TrainData:
     # HERE IS WHERE TO CHECK FOR STATION
     # get all trains heading in the correct direction and stopping at start and end stations
     # OR going to and from shared station (has start station terminus and end station origin)
+    # TIS IS WHERE NEW CLASS BEGINS
     def get_leg_trains(self):
         filtered_leg_info_obj = {}
         if self.start_station_terminus_id == None and self.end_station_origin_id == None:
