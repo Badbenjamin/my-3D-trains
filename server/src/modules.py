@@ -37,12 +37,9 @@ def check_for_station_service(train_array, station_id):
             station_serivce = True
     return station_serivce
           
-# if filtered trains is NONE, then no trains are arriving at the start station in the future
-# or they skip either the start or end station
-# how do I raise an error and pass it to the front end?
+# THIS IS NOT WORKING SINCE REFACTOR
 def filter_trains_for_stations_direction_current(train_data, start_station_id, end_station_id):
         filtered_trains = []
-        other_trains = []
         for train_feed in train_data:
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
@@ -50,6 +47,7 @@ def filter_trains_for_stations_direction_current(train_data, start_station_id, e
                     # checking if start stop and end stop are present, and start stop is before end stop in stops array
                     if ((start_station_id in stops and end_station_id in stops) and (stops.index(start_station_id) < stops.index(end_station_id))):
                         stop_schedule = train.trip_update.stop_time_update
+                        
                         for stop in stop_schedule:
                             arrival_time = stop.arrival.time
                             current_time_int = int(math.ceil(current_time.timestamp()))
@@ -57,24 +55,24 @@ def filter_trains_for_stations_direction_current(train_data, start_station_id, e
                             if (stop.stop_id[:-1] == start_station_id) and (arrival_time > current_time_int):
                                 filtered_trains.append(train)
                             # else:
-                            #      other_trains.append(train)
-                    else:
-                        other_trains.append(train)
-        if filtered_trains != []:
-            return filtered_trains
-        else:
-            message = ""
-            if check_for_station_service(other_trains, start_station_id) == False:
-                message = "There are no trains serving your start station"
-            elif check_for_station_service(other_trains, end_station_id) == False:
-                message = "There are no trains serving your start station"
-            elif  ((check_for_station_service(other_trains, start_station_id) == False) and (check_for_station_service(other_trains, end_station_id) == False)):
-                 message = "trains are not stopping at either of your chosen stations"
-            print('message', message)
-            return message
+                            #      other_trains.append(train)      
+        # if filtered_trains != []:
+        # print('ft', start_station_id, end_station_id)
+        return filtered_trains
+        # else:
+        #     message = ""
+        #     if check_for_station_service(other_trains, start_station_id) == False:
+        #         message = "There are no trains serving your start station"
+        #     elif check_for_station_service(other_trains, end_station_id) == False:
+        #         message = "There are no trains serving your start station"
+        #     elif  ((check_for_station_service(other_trains, start_station_id) == False) and (check_for_station_service(other_trains, end_station_id) == False)):
+        #          message = "trains are not stopping at either of your chosen stations"
+        #     print('message', message)
+        #     return message
              
 
 def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id, ):
+    print('ftdo', filtered_train_data_object)
     trains_with_arrival = []
     for train in filtered_train_data_object:
         arrival_train = {"train" : train, "dest_arrival_time" : None, "origin_arrival_time" : None}
@@ -111,7 +109,7 @@ def quick_sort_trains_by_arrival_time(train_obj_array):
                
      
 
-# LEFT OFF HERE
+
 def sort_trains_by_arrival_at_destination(filtered_train_data_object, start_station_id, dest_station_id, time=(round(current_time.timestamp()))):
         
         trains_with_arrival_objs_array = create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id)
@@ -135,6 +133,7 @@ def get_station_routes(station_daytime_routes):
     return routes
 
 # returns True if a route from the start station routes is present in the end station routes
+# NEEDS TO BE ABLE TO HANDLE EXPRESS/LOCAL LOGIC
 def same_line(start_station_routes, end_station_routes):
     for route in start_station_routes:
             if route not in end_station_routes:

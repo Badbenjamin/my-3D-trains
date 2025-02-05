@@ -1,16 +1,23 @@
 from config import app
 from datetime import datetime
 from models import Station
-from Objects import Journey, TrainData
+from Objects import Journey, TrainData, TripSchedule
 
 ct = datetime.now()
 
 # takes input from journey planner, returns train or trains going from start to end station
 @app.route('/api/plan_trip/<string:start_station_id>/<string:end_station_id>')
 def plan_trip(start_station_id, end_station_id):
+    # print('ids',start_station_id, end_station_id)
     new_journey = Journey(start_station_id, end_station_id)
-    new_data = TrainData(new_journey)
-    return new_data.format_for_react(), 200
+    new_train_data = TrainData(new_journey)
+    # print('traindata', new_train_data.all_train_data)
+    # fork here for multi leg trips?
+    # if new_train_data.shared_stations == None:
+    new_schedule = TripSchedule(new_train_data.all_train_data, new_train_data.start_station_id, new_train_data.end_station_id)
+    # else:
+
+    return new_schedule.format_for_react(), 200
 
 # get names and routes (and gtfs id) for search bar in journey planner
 @app.route('/api/stations')

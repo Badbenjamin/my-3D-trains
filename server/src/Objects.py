@@ -16,11 +16,12 @@ import modules
 
 # Converts JSON train into a easier to read object
 # circular import issue, couldn't move to modules
-def trains_to_objects(train_list):
-        if type(train_list) == str:
-            return train_list
+def trains_to_objects(filtered_trains):
+        # print("ft", filtered_trains)
+        # if type(train_list) == str:
+        #     return train_list
         train_object_list = []
-        for train in train_list:
+        for train in filtered_trains:
             new_schedule = []
             for stop in train.trip_update.stop_time_update:
                 new_stop = Stop(
@@ -45,22 +46,24 @@ def trains_to_objects(train_list):
 class Journey:
 
     def __init__(self, start_station_id, end_station_id, time=None):
+
         self.start_station = Station.query.filter(Station.id == start_station_id).first()
         self.end_station = Station.query.filter(Station.id == end_station_id).first()
         # these will be reset or used as base case for recursive version
         self.start_station_terminus = None
         self.end_station_origin = None
+        
         # LET USER INPUT TRANSFER STATIONS IF THEY WANT
         self.shared_stations = []
         self.time = time
-        start_station_routes = self.start_station.daytime_routes.split()
-        end_station_routes = self.end_station.daytime_routes.split()
+        self.start_station_routes = self.start_station.daytime_routes.split()
+        self.end_station_routes = self.end_station.daytime_routes.split()
         # am i using the routes variable correctly? is it needed?
-        start_and_end_routes = list(set(start_station_routes + end_station_routes))
+        start_and_end_routes = list(set(self.start_station_routes + self.end_station_routes))
         
         # False if end station does not share a route with start station
         # True if they share a route
-        same_line = modules.same_line(start_station_routes, end_station_routes)
+        same_line = modules.same_line(self.start_station_routes, self.end_station_routes)
 
         # NEED TO MAKE BRANCH FOR SAME LINE BUT EXPRESS TO LOCAL OR LOCAL TO EXPRESS
         if same_line == False:
@@ -85,10 +88,10 @@ class Journey:
             if shared_stations:
                 for station in shared_stations:
                     shared_station_routes = station.daytime_routes.split()
-                    for route in start_station_routes:
+                    for route in self.start_station_routes:
                         if route in shared_station_routes:
                             self.start_station_terminus = station
-                    for route in end_station_routes:
+                    for route in self.end_station_routes:
                         if route in shared_station_routes:
                             self.end_station_origin = station
 
@@ -105,70 +108,17 @@ class Journey:
         
         self.end_station_endpoints = list(set(end_station_endpoints))
 
-        self.all_endpoints = [self.start_station_endpoints] + [self.end_station_endpoints]
-        print('all eps', self.all_endpoints)
+        # self.all_endpoints = [self.start_station_endpoints] + [self.end_station_endpoints]
+        # print('all eps', self.all_endpoints)
 
         
 
     def __repr__(self):
         return f'<Journey {self.start_station.stop_name} to {self.end_station.stop_name} through{self.shared_stations} at {self.time}>'
 
-class Train:
-    def __init__(self, trip_id, start_time, start_date, route_id, schedule=[]):
-        self.trip_id = trip_id
-        self.start_time = start_time
-        self.start_date = start_date
-        self.route_id = route_id
-        self.schedule = schedule
-
-    def last_stop(self):
-        return self.schedule[0]
-    
-    def next_stop(self):
-        return self.schedule[1]
-
-    def arrival_time(self, station_gtfs_id):
-        for stop in self.schedule:
-            if stop.stop_id[:-1] == station_gtfs_id:
-                return stop.arrival
-            
-    def route(self):
-        return self.route_id
-    
-    def direction(self):
-        return self.schedule[0].stop_id[-1]
-            
-    def current_location(self):
-        location = {
-            "last_stop" : self.schedule[0].stop_id,
-            "last_stop_departure" : self.schedule[0].departure,
-            "next_stop" : self.schedule[1].stop_id,
-            "next_stop_arrival" : self.schedule[1].arrival,
-            "length_of_trip" : modules.convert_seconds(self.schedule[1].arrival - self.schedule[0].departure)
-        }
-        return location
-
-    def __repr__(self):
-        return f'<Train {self.trip_id}>'
-
-class Stop:
-    def __init__(self, arrival, departure, stop_id):
-
-        self.arrival = arrival
-        self.departure = departure
-        self.stop_id = stop_id
-
-    def __repr__(self):
-        return f'<Stop {self.stop_id} {str(modules.convert_timestamp(self.arrival))[11:-3]}>'
-    
-class Schedule:
-    # make a train schedule class
-    pass
-
-
 # accepts journey object as arg
 # all_train_data will provide every relevant train for a multi leg trip
-# GONNA SPLIT THIS B UP!
+# GONNA SPLIT THIS B UP!   
 class TrainData:
 
     def __init__(self, journey_object):
@@ -179,8 +129,9 @@ class TrainData:
         self.shared_station_names = None
         self.shared_stations = None
         self.journey_object = journey_object
+        self.routes = set(journey_object.start_station_routes + journey_object.end_station_routes)
+
         if journey_object.shared_stations:
-            # just working with one shared station now!
             self.shared_station_names = set([station.stop_name for station in journey_object.shared_stations]).pop()
             self.shared_stations = journey_object.shared_stations
 
@@ -193,13 +144,9 @@ class TrainData:
         if self.journey_object.end_station_origin:
             self.end_station_origin_id = self.journey_object.end_station_origin.gtfs_stop_id
         
-        all_endpoints = []
 
-        for endpoint in journey_object.start_station_endpoints:
-            all_endpoints.append(endpoint)
+        all_endpoints = journey_object.start_station_endpoints + journey_object.end_station_endpoints
         
-        for endpoint in journey_object.end_station_endpoints:
-            all_endpoints.append(endpoint)
 
         de_duplicated_endpoints = list(set(all_endpoints))
       
@@ -211,50 +158,34 @@ class TrainData:
             feed.ParseFromString(response.content)
             all_train_data.append(feed)
         
+        # THIS IS THE IMPORTANT INFO
         self.all_train_data = all_train_data
+    
+    def __repr__(self):
+        return f'<TrainData from {self.routes} for {self.journey_object}>'
         
 
-    # returns all trains from provided endpoints
-    # def get_all_trains(self):
-    #     all_trains = []
-    #     for train_feed in self.all_train_data:
-    #         for train in train_feed.entity: 
-    #             if train.HasField('trip_update'):
-    #                 all_trains.append(train)
-    #     return all_trains
-    
-    
-    # HERE IS WHERE TO CHECK FOR STATION
-    # get all trains heading in the correct direction and stopping at start and end stations
-    # OR going to and from shared station (has start station terminus and end station origin)
-    # TIS IS WHERE NEW CLASS BEGINS
-    def get_leg_trains(self):
-        filtered_leg_info_obj = {}
-        if self.start_station_terminus_id == None and self.end_station_origin_id == None:
-            # LEFT OFF HERE 2/4
-            single_leg_data = trains_to_objects(modules.filter_trains_for_stations_direction_current(self.all_train_data, self.start_station_id, self.end_station_id))
-            filtered_leg_info_obj = {"single_leg" : single_leg_data}
-        elif self.start_station_terminus_id and self.end_station_origin_id:
-            first_leg_data =  trains_to_objects(modules.filter_trains_for_stations_direction_current(self.all_train_data, self.start_station_id, self.start_station_terminus_id))
-            second_leg_data = trains_to_objects(modules.filter_trains_for_stations_direction_current(self.all_train_data, self.end_station_origin_id, self.end_station_id))
-            filtered_leg_info_obj = { "leg_one" :first_leg_data,"leg_two" : second_leg_data}
-        return filtered_leg_info_obj
-    
-    # find the train that is arriving closest to current time
-    # if two leg trip, "time" arg is current time by default, but is replaced by leg 1 dest arrival time in second function call.
-    # CHANGE FROM 
-    def get_next_train_data(self):
-        leg_info = self.get_leg_trains()
-        print("leg info", leg_info)
-        if "leg_two" in leg_info:
-            leg_one_train = modules.sort_trains_by_arrival_at_destination(leg_info['leg_one'], self.start_station_id, self.start_station_terminus_id)
-            leg_one_arrival_time = leg_one_train['dest_arrival_time'] + 120
-            leg_two_train = modules.sort_trains_by_arrival_at_destination(leg_info['leg_two'], self.end_station_origin_id, self.end_station_id, leg_one_arrival_time)
-            return [{"train":leg_one_train['train'], "start": self.start_station_id, "end":self.start_station_terminus_id}, {"train":leg_two_train['train'], "start":self.end_station_origin_id, "end": self.end_station_id}]
-        elif "single_leg" in leg_info:
-            single_leg_train = modules.sort_trains_by_arrival_at_destination(leg_info['single_leg'], self.start_station_id, self.end_station_id)
-            return [{"train" : single_leg_train['train'], "start":self.start_station_id, "end":self.end_station_id}]
+# LEFT OFF HERE
+# NEED TO ACCOUNT FOR TIME AND PASS OFF TO FORMATTED TRAIN DATA
+class TripSchedule:
+
+    def __init__(self, train_data, start_station_id, end_station_id, time=(round(current_time.timestamp()))):
+        # problem with train_data?
         
+        leg_data = trains_to_objects(modules.filter_trains_for_stations_direction_current(train_data, start_station_id, end_station_id))
+        
+        sorted_trains = modules.sort_trains_by_arrival_at_destination(leg_data, start_station_id, end_station_id, time)
+        
+        print('sorted trains', sorted_trains)
+    
+    def __repr__(self):
+        return f'<TripSchedule   >'
+    
+
+class FormattedTrainData:
+    def __init__(self):
+        pass
+
     def format_for_react(self):
         trains_for_react = []
         
@@ -310,8 +241,62 @@ class TrainData:
         
             
 
+    
+
+class Train:
+    def __init__(self, trip_id, start_time, start_date, route_id, schedule=[]):
+        self.trip_id = trip_id
+        self.start_time = start_time
+        self.start_date = start_date
+        self.route_id = route_id
+        self.schedule = schedule
+
+    def last_stop(self):
+        return self.schedule[0]
+    
+    def next_stop(self):
+        return self.schedule[1]
+
+    def arrival_time(self, station_gtfs_id):
+        for stop in self.schedule:
+            if stop.stop_id[:-1] == station_gtfs_id:
+                return stop.arrival
+            
+    def route(self):
+        return self.route_id
+    
+    def direction(self):
+        return self.schedule[0].stop_id[-1]
+            
+    def current_location(self):
+        location = {
+            "last_stop" : self.schedule[0].stop_id,
+            "last_stop_departure" : self.schedule[0].departure,
+            "next_stop" : self.schedule[1].stop_id,
+            "next_stop_arrival" : self.schedule[1].arrival,
+            "length_of_trip" : modules.convert_seconds(self.schedule[1].arrival - self.schedule[0].departure)
+        }
+        return location
+
     def __repr__(self):
-        return f'<TrainData {self.start_station_name} to {self.end_station_name} through {self.shared_station_names}>'
+        return f'<Train {self.trip_id}>'
+
+class Stop:
+    def __init__(self, arrival, departure, stop_id):
+
+        self.arrival = arrival
+        self.departure = departure
+        self.stop_id = stop_id
+
+    def __repr__(self):
+        return f'<Stop {self.stop_id} {str(modules.convert_timestamp(self.arrival))[11:-3]}>'
+    
+class Schedule:
+    # make a train schedule class
+    pass
+
+
+
 
 
 
