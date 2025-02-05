@@ -50,6 +50,7 @@ class Journey:
         # these will be reset or used as base case for recursive version
         self.start_station_terminus = None
         self.end_station_origin = None
+        # LET USER INPUT TRANSFER STATIONS IF THEY WANT
         self.shared_stations = []
         self.time = time
         start_station_routes = self.start_station.daytime_routes.split()
@@ -61,6 +62,7 @@ class Journey:
         # True if they share a route
         same_line = modules.same_line(start_station_routes, end_station_routes)
 
+        # NEED TO MAKE BRANCH FOR SAME LINE BUT EXPRESS TO LOCAL OR LOCAL TO EXPRESS
         if same_line == False:
             # 
             start_line_complex_ids = modules.find_complex_ids(self.start_station.daytime_routes)
@@ -102,6 +104,9 @@ class Journey:
             end_station_endpoints.append(endpoint.endpoint.endpoint)
         
         self.end_station_endpoints = list(set(end_station_endpoints))
+
+        self.all_endpoints = [self.start_station_endpoints] + [self.end_station_endpoints]
+        print('all eps', self.all_endpoints)
 
         
 
@@ -166,7 +171,7 @@ class Schedule:
 class TrainData:
 
     def __init__(self, journey_object):
-        # print(journey_object)
+        # 2/4 look for this atribute in app.py and return message to front end? 
         self.missing_stations = None
         self.start_station_name = journey_object.start_station.stop_name
         self.end_station_name = journey_object.end_station.stop_name
@@ -197,8 +202,8 @@ class TrainData:
 
         de_duplicated_endpoints = list(set(all_endpoints))
       
+        # THIS IS WHERE THE REQUESTS HAPPEN 
         all_train_data = []
-        
         for endpoint in de_duplicated_endpoints:
             feed = gtfs_realtime_pb2.FeedMessage()
             response = requests.get(endpoint)
@@ -209,13 +214,13 @@ class TrainData:
         
 
     # returns all trains from provided endpoints
-    def get_all_trains(self):
-        all_trains = []
-        for train_feed in self.all_train_data:
-            for train in train_feed.entity: 
-                if train.HasField('trip_update'):
-                    all_trains.append(train)
-        return all_trains
+    # def get_all_trains(self):
+    #     all_trains = []
+    #     for train_feed in self.all_train_data:
+    #         for train in train_feed.entity: 
+    #             if train.HasField('trip_update'):
+    #                 all_trains.append(train)
+    #     return all_trains
     
     
     # HERE IS WHERE TO CHECK FOR STATION
@@ -226,10 +231,7 @@ class TrainData:
         if self.start_station_terminus_id == None and self.end_station_origin_id == None:
             # LEFT OFF HERE 2/4
             single_leg_data = trains_to_objects(modules.filter_trains_for_stations_direction_current(self.all_train_data, self.start_station_id, self.end_station_id))
-            if type(single_leg_data) == str:
-                self.missing_stations = single_leg_data
-            else:
-                filtered_leg_info_obj = {"single_leg" : single_leg_data}
+            filtered_leg_info_obj = {"single_leg" : single_leg_data}
         elif self.start_station_terminus_id and self.end_station_origin_id:
             first_leg_data =  trains_to_objects(modules.filter_trains_for_stations_direction_current(self.all_train_data, self.start_station_id, self.start_station_terminus_id))
             second_leg_data = trains_to_objects(modules.filter_trains_for_stations_direction_current(self.all_train_data, self.end_station_origin_id, self.end_station_id))
