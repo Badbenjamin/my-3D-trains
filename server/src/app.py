@@ -1,7 +1,8 @@
 from config import app
 from datetime import datetime
 from models import Station
-from Objects import Journey, TrainData, TripSchedule
+from Objects import Journey, TrainData, TripSchedule, FormattedTrainData
+import modules
 
 ct = datetime.now()
 
@@ -11,13 +12,16 @@ def plan_trip(start_station_id, end_station_id):
     # print('ids',start_station_id, end_station_id)
     new_journey = Journey(start_station_id, end_station_id)
     new_train_data = TrainData(new_journey)
-    # print('traindata', new_train_data.all_train_data)
-    # fork here for multi leg trips?
-    # if new_train_data.shared_stations == None:
-    new_schedule = TripSchedule(new_train_data.all_train_data, new_train_data.start_station_id, new_train_data.end_station_id)
-    # else:
-
-    return new_schedule.format_for_react(), 200
+    trip_sequence = []
+    # eventually i'd like to replace this with a loop for trips with more than one transfer
+    if new_journey.shared_stations == []:
+        trip_sequence.append(TripSchedule(new_train_data.all_train_data, new_train_data.start_station_id, new_train_data.end_station_id))
+    else:
+        trip_sequence.append(TripSchedule(new_train_data.all_train_data, new_train_data.start_station_id, new_train_data.start_station_terminus_id))
+        trip_sequence.append(TripSchedule(new_train_data.all_train_data, new_train_data.end_station_origin_id, new_train_data.end_station_id, trip_sequence[0].dest_arrival_time + 120))
+    
+        
+    return FormattedTrainData(trip_sequence), 200
 
 # get names and routes (and gtfs id) for search bar in journey planner
 @app.route('/api/stations')

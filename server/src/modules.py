@@ -37,8 +37,9 @@ def check_for_station_service(train_array, station_id):
             station_serivce = True
     return station_serivce
           
-# THIS IS NOT WORKING SINCE REFACTOR
-def filter_trains_for_stations_direction_current(train_data, start_station_id, end_station_id):
+# takes all json data from endpoints and returns array of trains relevant for our trip
+# returns array of JSON trains, each containing a schedule. 
+def filter_trains_for_stations_direction_future_arrival(train_data, start_station_id, end_station_id):
         filtered_trains = []
         for train_feed in train_data:
             for train in train_feed.entity: 
@@ -56,23 +57,12 @@ def filter_trains_for_stations_direction_current(train_data, start_station_id, e
                                 filtered_trains.append(train)
                             # else:
                             #      other_trains.append(train)      
-        # if filtered_trains != []:
-        # print('ft', start_station_id, end_station_id)
         return filtered_trains
-        # else:
-        #     message = ""
-        #     if check_for_station_service(other_trains, start_station_id) == False:
-        #         message = "There are no trains serving your start station"
-        #     elif check_for_station_service(other_trains, end_station_id) == False:
-        #         message = "There are no trains serving your start station"
-        #     elif  ((check_for_station_service(other_trains, start_station_id) == False) and (check_for_station_service(other_trains, end_station_id) == False)):
-        #          message = "trains are not stopping at either of your chosen stations"
-        #     print('message', message)
-        #     return message
+       
              
-
+# 
 def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id, ):
-    print('ftdo', filtered_train_data_object)
+    # print('ftdo', filtered_train_data_object)
     trains_with_arrival = []
     for train in filtered_train_data_object:
         arrival_train = {"train" : train, "dest_arrival_time" : None, "origin_arrival_time" : None}
@@ -109,19 +99,15 @@ def quick_sort_trains_by_arrival_time(train_obj_array):
                
      
 
-
+# takes list of JSON trains (from filter_trains_for_stations_direction_future_arrival()) and returns list of trains sorted by arrival time at destination.
 def sort_trains_by_arrival_at_destination(filtered_train_data_object, start_station_id, dest_station_id, time=(round(current_time.timestamp()))):
         
+        # take JSON train array (filtered) and build objects with {train, dest arrival, origin arrival} key value pairs
         trains_with_arrival_objs_array = create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id)
-        
+        # use quicksort to sort array of objects by arrival at destination. 
         sorted_trains = [train for train in quick_sort_trains_by_arrival_time(trains_with_arrival_objs_array) if train['origin_arrival_time'] > time]
-        # print("check status", check_station_status(sorted_trains,start_station_id,dest_station_id))
-        # Raise except try that here?
-        # should raise exeption in filter_trains_for_station_direction_current
-        if len(sorted_trains) == 0:
-             print("no trains arriving at", dest_station_id)
-        else:
-            return sorted_trains[0]
+        
+        return sorted_trains
 
 # return a list of routes eg. [A,C,E] for a station
 # This doesn't appear to be used!
@@ -168,3 +154,6 @@ def get_shared_stations(stations_in_complexes, routes):
             if route != " " and route in routes:
                 shared_stations.append(station) 
     return list(set(shared_stations))
+
+def build_trip_schedule():
+     pass
