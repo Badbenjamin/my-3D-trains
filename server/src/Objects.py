@@ -233,61 +233,9 @@ class FormattedTrainData:
             if train.direction() == "S":
                 train_for_react['direction_label'] = start_station.south_direction_label
             self.trains_for_react.append(train_for_react)
-        print('trains', self.trains_for_react)
-        return self.trains_for_react
-
-    # def format_for_react(self):
-    #     trains_for_react = []
         
-    #     for train in self.get_next_train_data():
-    #         start_station = Station.query.filter(Station.gtfs_stop_id == train['start']).first()
-    #         end_station = Station.query.filter(Station.gtfs_stop_id == train['end']).first()
-    #         stop_schedule = []
-            
-    #         # should Schedule be replaced with a class?
-    #         for stop in train['train'].schedule:
-    #             stop_obj = {
-    #                 "stop_id" : stop.stop_id,
-    #                 "arrival" : stop.arrival,
-    #                 "departure" : stop.departure
-    #             }
-    #             stop_schedule.append(stop_obj)
-    #         stop_schedule_ids = []
-    #         for stop in stop_schedule:
-    #             stop_schedule_ids.append(stop['stop_id'][:-1])
-            
-            
-            
-            
-    #         print("arrival", train['train'].arrival_time(train['start']))
-    #         # print("train",train)
-    #         train_for_react = {
-                
-    #             "train_id" : train['train'].trip_id,
-    #             # START STATION CHANGES 
-    #             "start_station" : start_station.stop_name,
-    #             "start_station_gtfs" : train['start'],
-    #             "start_station_arrival" : str(modules.convert_timestamp(train['train'].arrival_time(train['start'])))[10:16],
-    #             # END STATION CHANGES
-    #             "end_station" : end_station.stop_name,
-    #             "end_station_gtfs" : train['end'],
-    #             "end_station_arrival" : str(modules.convert_timestamp(train['train'].arrival_time(train['end'])))[10:16],
-    #             "transfer_station" : None,
-    #             "route" : train['train'].route(),
-    #             "direction_label" : None,
-    #             "schedule" : stop_schedule,
-    #             "number_of_stops" : stop_schedule_ids.index(train['end']) - stop_schedule_ids.index(train['start']),
-    #             "trip_time" : round((train['train'].arrival_time(train['end']) - train['train'].arrival_time(train['start'])) / 60)
-    #         }
-    #         # DIRECTION LABEL NEEDS WORK
-    #         # Do I want to query db again to get info or pass that info down from the start?
-    #         if train['train'].direction() == "N":
-    #             train_for_react['direction_label'] = start_station.north_direction_label
-    #         if train['train'].direction() == "S":
-    #             train_for_react['direction_label'] = start_station.south_direction_label
-    #         trains_for_react.append(train_for_react)
-    #         # print(train_for_react['start_station_arrival'])
-    #     # print(trains_for_react)
+    def __repr__(self):
+        return f'<FormattedTrainData >'
         
 
 

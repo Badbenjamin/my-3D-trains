@@ -21,7 +21,7 @@ def plan_trip(start_station_id, end_station_id):
         trip_sequence.append(TripSchedule(new_train_data.all_train_data, new_train_data.end_station_origin_id, new_train_data.end_station_id, trip_sequence[0].dest_arrival_time + 120))
     
         
-    return FormattedTrainData(trip_sequence), 200
+    return FormattedTrainData(trip_sequence).trains_for_react, 200
 
 # get names and routes (and gtfs id) for search bar in journey planner
 @app.route('/api/stations')

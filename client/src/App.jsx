@@ -20,7 +20,7 @@ function App() {
   const [statusArray, setStatusArray] = useState([])
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
-  
+  console.log('ti', tripInfo)
   // get station info for trip planner for station search. 
   useEffect(() => {
     // remove local host for deployment
