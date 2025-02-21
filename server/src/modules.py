@@ -39,6 +39,29 @@ def check_for_station_service(train_array, station_id):
         if station_id in stops:
             station_serivce = True
     return station_serivce
+
+# returns true if the station appears in the schedule of a train
+def check_for_station_service(stops, station_id):
+     if station_id in stops:
+          return True
+     else:
+          return False
+
+# if start station id is before stop station id in stops (train schedule), then the train is headed in the correct direction.   
+def check_for_train_direction(stops, start_station_id, end_station_id):
+     if (stops.index(start_station_id) < stops.index(end_station_id)):
+         return True
+     else:
+          return False
+
+# returns True train if it arrives at a specified station in the future
+def check_if_station_arrival_is_in_future(stop, station_id):
+        arrival_time = stop.arrival.time
+        current_time_int = int(math.ceil(current_time.timestamp()))
+        if (stop.stop_id[:-1] == station_id) and (arrival_time > current_time_int):
+            return True
+        else:
+            return False
           
 # takes all json data from endpoints and returns array of trains relevant for our trip
 # returns array of JSON trains, each containing a schedule. 
@@ -48,18 +71,12 @@ def filter_trains_for_stations_direction_future_arrival(train_data, start_statio
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
                     stops = create_stop_schedule(train)
-                    # checking if start stop and end stop are present, and start stop is before end stop in stops array
-                    if ((start_station_id in stops and end_station_id in stops) and (stops.index(start_station_id) < stops.index(end_station_id))):
+                    if ((check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id)) and (check_for_train_direction(stops, start_station_id, end_station_id))):
                         stop_schedule = train.trip_update.stop_time_update
-                        
                         for stop in stop_schedule:
-                            arrival_time = stop.arrival.time
-                            current_time_int = int(math.ceil(current_time.timestamp()))
-                            # only add train if it arrives at start station, and that arrival time is in the future
-                            if (stop.stop_id[:-1] == start_station_id) and (arrival_time > current_time_int):
-                                filtered_trains.append(train)
-                            # else:
-                            #      other_trains.append(train)      
+                            if (check_if_station_arrival_is_in_future(stop, start_station_id)):
+                                 filtered_trains.append(train)
+                                
         return filtered_trains
        
              
