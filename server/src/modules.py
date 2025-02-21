@@ -28,6 +28,9 @@ def create_stop_schedule(train):
         stops.append(stop.stop_id[:-1])
     return stops
 
+def create_stop_scheudle_for_frontend():
+     pass
+
 # could I combine this into filter trains for station direction current?
 def check_for_station_service(train_array, station_id):
     station_serivce = False
@@ -74,13 +77,13 @@ def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_st
         trains_with_arrival.append(arrival_train)
     return trains_with_arrival
 
+# is quick sort efficient for a sorted array?
+# it should be sorted correctly unless an express train arrives at the destination. 
 def quick_sort_trains_by_arrival_time(train_obj_array):
     new_train_obj_array = [*train_obj_array]
-    # print("ntoa", new_train_obj_array[0]['dest_arrival_time'])
     if len(new_train_obj_array) < 2:
          return new_train_obj_array
     else:
-        #  print("ntoa",[convert_timestamp(at['dest_arrival_time']).strftime('%H:%M:%S') for at in new_train_obj_array])
          pivot = new_train_obj_array[0]
          less = [nto for nto in new_train_obj_array[1:] if nto['dest_arrival_time'] <= pivot['dest_arrival_time']]
          greater = [nto for nto in new_train_obj_array[1:] if nto['dest_arrival_time'] > pivot['dest_arrival_time']]

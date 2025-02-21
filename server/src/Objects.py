@@ -3,7 +3,7 @@ from flask import session, request
 from sqlalchemy_serializer import SerializerMixin
 import requests
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from google.transit import gtfs_realtime_pb2
 
 from models import Station
@@ -17,9 +17,6 @@ import modules
 # Converts JSON train into a easier to read object
 # circular import issue, couldn't move to modules
 def trains_to_objects(filtered_trains):
-        # print("ft", filtered_trains)
-        # if type(train_list) == str:
-        #     return train_list
         train_object_list = []
         for train in filtered_trains:
             new_schedule = []
@@ -118,8 +115,9 @@ class Journey:
         return f'<Journey {self.start_station.stop_name} to {self.end_station.stop_name} through{self.shared_stations} at {self.time}>'
 
 # accepts journey object as arg
+# 
 # all_train_data will provide every relevant train for a multi leg trip
-# GONNA SPLIT THIS B UP!   
+
 class TrainData:
 
     def __init__(self, journey_object):
@@ -166,19 +164,22 @@ class TrainData:
         return f'<TrainData from {self.routes} for {self.journey_object}>'
         
 
-# LEFT OFF HERE
-# NEED TO ACCOUNT FOR TIME AND PASS OFF TO FORMATTED TRAIN DATA
-class TripSchedule:
+# FilteredTrains class takes train_data (gtfs json response), and start and end station (time optional, defalults to current).
+# Frist_Train.first_train 
+class SortedTrains:
 
     def __init__(self, train_data, start_station_id, end_station_id, time=(round(current_time.timestamp()))):
-        # problem with train_data?
+        
         self.start_station_id = start_station_id
         self.end_station_id = end_station_id
-
+        # leg_data takes train_data (json gtfs data) and filters for station, direction, and future arrival. 
+        # these trains are converted into objects of the Train class.
         leg_data = trains_to_objects(modules.filter_trains_for_stations_direction_future_arrival(train_data, start_station_id, end_station_id))
-        
+        # sorted_trains is an array of objects containing a train object, origin arrival, and dest arrival.
+        # they are sorted by soonest arrival time at destination. 
         sorted_trains = modules.sort_trains_by_arrival_at_destination(leg_data, start_station_id, end_station_id, time)
 
+        # first train to arrive at destination station
         self.first_train = sorted_trains[0]
         self.dest_arrival_time = sorted_trains[0]['dest_arrival_time']
         self.origin_arrival_time = sorted_trains[0]['origin_arrival_time']
@@ -186,10 +187,10 @@ class TripSchedule:
         self.origin_arrival_time_readable = datetime.fromtimestamp(sorted_trains[0]['origin_arrival_time']).strftime('%H:%M:%S')
     
     def __repr__(self):
-        return f'<TripSchedule {self.start_station_id} at {self.origin_arrival_time_readable} to {self.end_station_id} at {self.dest_arrival_time_readable}>'
+        return f'<SortedTrains {self.start_station_id} at {self.origin_arrival_time_readable} to {self.end_station_id} at {self.dest_arrival_time_readable}>'
     
+# Takes array of FilteredTrain Objects (trip_sequence) and creates information to display in browser.
 
-# Takes array of TripSchedule Objects and creates information to display on react
 class FormattedTrainData:
     def __init__(self, trip_sequence):
         self.trip_sequence = trip_sequence
@@ -236,14 +237,8 @@ class FormattedTrainData:
         
     def __repr__(self):
         return f'<FormattedTrainData >'
-        
 
-
-        
-            
-
-    
-
+# Class to represent data from gtfs json train
 class Train:
     def __init__(self, trip_id, start_time, start_date, route_id, schedule=[]):
         self.trip_id = trip_id
@@ -292,30 +287,6 @@ class Stop:
     def __repr__(self):
         return f'<Stop {self.stop_id} {str(modules.convert_timestamp(self.arrival))[11:-3]}>'
     
-class Schedule:
-    # make a train schedule class
-    pass
-
-
-
-
-
-
 if __name__ == "__main__":
     with app.app_context():
-        new_journey = Journey(175, 178)
-        new_data = TrainData(new_journey)
-        # print(new_journey.start_station.gtfs_stop_id)
-        # sorted_trains = new_data.sort_trains_by_arrival_at_destination()
-        # for train in sorted_trains:
-        #     print(train.arrival_time(train.arrival_time(new_journey.end_station.gtfs_stop_id)))
-
-        trains_for_react = new_data.format_for_react(new_journey)
-        # for train in trains_for_react:
-        #     print(train["start_station_arrival"])
-
-        # for train in new_data.filter_trains_for_stations_direction_current():
-        #     print("fsd", train)
-        # t1 = trains_to_objects(new_data.filter_trains_for_stations_direction_current())[0]
-        # # print(t1.schedule)
-        # print(t1.current_location())
+        pass

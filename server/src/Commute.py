@@ -1,6 +1,8 @@
 from config import db
 from sqlalchemy_serializer import SerializerMixin
 
+
+# This table contains saved commutes for riders. It is not used yet. 
 class Commute(db.Model, SerializerMixin):
     __tablename__ = 'commutes'
 
