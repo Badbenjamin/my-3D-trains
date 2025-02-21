@@ -20,10 +20,14 @@ def plan_trip(start_station_id, end_station_id):
     # trip_sequence is each train of our trip after it has been filtered for station, direction, currenty running, and soonest arrival time at dest station. 
     trip_sequence = []
     if new_journey.shared_stations == []:
-        trip_sequence.append(SortedTrains(new_train_data.all_train_data, new_train_data.start_station_id, new_train_data.end_station_id))
+        leg = SortedTrains(new_train_data.all_train_data, new_train_data.start_station_id, new_train_data.end_station_id)
+        trip_sequence.append(leg)
     else:
-        trip_sequence.append(SortedTrains(new_train_data.all_train_data, new_train_data.start_station_id, new_train_data.start_station_terminus_id))
-        trip_sequence.append(SortedTrains(new_train_data.all_train_data, new_train_data.end_station_origin_id, new_train_data.end_station_id, trip_sequence[0].dest_arrival_time + 120))
+        leg_one = SortedTrains(new_train_data.all_train_data, new_train_data.start_station_id, new_train_data.start_station_terminus_id)
+        trip_sequence.append(leg_one)
+        leg_two = SortedTrains(new_train_data.all_train_data, new_train_data.end_station_origin_id, new_train_data.end_station_id, trip_sequence[0].dest_arrival_time + 120)
+        trip_sequence.append(leg_two)
+    print('ts', trip_sequence)
     # FormattedTrainData class takes our trip sequence (one or two trips), and converts the first arriving train to a dict, which is sent to client. 
     return FormattedTrainData(trip_sequence).trains_for_react, 200
 

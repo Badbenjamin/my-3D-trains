@@ -172,19 +172,31 @@ class SortedTrains:
         
         self.start_station_id = start_station_id
         self.end_station_id = end_station_id
-        # leg_data takes train_data (json gtfs data) and filters for station, direction, and future arrival. 
-        # these trains are converted into objects of the Train class.
-        leg_data = trains_to_objects(modules.filter_trains_for_stations_direction_future_arrival(train_data, start_station_id, end_station_id))
-        # sorted_trains is an array of objects containing a train object, origin arrival, and dest arrival.
-        # they are sorted by soonest arrival time at destination. 
-        sorted_trains = modules.sort_trains_by_arrival_at_destination(leg_data, start_station_id, end_station_id, time)
+        self.error_obj = None
         
-        # this is the train that will be formmated and sent to the front end
-        self.first_train = sorted_trains[0]
-        self.dest_arrival_time = sorted_trains[0]['dest_arrival_time']
-        self.origin_arrival_time = sorted_trains[0]['origin_arrival_time']
-        self.dest_arrival_time_readable = datetime.fromtimestamp(sorted_trains[0]['dest_arrival_time']).strftime('%H:%M:%S')
-        self.origin_arrival_time_readable = datetime.fromtimestamp(sorted_trains[0]['origin_arrival_time']).strftime('%H:%M:%S')
+        # filter the gtfs json data for trains relevant to the user's trip.
+        # a successful trip (both stations in service), will yield a list of trains for our trip.
+        # if no trains are found, an error object is returned
+        filtered_train_data = modules.filter_trains_for_stations_direction_future_arrival(train_data, start_station_id, end_station_id)
+        
+        
+        if (type(filtered_train_data) == dict):
+            self.error_obj = filtered_train_data
+        else:
+            print('ftd', type(filtered_train_data))
+            # leg_data takes train_data (json gtfs data) and filters for station, direction, and future arrival. 
+            # these trains are converted into objects of the Train class.
+            leg_data = trains_to_objects(filtered_train_data)
+            # sorted_trains is an array of objects containing a train object, origin arrival, and dest arrival.
+            # they are sorted by soonest arrival time at destination. 
+            sorted_trains = modules.sort_trains_by_arrival_at_destination(leg_data, start_station_id, end_station_id, time)
+            
+            # this is the train that will be formmated and sent to the front end
+            self.first_train = sorted_trains[0]
+            self.dest_arrival_time = sorted_trains[0]['dest_arrival_time']
+            self.origin_arrival_time = sorted_trains[0]['origin_arrival_time']
+            self.dest_arrival_time_readable = datetime.fromtimestamp(sorted_trains[0]['dest_arrival_time']).strftime('%H:%M:%S')
+            self.origin_arrival_time_readable = datetime.fromtimestamp(sorted_trains[0]['origin_arrival_time']).strftime('%H:%M:%S')
     
     def __repr__(self):
         return f'<SortedTrains {self.start_station_id} at {self.origin_arrival_time_readable} to {self.end_station_id} at {self.dest_arrival_time_readable}>'

@@ -62,9 +62,35 @@ def check_if_station_arrival_is_in_future(stop, station_id):
             return True
         else:
             return False
-          
+
+# if filter_trains_for_stations_direction_future_arrival() returns an empty array, an error obj is created.
+
+def create_trip_error_obj(train_data, start_station_id, end_station_id):
+     trip_error_obj = {
+          "start_station_id" : start_station_id,
+          "end_station_id" : end_station_id,
+          "start_station_service" : None,
+          "end_station_service" : None,
+          "direction_service" : None
+     }
+     for train_feed in train_data:
+            for train in train_feed.entity: 
+                if train.HasField('trip_update'):
+                    stops = create_stop_schedule(train)
+                    if not check_for_station_service(stops, start_station_id):
+                         trip_error_obj['start_station_service'] = False
+                    elif not check_for_station_service(stops, end_station_id):
+                         trip_error_obj['end_station_service'] = False
+                    elif (not check_for_station_service(stops, start_station_id) and (not check_for_station_service(stops, end_station_id))):
+                         trip_error_obj['start_station_service'] = False
+                         trip_error_obj['end_station_service'] = False
+                    elif not check_for_train_direction(stops, start_station_id, end_station_id):
+                         trip_error_obj['direction_service'] = False
+     return trip_error_obj
+
 # takes all json data from endpoints and returns array of trains relevant for our trip
-# returns array of JSON trains, each containing a schedule. 
+# if there are trains serving both stations currently, and in the correct direction, return array of JSON trains, each containing a schedule. 
+# if the trip is not possible, a trip_error_obj is returned with info about stations
 def filter_trains_for_stations_direction_future_arrival(train_data, start_station_id, end_station_id):
         filtered_trains = []
         for train_feed in train_data:
@@ -76,12 +102,15 @@ def filter_trains_for_stations_direction_future_arrival(train_data, start_statio
                         for stop in stop_schedule:
                             if (check_if_station_arrival_is_in_future(stop, start_station_id)):
                                  filtered_trains.append(train)
-                                
-        return filtered_trains
+        if filtered_trains:
+            return filtered_trains
+        else:
+            return create_trip_error_obj(train_data, start_station_id, end_station_id)       
+        
        
              
 # 
-def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id, ):
+def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id):
     # print('ftdo', filtered_train_data_object)
     trains_with_arrival = []
     for train in filtered_train_data_object:
