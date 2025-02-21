@@ -18,6 +18,8 @@ def plan_trip(start_station_id, end_station_id):
     # it contains the JSON train data from the realtime gtfs feed. 
     new_train_data = TrainData(new_journey)
     # trip_sequence is each train of our trip after it has been filtered for station, direction, currenty running, and soonest arrival time at dest station. 
+    # LEFT OFF HERE
+    # need to figure out how to pass error message down 
     trip_sequence = []
     if new_journey.shared_stations == []:
         leg = SortedTrains(new_train_data.all_train_data, new_train_data.start_station_id, new_train_data.end_station_id)

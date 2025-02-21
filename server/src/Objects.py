@@ -197,9 +197,14 @@ class SortedTrains:
             self.origin_arrival_time = sorted_trains[0]['origin_arrival_time']
             self.dest_arrival_time_readable = datetime.fromtimestamp(sorted_trains[0]['dest_arrival_time']).strftime('%H:%M:%S')
             self.origin_arrival_time_readable = datetime.fromtimestamp(sorted_trains[0]['origin_arrival_time']).strftime('%H:%M:%S')
-    
+        print('eo', self.error_obj)
     def __repr__(self):
-        return f'<SortedTrains {self.start_station_id} at {self.origin_arrival_time_readable} to {self.end_station_id} at {self.dest_arrival_time_readable}>'
+        if (self.error_obj == None):
+            return f'<SortedTrains {self.start_station_id} at {self.origin_arrival_time_readable} to {self.end_station_id} at {self.dest_arrival_time_readable}>'
+        else:
+            # LEFT OFF HERE
+            # how to pass error message down? 
+            return f'<SortedTrains THERE IS A PROBLEM WITH THE TRIP>'
     
 # Takes data from SortedTrains object and formats it into an object that is sent to the client. 
 # only returns one object, from the first train in trip_sequence
