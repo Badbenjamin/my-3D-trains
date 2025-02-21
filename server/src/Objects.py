@@ -178,8 +178,8 @@ class SortedTrains:
         # sorted_trains is an array of objects containing a train object, origin arrival, and dest arrival.
         # they are sorted by soonest arrival time at destination. 
         sorted_trains = modules.sort_trains_by_arrival_at_destination(leg_data, start_station_id, end_station_id, time)
-
-        # first train to arrive at destination station
+        
+        # this is the train that will be formmated and sent to the front end
         self.first_train = sorted_trains[0]
         self.dest_arrival_time = sorted_trains[0]['dest_arrival_time']
         self.origin_arrival_time = sorted_trains[0]['origin_arrival_time']
@@ -189,52 +189,57 @@ class SortedTrains:
     def __repr__(self):
         return f'<SortedTrains {self.start_station_id} at {self.origin_arrival_time_readable} to {self.end_station_id} at {self.dest_arrival_time_readable}>'
     
-# Takes array of FilteredTrain Objects (trip_sequence) and creates information to display in browser.
-
+# Takes data from SortedTrains object and formats it into an object that is sent to the client. 
+# only returns one object, from the first train in trip_sequence
+# trip sequence is a list created in app.py from SorteDTrains object(s). It is a list of trains sorted by dest arrival time, for each leg of the trip. 
 class FormattedTrainData:
     def __init__(self, trip_sequence):
         self.trip_sequence = trip_sequence
+        # for each trip in trip_sequence, a json compatible object is created and appended to trains_for_react.
+        # trains for react is sent to the client and the information is displaid. 
         self.trains_for_react = []
         for trip in self.trip_sequence:
             
             start_station = Station.query.filter(Station.gtfs_stop_id == trip.start_station_id).first()
             end_station = Station.query.filter(Station.gtfs_stop_id == trip.end_station_id).first()
-            train = trip.first_train['train']
-            schedule = train.schedule
-            stop_schedule = []
-            for stop in schedule:
+            # building our object from first train in trip_sequence
+            first_train = trip.first_train['train']
+            first_train_schedule = first_train.schedule
+            # create an array of stop objects, the schedule for the train. 
+            first_train_stop_schedule = []
+            for stop in first_train_schedule:
                 stop_obj = {
                     "stop_id" : stop.stop_id,
                     "arrival" : stop.arrival,
                     "departure" : stop.departure
                 }
-                stop_schedule.append(stop_obj)
+                first_train_stop_schedule.append(stop_obj)
             stop_schedule_ids = []
-            for stop in stop_schedule:
+            for stop in first_train_stop_schedule:
                 
                 stop_schedule_ids.append(stop['stop_id'][:-1])
 
             train_for_react = {
-                "train_id" : train.trip_id,
+                "train_id" : first_train.trip_id,
                 "start_station" : start_station.stop_name,
                 "start_station_gtfs" : trip.start_station_id,
-                "start_station_arrival" : str(modules.convert_timestamp(train.arrival_time(trip.start_station_id)))[10:16],
+                "start_station_arrival" : str(modules.convert_timestamp(first_train.arrival_time(trip.start_station_id)))[10:16],
                 "end_station" : end_station.stop_name,
                 "end_station_gtfs" : trip.end_station_id,
-                "end_station_arrival" : str(modules.convert_timestamp(train.arrival_time(trip.end_station_id)))[10:16],
+                "end_station_arrival" : str(modules.convert_timestamp(first_train.arrival_time(trip.end_station_id)))[10:16],
                 "transfer_station" : None,
-                "route" : train.route(),
+                "route" : first_train.route(),
                 "direction_label" : None,
-                "schedule" : stop_schedule,
+                "schedule" : first_train_stop_schedule,
                 "number_of_stops" : stop_schedule_ids.index(trip.end_station_id) - stop_schedule_ids.index(trip.start_station_id),
-                "trip_time" : round((train.arrival_time(trip.end_station_id) - train.arrival_time(trip.start_station_id)) / 60)
+                "trip_time" : round((first_train.arrival_time(trip.end_station_id) - first_train.arrival_time(trip.start_station_id)) / 60)
             }
-            if train.direction() == "N":
+            if first_train.direction() == "N":
                 train_for_react['direction_label'] = start_station.north_direction_label
-            if train.direction() == "S":
+            if first_train.direction() == "S":
                 train_for_react['direction_label'] = start_station.south_direction_label
             self.trains_for_react.append(train_for_react)
-        
+        # print('s.ft', self.first_train)
     def __repr__(self):
         return f'<FormattedTrainData >'
 

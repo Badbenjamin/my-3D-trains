@@ -141,7 +141,8 @@ def find_complex_ids(daytime_routes):
                         if station.complex_id not in complex_ids:
                             complex_ids.append(station.complex_id)
                 return complex_ids
-     
+
+# convert complex ids to Stations   
 def complex_ids_to_stations(shared_complexes):
     complex_stations =  []
     for complex_number in shared_complexes:
@@ -150,6 +151,7 @@ def complex_ids_to_stations(shared_complexes):
             complex_stations.append(complex)
     return complex_stations
 
+# 
 def get_shared_stations(stations_in_complexes, routes):
     shared_stations = []
     for station in stations_in_complexes:

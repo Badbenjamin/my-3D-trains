@@ -2,7 +2,7 @@ import './Component.css'
 import LegInfo from './LegInfo'
 
 function TripInfo({tripInfo}){
-
+    console.log(tripInfo[1])
     if (tripInfo.length === 1){
         return(
             <div className='leg-info-div'>
