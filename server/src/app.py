@@ -1,7 +1,7 @@
 from config import app
 from datetime import datetime
 from models import Station
-from Objects import Journey, TrainData, SortedTrains, FormattedTrainData
+from Objects import Journey, TrainData, SortedTrains, FormattedTrainData, FilteredTrains, TripError
 import modules
 import pprint
 
@@ -21,9 +21,15 @@ def plan_trip(start_station_id, end_station_id):
     # LEFT OFF HERE
     # need to figure out how to pass error message down 
     trip_sequence = []
+    # TURN THIS INTO ITS OWN FUNCTION
     if new_journey.shared_stations == []:
-        leg = SortedTrains(new_train_data.all_train_data, new_train_data.start_station_id, new_train_data.end_station_id)
-        trip_sequence.append(leg)
+        train_objs = FilteredTrains(new_train_data.all_train_data, new_train_data.start_station_id, new_train_data.end_station_id)
+        if (train_objs.train_obj_array):
+            leg = SortedTrains(train_objs.train_obj_array, new_train_data.start_station_id, new_train_data.end_station_id)
+            trip_sequence.append(leg)
+        else:
+            error = TripError(train_objs)
+            trip_sequence.append(error)
     else:
         leg_one = SortedTrains(new_train_data.all_train_data, new_train_data.start_station_id, new_train_data.start_station_terminus_id)
         trip_sequence.append(leg_one)

@@ -164,48 +164,62 @@ class TrainData:
         return f'<TrainData from {self.routes} for {self.journey_object}>'
         
 
-# FilteredTrains class takes train_data (gtfs json response), and start and end station (time optional, defalults to current).
-# Frist_Train.first_train 
-class SortedTrains:
+# FilteredTrains class takes train_data (gtfs json response), and start and end station gtfs id.
+# It filters out trains that are irrelevant to our trip (not stoping at both stations) and converts json into an array of objects of the Train class.
+class FilteredTrains:
 
-    def __init__(self, train_data, start_station_id, end_station_id, time=(round(current_time.timestamp()))):
+    def __init__(self, train_data, start_station_id, end_station_id):
         
         self.start_station_id = start_station_id
         self.end_station_id = end_station_id
+        # this is passed to SortedTrains if filter yields results
+        self.train_obj_array = None
+        # this is passed to TripError if filter produces empty array
         self.error_obj = None
-        
+
         # filter the gtfs json data for trains relevant to the user's trip.
         # a successful trip (both stations in service), will yield a list of trains for our trip.
-        # if no trains are found, an error object is returned
-        filtered_train_data = modules.filter_trains_for_stations_direction_future_arrival(train_data, start_station_id, end_station_id)
+        # if no trains are found, an error object is returned containing information on which stops are not in service.
+        self.filtered_train_data = modules.filter_trains_for_stations_direction_future_arrival(train_data, start_station_id, end_station_id)
         
-        
-        if (type(filtered_train_data) == dict):
-            self.error_obj = filtered_train_data
+        if self.filtered_train_data:
+            self.train_obj_array = trains_to_objects(self.filtered_train_data)
         else:
-            print('ftd', type(filtered_train_data))
-            # leg_data takes train_data (json gtfs data) and filters for station, direction, and future arrival. 
-            # these trains are converted into objects of the Train class.
-            leg_data = trains_to_objects(filtered_train_data)
-            # sorted_trains is an array of objects containing a train object, origin arrival, and dest arrival.
-            # they are sorted by soonest arrival time at destination. 
-            sorted_trains = modules.sort_trains_by_arrival_at_destination(leg_data, start_station_id, end_station_id, time)
-            
-            # this is the train that will be formmated and sent to the front end
-            self.first_train = sorted_trains[0]
-            self.dest_arrival_time = sorted_trains[0]['dest_arrival_time']
-            self.origin_arrival_time = sorted_trains[0]['origin_arrival_time']
-            self.dest_arrival_time_readable = datetime.fromtimestamp(sorted_trains[0]['dest_arrival_time']).strftime('%H:%M:%S')
-            self.origin_arrival_time_readable = datetime.fromtimestamp(sorted_trains[0]['origin_arrival_time']).strftime('%H:%M:%S')
-        print('eo', self.error_obj)
+            self.error_obj = self.filtered_train_data
+        
     def __repr__(self):
-        if (self.error_obj == None):
-            return f'<SortedTrains {self.start_station_id} at {self.origin_arrival_time_readable} to {self.end_station_id} at {self.dest_arrival_time_readable}>'
-        else:
-            # LEFT OFF HERE
-            # how to pass error message down? 
-            return f'<SortedTrains THERE IS A PROBLEM WITH THE TRIP>'
+        return f'<FilteredTrains #{len(self.filtered_train_data)} between {self.start_station_id} and {self.end_station_id} >'
+
+# SortedTrains takes an array of Train objects, and sorts them by arrival at destination.
+# start station, end station, and time can be changed to split trip into multiple legs
+class SortedTrains:
+
+    def __init__(self, train_obj_array, start_station_id, end_station_id, time=(round(current_time.timestamp()))):
+        self.train_array = train_obj_array
+        self.start_station_id = start_station_id
+        self.end_station_id = end_station_id
+
+
+        self.sorted_trains  = modules.sort_trains_by_arrival_at_destination(train_obj_array, start_station_id, end_station_id, time)
+        self.first_train = self.sorted_trains[0]
+        # self.first_train_id = self.first_train.train
+        self.dest_arrival_time = self.sorted_trains[0]['dest_arrival_time']
+        self.origin_arrival_time = self.sorted_trains[0]['origin_arrival_time']
+        self.dest_arrival_time_readable = datetime.fromtimestamp(self.sorted_trains[0]['dest_arrival_time']).strftime('%H:%M:%S')
+        self.origin_arrival_time_readable = datetime.fromtimestamp(self.sorted_trains[0]['origin_arrival_time']).strftime('%H:%M:%S')
+
+    def __repr__(self):
+        return f'<SortedTrains {self.first_train} from {self.start_station_id} at {self.origin_arrival_time_readable} to {self.end_station_id} at {self.dest_arrival_time_readable} >'
     
+class TripError:
+
+    def __init__(self, error_obj):
+        self.error_obj = error_obj
+
+    def __repr__(self):
+        f'<TripError {self.error_obj}>'
+            
+
 # Takes data from SortedTrains object and formats it into an object that is sent to the client. 
 # only returns one object, from the first train in trip_sequence
 # trip sequence is a list created in app.py from SorteDTrains object(s). It is a list of trains sorted by dest arrival time, for each leg of the trip. 
