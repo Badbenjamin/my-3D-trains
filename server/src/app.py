@@ -1,8 +1,9 @@
 from config import app
 from datetime import datetime
 from models import Station
-from Objects import Journey, TrainData, SortedTrains, FormattedTrainData, FilteredTrains, TripError
-import modules
+from Classes import Journey, TrainData, FormattedTrainData
+# import modules
+import modules_app
 import pprint
 
 ct = datetime.now()
@@ -17,25 +18,8 @@ def plan_trip(start_station_id, end_station_id):
     # new_train_data takes the info from new_journey and uses it to make requests from the relevant MTA API route endpoints.
     # it contains the JSON train data from the realtime gtfs feed. 
     new_train_data = TrainData(new_journey)
-    # trip_sequence is each train of our trip after it has been filtered for station, direction, currenty running, and soonest arrival time at dest station. 
-    # LEFT OFF HERE
-    # need to figure out how to pass error message down 
-    trip_sequence = []
-    # TURN THIS INTO ITS OWN FUNCTION
-    if new_journey.shared_stations == []:
-        train_objs = FilteredTrains(new_train_data.all_train_data, new_train_data.start_station_id, new_train_data.end_station_id)
-        if (train_objs.train_obj_array):
-            leg = SortedTrains(train_objs.train_obj_array, new_train_data.start_station_id, new_train_data.end_station_id)
-            trip_sequence.append(leg)
-        else:
-            error = TripError(train_objs)
-            trip_sequence.append(error)
-    else:
-        leg_one = SortedTrains(new_train_data.all_train_data, new_train_data.start_station_id, new_train_data.start_station_terminus_id)
-        trip_sequence.append(leg_one)
-        leg_two = SortedTrains(new_train_data.all_train_data, new_train_data.end_station_origin_id, new_train_data.end_station_id, trip_sequence[0].dest_arrival_time + 120)
-        trip_sequence.append(leg_two)
-    print('ts', trip_sequence)
+    # trip_sequence is an array that contains either a SortedTrains obj or a TripError object.
+    trip_sequence = modules_app.build_trip_sequence(new_journey, new_train_data)
     # FormattedTrainData class takes our trip sequence (one or two trips), and converts the first arriving train to a dict, which is sent to client. 
     return FormattedTrainData(trip_sequence).trains_for_react, 200
 

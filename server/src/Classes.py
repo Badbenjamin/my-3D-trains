@@ -12,7 +12,7 @@ current_time = datetime.now()
 
 from collections import Counter
 
-import modules
+import modules_classes
 
 # Converts JSON train into a easier to read object
 # circular import issue, couldn't move to modules
@@ -61,13 +61,13 @@ class Journey:
         
         # False if end station does not share a route with start station
         # True if they share a route
-        same_line = modules.same_line(self.start_station_routes, self.end_station_routes)
+        same_line = modules_classes.same_line(self.start_station_routes, self.end_station_routes)
 
         # NEED TO MAKE BRANCH FOR SAME LINE BUT EXPRESS TO LOCAL OR LOCAL TO EXPRESS
         if same_line == False:
             # 
-            start_line_complex_ids = modules.find_complex_ids(self.start_station.daytime_routes)
-            end_line_complex_ids = modules.find_complex_ids(self.end_station.daytime_routes)
+            start_line_complex_ids = modules_classes.find_complex_ids(self.start_station.daytime_routes)
+            end_line_complex_ids = modules_classes.find_complex_ids(self.end_station.daytime_routes)
 
             all_complex_ids = start_line_complex_ids + end_line_complex_ids
             
@@ -76,10 +76,10 @@ class Journey:
             shared_complexes = list(set([complex_id for complex_id in all_complex_ids if all_complex_ids.count(complex_id)>1]))
             
             # takes the complex_id list of shared_complexes and returns stations for each complex
-            stations_in_complexes =  modules.complex_ids_to_stations(shared_complexes)
+            stations_in_complexes =  modules_classes.complex_ids_to_stations(shared_complexes)
             
             # return all stations that serve a route that is served by the start and end station
-            shared_stations = modules.get_shared_stations(stations_in_complexes, start_and_end_routes)
+            shared_stations = modules_classes.get_shared_stations(stations_in_complexes, start_and_end_routes)
             self.shared_stations = shared_stations
 
             # Assign correct shared station to start_terminus and end_origin
@@ -180,7 +180,7 @@ class FilteredTrains:
         # filter the gtfs json data for trains relevant to the user's trip.
         # a successful trip (both stations in service), will yield a list of trains for our trip.
         # if no trains are found, an error object is returned containing information on which stops are not in service.
-        self.filtered_train_data = modules.filter_trains_for_stations_direction_future_arrival(train_data, start_station_id, end_station_id)
+        self.filtered_train_data = modules_classes.filter_trains_for_stations_direction_future_arrival(train_data, start_station_id, end_station_id)
         
         if self.filtered_train_data:
             self.train_obj_array = trains_to_objects(self.filtered_train_data)
@@ -190,7 +190,8 @@ class FilteredTrains:
     def __repr__(self):
         return f'<FilteredTrains #{len(self.filtered_train_data)} between {self.start_station_id} and {self.end_station_id} >'
 
-# SortedTrains takes an array of Train objects, and sorts them by arrival at destination.
+# FirstTrain takes an array of Train objects, and sorts them by arrival at destination.
+# self.first_train is used by FormattedTrainData to display the information from the first train arriving at our destination. 
 # start station, end station, and time can be changed to split trip into multiple legs
 class SortedTrains:
 
@@ -200,16 +201,17 @@ class SortedTrains:
         self.end_station_id = end_station_id
 
 
-        self.sorted_trains  = modules.sort_trains_by_arrival_at_destination(train_obj_array, start_station_id, end_station_id, time)
-        self.first_train = self.sorted_trains[0]
-        # self.first_train_id = self.first_train.train
+        self.sorted_trains  = modules_classes.sort_trains_by_arrival_at_destination(train_obj_array, start_station_id, end_station_id, time)
+        self.first_train_and_schedule = self.sorted_trains[0]
+        self.first_train_only = self.first_train_and_schedule['train']
+        self.first_train_id = self.first_train_only.trip_id
         self.dest_arrival_time = self.sorted_trains[0]['dest_arrival_time']
         self.origin_arrival_time = self.sorted_trains[0]['origin_arrival_time']
         self.dest_arrival_time_readable = datetime.fromtimestamp(self.sorted_trains[0]['dest_arrival_time']).strftime('%H:%M:%S')
         self.origin_arrival_time_readable = datetime.fromtimestamp(self.sorted_trains[0]['origin_arrival_time']).strftime('%H:%M:%S')
 
     def __repr__(self):
-        return f'<SortedTrains {self.first_train} from {self.start_station_id} at {self.origin_arrival_time_readable} to {self.end_station_id} at {self.dest_arrival_time_readable} >'
+        return f'<SortedTrains {self.first_train_id} of {len(self.sorted_trains)} from {self.start_station_id} at {self.origin_arrival_time_readable} to {self.end_station_id} at {self.dest_arrival_time_readable} >'
     
 class TripError:
 
@@ -224,6 +226,8 @@ class TripError:
 # only returns one object, from the first train in trip_sequence
 # trip sequence is a list created in app.py from SorteDTrains object(s). It is a list of trains sorted by dest arrival time, for each leg of the trip. 
 class FormattedTrainData:
+    # trip sequence is sorted train objects?
+    # what if it was just the first train?
     def __init__(self, trip_sequence):
         self.trip_sequence = trip_sequence
         # for each trip in trip_sequence, a json compatible object is created and appended to trains_for_react.
@@ -234,7 +238,7 @@ class FormattedTrainData:
             start_station = Station.query.filter(Station.gtfs_stop_id == trip.start_station_id).first()
             end_station = Station.query.filter(Station.gtfs_stop_id == trip.end_station_id).first()
             # building our object from first train in trip_sequence
-            first_train = trip.first_train['train']
+            first_train = trip.first_train_only
             first_train_schedule = first_train.schedule
             # create an array of stop objects, the schedule for the train. 
             first_train_stop_schedule = []
@@ -254,10 +258,10 @@ class FormattedTrainData:
                 "train_id" : first_train.trip_id,
                 "start_station" : start_station.stop_name,
                 "start_station_gtfs" : trip.start_station_id,
-                "start_station_arrival" : str(modules.convert_timestamp(first_train.arrival_time(trip.start_station_id)))[10:16],
+                "start_station_arrival" : str(modules_classes.convert_timestamp(first_train.arrival_time(trip.start_station_id)))[10:16],
                 "end_station" : end_station.stop_name,
                 "end_station_gtfs" : trip.end_station_id,
-                "end_station_arrival" : str(modules.convert_timestamp(first_train.arrival_time(trip.end_station_id)))[10:16],
+                "end_station_arrival" : str(modules_classes.convert_timestamp(first_train.arrival_time(trip.end_station_id)))[10:16],
                 "transfer_station" : None,
                 "route" : first_train.route(),
                 "direction_label" : None,
@@ -306,7 +310,7 @@ class Train:
             "last_stop_departure" : self.schedule[0].departure,
             "next_stop" : self.schedule[1].stop_id,
             "next_stop_arrival" : self.schedule[1].arrival,
-            "length_of_trip" : modules.convert_seconds(self.schedule[1].arrival - self.schedule[0].departure)
+            "length_of_trip" : modules_classes.convert_seconds(self.schedule[1].arrival - self.schedule[0].departure)
         }
         return location
 
@@ -321,7 +325,7 @@ class Stop:
         self.stop_id = stop_id
 
     def __repr__(self):
-        return f'<Stop {self.stop_id} {str(modules.convert_timestamp(self.arrival))[11:-3]}>'
+        return f'<Stop {self.stop_id} {str(modules_classes.convert_timestamp(self.arrival))[11:-3]}>'
     
 if __name__ == "__main__":
     with app.app_context():
