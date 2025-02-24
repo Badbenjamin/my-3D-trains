@@ -14,6 +14,7 @@ from collections import Counter
 
 import modules_classes
 
+
 # Converts JSON train into a easier to read object
 # circular import issue, couldn't move to modules
 def trains_to_objects(filtered_trains):
@@ -37,6 +38,7 @@ def trains_to_objects(filtered_trains):
             )
             train_object_list.append(new_train)
         return train_object_list
+
 
 # the journey object takes a start and end station
 # it will contain endpoints for the start and end station, as well as the transfer station if applicable
@@ -181,14 +183,43 @@ class FilteredTrains:
         # a successful trip (both stations in service), will yield a list of trains for our trip.
         # if no trains are found, an error object is returned containing information on which stops are not in service.
         self.filtered_train_data = modules_classes.filter_trains_for_stations_direction_future_arrival(train_data, start_station_id, end_station_id)
-        
-        if self.filtered_train_data:
+        print('sftd', self.filtered_train_data)
+        if len(self.filtered_train_data) > 0:
             self.train_obj_array = trains_to_objects(self.filtered_train_data)
-        else:
-            self.error_obj = self.filtered_train_data
+        elif (self.filtered_train_data):
+            self.error_obj = TripError(train_data, start_station_id, end_station_id)
         
     def __repr__(self):
-        return f'<FilteredTrains #{len(self.filtered_train_data)} between {self.start_station_id} and {self.end_station_id} >'
+        if (self.train_obj_array != None):
+            return f'<FilteredTrains #{len(self.filtered_train_data)} between {self.start_station_id} and {self.end_station_id} >'
+        else:
+            return f'<FilteredTrains origin service {self.start_station_id}{self.error_obj} dest service {self.end_station_id}{self.error_obj}>'
+        
+class TripError:
+    def __init__(self, train_data, start_station_id, end_station_id):
+        self.train_data = train_data
+        self.start_station_id = start_station_id
+        self.end_station_id = end_station_id,
+        self.start_station_service = None
+        self.end_station_service = None
+        self.direction_service = None
+
+        for train_feed in train_data:
+            for train in train_feed.entity: 
+                if train.HasField('trip_update'):
+                    stops = modules_classes.create_stop_schedule(train)
+                    if not modules_classes.check_for_station_service(stops, start_station_id):
+                         self.start_station_service = False
+                    elif not modules_classes.check_for_station_service(stops, end_station_id):
+                         self.end_station_service = False
+                    elif (not modules_classes.check_for_station_service(stops, start_station_id) and (not modules_classes.check_for_station_service(stops, end_station_id))):
+                         self.start_station_service = False
+                         self.end_station_service = False
+                    elif not modules_classes.check_for_train_direction(stops, start_station_id, end_station_id):
+                         self.direction_service = False
+
+    def __repr__(self):
+        return f'<TripError {self.start_station_id} {self.end_station_id}>'
 
 # FirstTrain takes an array of Train objects, and sorts them by arrival at destination.
 # self.first_train is used by FormattedTrainData to display the information from the first train arriving at our destination. 
@@ -213,13 +244,18 @@ class SortedTrains:
     def __repr__(self):
         return f'<SortedTrains {self.first_train_id} of {len(self.sorted_trains)} from {self.start_station_id} at {self.origin_arrival_time_readable} to {self.end_station_id} at {self.dest_arrival_time_readable} >'
     
-class TripError:
+# class TripError:
 
-    def __init__(self, error_obj):
-        self.error_obj = error_obj
+    
+#     def __init__(self, start_station_id, end_station_id):
+#         self.start_station_id = start_station_id
+#         self.end_station_id = end_station_id,
+#         self.start_station_service = None
+#         self.end_station_service = None
+#         self.direction_service = None
 
-    def __repr__(self):
-        f'<TripError {self.error_obj}>'
+#     def __repr__(self):
+#         f'<TripError {self.start_station_id} {self.end_station_id}>'
             
 
 # Takes data from SortedTrains object and formats it into an object that is sent to the client. 
@@ -326,6 +362,10 @@ class Stop:
 
     def __repr__(self):
         return f'<Stop {self.stop_id} {str(modules_classes.convert_timestamp(self.arrival))[11:-3]}>'
+    
+# class TripError:
+    
+     
     
 if __name__ == "__main__":
     with app.app_context():
