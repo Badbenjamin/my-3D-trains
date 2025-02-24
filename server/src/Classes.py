@@ -177,17 +177,17 @@ class FilteredTrains:
         # this is passed to SortedTrains if filter yields results
         self.train_obj_array = None
         # this is passed to TripError if filter produces empty array
-        self.error_obj = None
+        self.trip_error_obj = None
 
         # filter the gtfs json data for trains relevant to the user's trip.
         # a successful trip (both stations in service), will yield a list of trains for our trip.
         # if no trains are found, an error object is returned containing information on which stops are not in service.
         self.filtered_train_data = modules_classes.filter_trains_for_stations_direction_future_arrival(train_data, start_station_id, end_station_id)
-        print('sftd', self.filtered_train_data)
+        # print('sftd', self.filtered_train_data)
         if len(self.filtered_train_data) > 0:
             self.train_obj_array = trains_to_objects(self.filtered_train_data)
         elif (self.filtered_train_data):
-            self.error_obj = TripError(train_data, start_station_id, end_station_id)
+            self.trip_error_obj = TripError(train_data, start_station_id, end_station_id)
         
     def __repr__(self):
         if (self.train_obj_array != None):
