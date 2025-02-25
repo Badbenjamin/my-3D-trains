@@ -178,32 +178,32 @@ class FilteredTrains:
         self.train_obj_array = None
         # this is passed to TripError if filter produces empty array
         self.trip_error_obj = None
-
         # filter the gtfs json data for trains relevant to the user's trip.
         # a successful trip (both stations in service), will yield a list of trains for our trip.
         # if no trains are found, an error object is returned containing information on which stops are not in service.
         self.filtered_train_data = modules_classes.filter_trains_for_stations_direction_future_arrival(train_data, start_station_id, end_station_id)
-        # print('sftd', self.filtered_train_data)
+        
         if len(self.filtered_train_data) > 0:
             self.train_obj_array = trains_to_objects(self.filtered_train_data)
-        elif (self.filtered_train_data):
-            self.trip_error_obj = TripError(train_data, start_station_id, end_station_id)
+        elif (self.filtered_train_data == []):
+            self.trip_error_obj = TripError(train_data, self.start_station_id, self.end_station_id)
+            
         
     def __repr__(self):
         if (self.train_obj_array != None):
             return f'<FilteredTrains #{len(self.filtered_train_data)} between {self.start_station_id} and {self.end_station_id} >'
         else:
-            return f'<FilteredTrains origin service {self.start_station_id}{self.error_obj} dest service {self.end_station_id}{self.error_obj}>'
+            return f'<FilteredTrains ERROR {self.trip_error_obj.start_station_id} {self.trip_error_obj.start_station_service} {self.trip_error_obj.end_station_id} {self.trip_error_obj.end_station_service}>'
         
 class TripError:
     def __init__(self, train_data, start_station_id, end_station_id):
         self.train_data = train_data
         self.start_station_id = start_station_id
-        self.end_station_id = end_station_id,
+        self.end_station_id = end_station_id
         self.start_station_service = None
         self.end_station_service = None
         self.direction_service = None
-
+        
         for train_feed in train_data:
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
