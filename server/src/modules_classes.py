@@ -123,8 +123,9 @@ def quick_sort_trains_by_arrival_time(train_obj_array):
      
 
 # takes list of JSON trains (from filter_trains_for_stations_direction_future_arrival()) and returns list of trains sorted by arrival time at destination.
-def sort_trains_by_arrival_at_destination(filtered_train_data_object, start_station_id, dest_station_id, time=(round(current_time.timestamp()))):
-        
+# MULTI LEG TRIP PROBLEM WITH QUICK SORT
+def sort_trains_by_arrival_at_destination(filtered_train_data_object, start_station_id, dest_station_id, time):
+        print('sort trains by arrival time', time)
         # take JSON train array (filtered) and build objects with {train, dest arrival, origin arrival} key value pairs
         trains_with_arrival_objs_array = create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id)
         # use quicksort to sort array of objects by arrival at destination. 
