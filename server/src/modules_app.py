@@ -16,17 +16,16 @@ def return_sorted_trains_or_trip_error(leg_info, start_station_id, end_station_i
     return info_for_trip_sequence
 
 def handle_multi_leg_trip(train_data_obj):
-    # print('ssid', train_data_obj.start_station_id)
+  
     trip_sequence = [] 
     leg_one = FilteredTrains(train_data_obj.all_train_data, train_data_obj.start_station_id, train_data_obj.start_station_terminus_id)
-    # print('ts type', type(leg_one))
     trip_sequence.append(return_sorted_trains_or_trip_error(leg_one, train_data_obj.start_station_id, train_data_obj.start_station_terminus_id))
-    # trip_sequence[0] == error obj, check_station_service?
-    # print('ts type',type(trip_sequence[0]))
-    # if isinstance()
-
-    leg_two = FilteredTrains(train_data_obj.all_train_data, train_data_obj.end_station_origin_id, train_data_obj.end_station_id)
-    trip_sequence.append(return_sorted_trains_or_trip_error(leg_two, train_data_obj.end_station_origin_id, train_data_obj.end_station_id, trip_sequence[0].dest_arrival_time + 120))
+    print('ts0 type', isinstance(trip_sequence[0], SortedTrains))
+    if isinstance(trip_sequence[0],SortedTrains):
+        leg_two = FilteredTrains(train_data_obj.all_train_data, train_data_obj.end_station_origin_id, train_data_obj.end_station_id)
+        trip_sequence.append(return_sorted_trains_or_trip_error(leg_two, train_data_obj.end_station_origin_id, train_data_obj.end_station_id, trip_sequence[0].dest_arrival_time + 120))
+    else:
+        return trip_sequence
     return trip_sequence
 
 def build_trip_sequence(journey_obj, train_data_obj):
