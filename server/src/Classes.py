@@ -60,11 +60,12 @@ class Journey:
         self.end_station_routes = self.end_station.daytime_routes.split()
         # am i using the routes variable correctly? is it needed?
         start_and_end_routes = list(set(self.start_station_routes + self.end_station_routes))
-        
+        print('start end routes', self.start_station_routes, self.end_station_routes)
         # False if end station does not share a route with start station
         # True if they share a route
+        # IF SAME LINE IS FALSE AND NO SHARED STATIONS, RETURN ERROR
         same_line = modules_classes.same_line(self.start_station_routes, self.end_station_routes)
-
+        print('same line', same_line)
         # NEED TO MAKE BRANCH FOR SAME LINE BUT EXPRESS TO LOCAL OR LOCAL TO EXPRESS
         if same_line == False:
             # 

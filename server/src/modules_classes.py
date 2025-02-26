@@ -85,7 +85,7 @@ def filter_trains_for_stations_direction_future_arrival(train_data, start_statio
              
 # 
 def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id):
-    print('ftdo', filtered_train_data_object[0].schedule)
+    # print('ftdo', filtered_train_data_object[0].schedule)
 
     trains_with_arrival = []
     for train in filtered_train_data_object:
@@ -126,14 +126,14 @@ def quick_sort_trains_by_arrival_time(train_obj_array):
 # takes list of JSON trains (from filter_trains_for_stations_direction_future_arrival()) and returns list of trains sorted by arrival time at destination.
 # MULTI LEG TRIP PROBLEM WITH QUICK SORT
 def sort_trains_by_arrival_at_destination(filtered_train_data_object, start_station_id, dest_station_id, time):
-        print('sort trains by arrival time', time)
+        # print('sort trains by arrival time', time)
         # NO DESTINATION ARRIVAL TIME
         # take JSON train array (filtered) and build objects with {train, dest arrival, origin arrival} key value pairs
         trains_with_arrival_objs_array = create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id)
         # use quicksort to sort array of objects by arrival at destination.
-        print('trainswarrivalobjarray',trains_with_arrival_objs_array) 
+        # print('trainswarrivalobjarray',trains_with_arrival_objs_array) 
         sorted_trains = [train for train in quick_sort_trains_by_arrival_time(trains_with_arrival_objs_array) if train['origin_arrival_time'] > time]
-        print('sort trains func sorted trains', sorted_trains)
+        # print('sort trains func sorted trains', sorted_trains)
         return sorted_trains
 
 # return a list of routes eg. [A,C,E] for a station
@@ -152,7 +152,7 @@ def same_line(start_station_routes, end_station_routes):
             if route not in end_station_routes:
                 return False
             else:
-                 return True
+                 return  True
 
 # takes daytime routes of a station (start or end), and returns the complex ids of all stations that are served by that route (eg. "G")
 def find_complex_ids(daytime_routes):
