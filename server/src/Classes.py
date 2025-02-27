@@ -268,6 +268,7 @@ class FormattedTrainData:
         self.trains_for_react = []
         for trip in self.trip_sequence:
             if isinstance(trip, SortedTrains):
+                print('its a train')
                 start_station = Station.query.filter(Station.gtfs_stop_id == trip.start_station_id).first()
                 end_station = Station.query.filter(Station.gtfs_stop_id == trip.end_station_id).first()
                 # building our object from first train in trip_sequence
@@ -308,7 +309,18 @@ class FormattedTrainData:
                     train_for_react['direction_label'] = start_station.south_direction_label
                 self.trains_for_react.append(train_for_react)
             elif isinstance(trip, TripError):
-                print('error encountered')
+                start_station = Station.query.filter(Station.gtfs_stop_id == trip.start_station_id).first()
+                end_station = Station.query.filter(Station.gtfs_stop_id == trip.end_station_id).first()
+                error_for_react = {
+                    "start_station_name" : start_station.stop_name,
+                    "start_station_gtfs" : trip.start_station_id,
+                    "start_station_service" : trip.start_station_service,
+                    "end_station_name" : start_station.stop_name,
+                    "end_station_gtfs" : trip.end_station_id,
+                    "end_station_service" : trip.end_station_service
+                }
+                self.trains_for_react.append(error_for_react)
+
         # print('s.ft', self.first_train)
     def __repr__(self):
         return f'<FormattedTrainData >'
