@@ -6,7 +6,7 @@ export  function getStationCode(name){
 // takes a train (tripInfo) and statusArray as args, returns a list of station and track ids
 // these are used to update the status array and highlight a route
 export function getAllIds(tripInfo, statusArray){
-    console.log('ti', tripInfo)
+    // console.log('ti', tripInfo)
       const currentTripSchedule = tripInfo.schedule
       const startStation = tripInfo.start_station_gtfs
       const endStation = tripInfo.end_station_gtfs
@@ -14,12 +14,13 @@ export function getAllIds(tripInfo, statusArray){
       const justStationIds = currentTripSchedule.map((station) => {
           return station['stop_id'].slice(0,3)
         })
+      
       const startIndex = justStationIds.indexOf(startStation)
       const endIndex = justStationIds.indexOf(endStation)
       // Only stations between start statio and end station
       const selectedStationArray = justStationIds.slice(startIndex, endIndex + 1)
       const direction = tripInfo.schedule[0]['stop_id'].slice(3,4)
-      
+      console.log('selected station array', selectedStationArray)
       // Only tracks between start station and end station
       const justTrackIds = selectedStationArray.map((stationId) => {
         const stationAndDirection = stationId + direction
@@ -32,9 +33,10 @@ export function getAllIds(tripInfo, statusArray){
       
       // complete array of all meshes to be selected, stations + tracks
       // this is the arg that gets passed to selectStations function
-      const allIdsArray = selectedStationArray.concat(justTrackIds)
-      console.log("allid in func", allIdsArray)
-      return allIdsArray
+      // const allIdsArray = selectedStationArray.concat(justTrackIds)
+      // console.log("allid in func", allIdsArray)
+      // JUST RETURNING SELECTED STATION ARRAY NO TRACK ARRAY RIGHT NOW
+      return selectedStationArray
 }
 
 
@@ -43,7 +45,7 @@ export function createStatusObjectArray(nodes){
   let newStatusArray = []
     for (const mesh in nodes){
       if (nodes[mesh].type === "Mesh"){
-        console.log('mat', nodes[mesh].material)
+        // console.log('mat', nodes[mesh].material)
         const status = {"name": nodes[mesh].name.slice(0,3), "status": false}
         newStatusArray.push(status)   
     } 

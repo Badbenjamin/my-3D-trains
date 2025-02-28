@@ -14,7 +14,7 @@ function App() {
   // nodes correspond to each geometry in the model
   // each node contains a mesh, which has the properties for that geometry 
   const { nodes, materials } = useGLTF('./subway_map_G_7_ACE_L_BDFM_456_NQRW.glb')
-
+  
   const [stations, setStations] = useState([])
   const [stationArray, setStationArray] = useState([])
   const [statusArray, setStatusArray] = useState([])
@@ -50,28 +50,26 @@ function App() {
   // This useEffect listens for a change in tripInfo. 
   // It takes the stations from ttrain schedule and creates an array of GTFS ids that will be passed to the selectStations function
   // selectStations takes an array of gtfs ids and uses it to change the status of the stations in stationArray.
+
   useEffect(()=>{
     // trip info contains trains, which contain schedules.
     // schedules are used to select meshes to be highlighted in our map.
     if (tripInfo == []){
       return 
-    } 
-      else if (tripInfo[0]?.schedule){
+    } else if (tripInfo[0]?.schedule) {
       let allIdsArray = []
-      if (tripInfo.length == 1){
-        if ('schedule' in tripInfo[0]){
-          allIdsArray = getAllIds(tripInfo[0], statusArray);
+      // Trigger some sort of animation change with errors?
+      let allErrorsArray = []
+
+      for (let leg of tripInfo){
+        if(leg.schedule){
+          for (let id of getAllIds(leg,statusArray)){
+            allIdsArray.push(id)
+          }
+        } else {
+          console.log('error')
+          // allErrorsArray.push(leg.error)
         }
-        
-      } else if (tripInfo.length == 2){
-        allIdsArray = getAllIds(tripInfo[0], statusArray).concat(getAllIds(tripInfo[1], statusArray));
-        // let idsArr = tripInfo.map((leg)=>{
-        //   if ('schedule' in leg){
-        //     return getAllIds(leg, statusArray)
-        //   }
-        // })
-        // console.log('idsar',idsArr)
-        // allIdsArray = idsArr[0].concat
       }
       
       // version must update to change key and trigger re render
@@ -102,11 +100,10 @@ function App() {
           }
         return newStation
       })
+      console.log('asa', alteredStationArray)
       setStationArray(alteredStationArray)
     }
   }, [tripInfo])
-
-  
 
   if (!nodes || !stationArray){
     return (
