@@ -55,13 +55,25 @@ function App() {
     // schedules are used to select meshes to be highlighted in our map.
     if (tripInfo == []){
       return 
-    } else if (tripInfo[0]?.schedule){
+    } 
+      else if (tripInfo[0]?.schedule){
       let allIdsArray = []
       if (tripInfo.length == 1){
-        allIdsArray = getAllIds(tripInfo[0], statusArray);
+        if ('schedule' in tripInfo[0]){
+          allIdsArray = getAllIds(tripInfo[0], statusArray);
+        }
+        
       } else if (tripInfo.length == 2){
         allIdsArray = getAllIds(tripInfo[0], statusArray).concat(getAllIds(tripInfo[1], statusArray));
+        // let idsArr = tripInfo.map((leg)=>{
+        //   if ('schedule' in leg){
+        //     return getAllIds(leg, statusArray)
+        //   }
+        // })
+        // console.log('idsar',idsArr)
+        // allIdsArray = idsArr[0].concat
       }
+      
       // version must update to change key and trigger re render
       // does version need to be saved in state?
       setVersion(version + 1)

@@ -40,6 +40,14 @@ def check_for_station_service(train_array, station_id):
             station_serivce = True
     return station_serivce
 
+# can i figure out direction if no trains are returned from filter?
+def get_trip_direction(train_data, start_station_id, end_station_id):
+     pass
+    #  start_station = Station.query.filter(Station.gtfs_stop_id == start_station_id).first()
+    #  end_station = Station.query.filter(Station.gtfs_stop_id == end_station_id).first()
+
+    #  print('get trip direction', start_station.line, end_station)
+
 # returns true if the station appears in the schedule of a train
 def check_for_station_service(stops, station_id):
      if station_id in stops:
@@ -48,7 +56,7 @@ def check_for_station_service(stops, station_id):
           return False
 
 # if start station id is before stop station id in stops (train schedule), then the train is headed in the correct direction.   
-def check_for_train_direction(stops, start_station_id, end_station_id):
+def check_for_correct_direction(stops, start_station_id, end_station_id):
      if (stops.index(start_station_id) < stops.index(end_station_id)):
          return True
      else:
@@ -73,7 +81,7 @@ def filter_trains_for_stations_direction_future_arrival(train_data, start_statio
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
                     stops = create_stop_schedule(train)
-                    if ((check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id)) and (check_for_train_direction(stops, start_station_id, end_station_id))):
+                    if ((check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id)) and (check_for_correct_direction(stops, start_station_id, end_station_id))):
                         stop_schedule = train.trip_update.stop_time_update
                         for stop in stop_schedule:
                             if (check_if_station_arrival_is_in_future(stop, start_station_id)):
@@ -144,6 +152,7 @@ def get_station_routes(station_daytime_routes):
         if route != " ":
             routes.append(route)
     return routes
+
 
 # returns True if a route from the start station routes is present in the end station routes
 # NEEDS TO BE ABLE TO HANDLE EXPRESS/LOCAL LOGIC

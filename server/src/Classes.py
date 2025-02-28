@@ -208,7 +208,7 @@ class TripError:
         # self.end_station_name = self.end_station.stop_name
         self.start_station_service = None
         self.end_station_service = None
-        
+        # modules_classes.get_trip_direction(train_data, start_station_id, end_station_id)
         
         for train_feed in train_data:
             for train in train_feed.entity: 
@@ -218,6 +218,7 @@ class TripError:
                          self.start_station_service = False
                     else: 
                         self.start_station_service = True
+
                     if (modules_classes.check_for_station_service(stops, end_station_id == False)):
                          self.end_station_service = False
                     else:
@@ -268,7 +269,6 @@ class FormattedTrainData:
         self.trains_for_react = []
         for trip in self.trip_sequence:
             if isinstance(trip, SortedTrains):
-                print('its a train')
                 start_station = Station.query.filter(Station.gtfs_stop_id == trip.start_station_id).first()
                 end_station = Station.query.filter(Station.gtfs_stop_id == trip.end_station_id).first()
                 # building our object from first train in trip_sequence
@@ -315,7 +315,7 @@ class FormattedTrainData:
                     "start_station_name" : start_station.stop_name,
                     "start_station_gtfs" : trip.start_station_id,
                     "start_station_service" : trip.start_station_service,
-                    "end_station_name" : start_station.stop_name,
+                    "end_station_name" : end_station.stop_name,
                     "end_station_gtfs" : trip.end_station_id,
                     "end_station_service" : trip.end_station_service
                 }
