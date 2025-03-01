@@ -66,6 +66,7 @@ class Journey:
         # True if they share a route
         # IF SAME LINE IS FALSE AND NO SHARED STATIONS, RETURN ERROR
         same_line = modules_classes.same_line(self.start_station_routes, self.end_station_routes)
+        print('same line', same_line)
         # print('same line', same_line)
         # NEED TO MAKE BRANCH FOR SAME LINE BUT EXPRESS TO LOCAL OR LOCAL TO EXPRESS
         if same_line == False:
@@ -176,6 +177,9 @@ class FilteredTrains:
         
         self.start_station_id = start_station_id
         self.end_station_id = end_station_id
+        self.start_station = Station.query.filter(Station.gtfs_stop_id == start_station_id).first()
+        self.end_station = Station.query.filter(Station.gtfs_stop_id == end_station_id).first()
+        print('st end', self.start_station, self.end_station)
         # this is passed to SortedTrains if filter yields results
         self.train_obj_array = None
         # this is passed to TripError if filter produces empty array
@@ -183,7 +187,7 @@ class FilteredTrains:
         # filter the gtfs json data for trains relevant to the user's trip.
         # a successful trip (both stations in service), will yield a list of trains for our trip.
         # if no trains are found, error info is returned with service status for each stop
-        self.filtered_train_data = modules_classes.filter_trains_for_stations_direction_future_arrival(train_data, start_station_id, end_station_id)
+        self.filtered_train_data = modules_classes.filter_trains_for_stations_direction_future_arrival(train_data, self.start_station, self.end_station)
         
         if len(self.filtered_train_data) > 0:
             self.train_obj_array = trains_to_objects(self.filtered_train_data)
@@ -342,7 +346,7 @@ class Train:
         self.start_date = start_date
         self.route_id = route_id
         self.schedule = schedule
-        print('route id', self.route_id)
+        # print('route id', self.route_id)
     def last_stop(self):
         return self.schedule[0]
     

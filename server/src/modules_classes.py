@@ -55,7 +55,7 @@ def check_for_station_service_on_failed_trip(train_data, start_station_id, end_s
         'start_to_end_service' : start_to_end_service,
     }
                          
-    print('so', service_obj)
+    # print('so', service_obj)
     return service_obj
 
 # can i figure out direction if no trains are returned from filter?
@@ -92,21 +92,39 @@ def check_if_station_arrival_is_in_future(stop, station_id):
             return True
         else:
             return False
-        
+
+# express?
+def check_if_train_route_matches_end_station_routes_start_station_routes(start_station_routes, end_station_routes, train_route):
+    #  return True
+     train_route_sliced = train_route[0]
+     shared_routes_matching_train_route = []
+     if (train_route_sliced in start_station_routes) and (train_route_sliced in end_station_routes):
+          shared_routes_matching_train_route.append(train_route_sliced)
+     if (shared_routes_matching_train_route):
+        return True
+     else:
+        return False
 
 # takes all json data from endpoints and returns array of trains relevant for our trip
 # if there are trains serving both stations currently, and in the correct direction, return array of JSON trains, each containing a schedule. 
 # if the trip is not possible, a trip_error_obj is returned with info about stations
-def filter_trains_for_stations_direction_future_arrival(train_data, start_station_id, end_station_id):
+def filter_trains_for_stations_direction_future_arrival(train_data, start_station, end_station):
+        start_station_id = start_station.gtfs_stop_id
+        end_station_id = end_station.gtfs_stop_id
+        start_station_routes = start_station.daytime_routes.split()
+        end_station_routes = end_station.daytime_routes.split()
+        print('ssr', end_station_routes)
         filtered_trains = []
         for train_feed in train_data:
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
+                    train_route = train.trip_update.trip.route_id
                     stops = create_stop_schedule(train)
-                    if ((check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id)) and (check_for_correct_direction(stops, start_station_id, end_station_id))):
+                    if ((check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id)) and (check_for_correct_direction(stops, start_station_id, end_station_id))) and (check_if_train_route_matches_end_station_routes_start_station_routes(start_station_routes, end_station_routes, train_route)):
                         stop_schedule = train.trip_update.stop_time_update
                         for stop in stop_schedule:
                             if (check_if_station_arrival_is_in_future(stop, start_station_id)):
+                                 
                                  filtered_trains.append(train)
         return filtered_trains
          
@@ -179,11 +197,18 @@ def get_station_routes(station_daytime_routes):
 # returns True if a route from the start station routes is present in the end station routes
 # NEEDS TO BE ABLE TO HANDLE EXPRESS/LOCAL LOGIC
 def same_line(start_station_routes, end_station_routes):
+    same_line = None
     for route in start_station_routes:
             if route not in end_station_routes:
-                return False
+                same_line = False
             else:
-                 return  True
+                 same_line = True
+    for route in end_station_routes:
+            if route not in start_station_routes:
+                same_line = False
+            else:
+                same_line = True
+    return same_line
 
 # takes daytime routes of a station (start or end), and returns the complex ids of all stations that are served by that route (eg. "G")
 def find_complex_ids(daytime_routes):
