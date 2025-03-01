@@ -55,6 +55,7 @@ class Journey:
         
         # LET USER INPUT TRANSFER STATIONS IF THEY WANT
         self.shared_stations = []
+        
         self.time = time
         self.start_station_routes = self.start_station.daytime_routes.split()
         self.end_station_routes = self.end_station.daytime_routes.split()
@@ -95,7 +96,7 @@ class Journey:
                     for route in self.end_station_routes:
                         if route in shared_station_routes:
                             self.end_station_origin = station
-
+        
         start_station_endpoints = []
         for endpoint in self.start_station.station_endpoints:
             start_station_endpoints.append(endpoint.endpoint.endpoint)
@@ -151,7 +152,7 @@ class TrainData:
         
 
         de_duplicated_endpoints = list(set(all_endpoints))
-      
+        print('de dup eps', de_duplicated_endpoints)
         # THIS IS WHERE THE REQUESTS HAPPEN 
         all_train_data = []
         for endpoint in de_duplicated_endpoints:
@@ -189,7 +190,7 @@ class FilteredTrains:
         elif (self.filtered_train_data == []):
             self.trip_error_obj = TripError(train_data, self.start_station_id, self.end_station_id)
             
-        
+        print('teo',self.trip_error_obj)
     def __repr__(self):
         if (self.train_obj_array != None):
             return f'<FilteredTrains #Trains {len(self.filtered_train_data)} between {self.start_station_id} and {self.end_station_id} >'
@@ -206,31 +207,38 @@ class TripError:
         self.end_station_id = end_station_id
         # self.end_station = Station.query.filter(Station.gtfs_stop_id == self.end_station_id).first()
         # self.end_station_name = self.end_station.stop_name
-        self.start_station_service = None
-        self.end_station_service = None
-        # modules_classes.get_trip_direction(train_data, start_station_id, end_station_id)
-        
-        for train_feed in train_data:
-            for train in train_feed.entity: 
-                if train.HasField('trip_update'):
-                    stops = modules_classes.create_stop_schedule(train)
-                    if (modules_classes.check_for_station_service(stops, start_station_id) == False):
-                         self.start_station_service = False
-                    else: 
-                        self.start_station_service = True
+        station_service_obj = modules_classes.check_for_station_service_on_failed_trip(train_data, start_station_id, end_station_id)
+        print('station_service', station_service_obj)
 
-                    if (modules_classes.check_for_station_service(stops, end_station_id == False)):
-                         self.end_station_service = False
-                    else:
-                        self.end_station_service = True
+        self.start_station_service = station_service_obj['start_station_service']
+        self.end_station_service = station_service_obj['end_station_service']
+        self.between_station_service = station_service_obj['start_to_end_service']
+        
+        # modules_classes.get_trip_direction(train_data, start_station_id, end_station_id)
+
+
+        
+        # for train_feed in train_data:
+        #     for train in train_feed.entity: 
+        #         if train.HasField('trip_update'):
+        #             stops = modules_classes.create_stop_schedule(train)
+        #             if (modules_classes.check_for_station_service(stops, start_station_id) == False):
+        #                  self.start_station_service = False
+        #             else: 
+        #                 self.start_station_service = True
+
+        #             if (modules_classes.check_for_station_service(stops, end_station_id) == False):
+        #                  self.end_station_service = False
+        #             else:
+        #                 self.end_station_service = True
                     # if (modules_classes.check_for_station_service(stops, start_station_id) and (not modules_classes.check_for_station_service(stops, end_station_id))):
                     #      self.start_station_service = False
                     #      self.end_station_service = False
                     # if not modules_classes.check_for_train_direction(stops, start_station_id, end_station_id):
                     #      self.direction_service = False
-
+        print('serv', self.start_station_service, self.end_station_service)
     def __repr__(self):
-        return f'<TripError {self.start_station_id} {self.start_station_service} {self.end_station_id} {self.end_station_service}>'
+        return f'<TripError {self.start_station_id} {self.start_station_service} {self.end_station_id} {self.end_station_service} trains between: {self.between_station_service}>'
 
 # FirstTrain takes an array of Train objects, and sorts them by arrival at destination.
 # self.first_train is used by FormattedTrainData to display the information from the first train arriving at our destination. 
@@ -317,7 +325,8 @@ class FormattedTrainData:
                     "start_station_service" : trip.start_station_service,
                     "end_station_name" : end_station.stop_name,
                     "end_station_gtfs" : trip.end_station_id,
-                    "end_station_service" : trip.end_station_service
+                    "end_station_service" : trip.end_station_service,
+                    "station_to_station_service" : trip.between_station_service
                 }
                 self.trains_for_react.append(error_for_react)
 
@@ -333,7 +342,7 @@ class Train:
         self.start_date = start_date
         self.route_id = route_id
         self.schedule = schedule
-
+        print('route id', self.route_id)
     def last_stop(self):
         return self.schedule[0]
     

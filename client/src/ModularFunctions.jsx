@@ -73,7 +73,7 @@ export function createStationComponentsObj(nodes, materials, newStatusArray){
                       getStationCode={getStationCode}/>
         } 
       };
-    console.log("nmmo func", newMapModelObj)
+    // console.log("nmmo func", newMapModelObj)
     return newMapModelObj
 }
 

@@ -32,13 +32,31 @@ def create_stop_scheudle_for_frontend():
      pass
 
 # could I combine this into filter trains for station direction current?
-def check_for_station_service(train_array, station_id):
-    station_serivce = False
-    for train in train_array:
-        stops = create_stop_schedule(train)
-        if station_id in stops:
-            station_serivce = True
-    return station_serivce
+def check_for_station_service_on_failed_trip(train_data, start_station_id, end_station_id):
+    
+    # there are trains stopping at start station, and at end station, but not at both
+    start_service = False
+    end_service = False
+    start_to_end_service = False
+    for train_feed in train_data:
+            
+            for train in train_feed.entity: 
+                if train.HasField('trip_update'):
+                    stops = create_stop_schedule(train)
+                    if (start_station_id in stops):
+                         start_service = True
+                    if (end_station_id in stops):
+                         end_service = True
+                    if (start_station_id in stops) and (end_station_id in stops):
+                         start_to_end_service = True
+    service_obj = {
+        'start_station_service' : start_service,
+        'end_station_service' : end_service,
+        'start_to_end_service' : start_to_end_service,
+    }
+                         
+    print('so', service_obj)
+    return service_obj
 
 # can i figure out direction if no trains are returned from filter?
 def get_trip_direction(train_data, start_station_id, end_station_id):
@@ -50,10 +68,14 @@ def get_trip_direction(train_data, start_station_id, end_station_id):
 
 # returns true if the station appears in the schedule of a train
 def check_for_station_service(stops, station_id):
+     service = False
      if station_id in stops:
-          return True
+        #   print('true', station_id)
+          service = True
      else:
-          return False
+        #   print('false', station_id)
+          service = False
+     return service
 
 # if start station id is before stop station id in stops (train schedule), then the train is headed in the correct direction.   
 def check_for_correct_direction(stops, start_station_id, end_station_id):
