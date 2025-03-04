@@ -61,13 +61,12 @@ class Journey:
         self.end_station_routes = self.end_station.daytime_routes.split()
         # am i using the routes variable correctly? is it needed?
         start_and_end_routes = list(set(self.start_station_routes + self.end_station_routes))
-        # print('start end routes', self.start_station_routes, self.end_station_routes)
         # False if end station does not share a route with start station
         # True if they share a route
         # IF SAME LINE IS FALSE AND NO SHARED STATIONS, RETURN ERROR
         same_line = modules_classes.same_line(self.start_station_routes, self.end_station_routes)
         print('same line', same_line)
-        # print('same line', same_line)
+        
         # NEED TO MAKE BRANCH FOR SAME LINE BUT EXPRESS TO LOCAL OR LOCAL TO EXPRESS
         if same_line == False:
             # 
@@ -86,9 +85,11 @@ class Journey:
             # return all stations that serve a route that is served by the start and end station
             shared_stations = modules_classes.get_shared_stations(stations_in_complexes, start_and_end_routes)
             self.shared_stations = shared_stations
-
+            print('shared stations', shared_stations)
             # Assign correct shared station to start_terminus and end_origin
+            # IF THERE ARE MULTIPLE SHARED STATIONS, WE NEED TO FIND THE FASTEST ROUTE
             if shared_stations:
+                start_stations = []
                 for station in shared_stations:
                     shared_station_routes = station.daytime_routes.split()
                     for route in self.start_station_routes:
@@ -112,9 +113,6 @@ class Journey:
         self.end_station_endpoints = list(set(end_station_endpoints))
 
         # self.all_endpoints = [self.start_station_endpoints] + [self.end_station_endpoints]
-        # print('all eps', self.all_endpoints)
-
-        
 
     def __repr__(self):
         return f'<Journey {self.start_station.stop_name} to {self.end_station.stop_name} through{self.shared_stations} at {self.time}>'
@@ -152,7 +150,7 @@ class TrainData:
         all_endpoints = journey_object.start_station_endpoints + journey_object.end_station_endpoints
         
         de_duplicated_endpoints = list(set(all_endpoints))
-        print('de dup eps', de_duplicated_endpoints)
+       
         # THIS IS WHERE THE REQUESTS HAPPEN 
         all_train_data = []
         for endpoint in de_duplicated_endpoints:
@@ -178,7 +176,7 @@ class FilteredTrains:
         self.end_station_id = end_station_id
         self.start_station = Station.query.filter(Station.gtfs_stop_id == start_station_id).first()
         self.end_station = Station.query.filter(Station.gtfs_stop_id == end_station_id).first()
-        print('st end', self.start_station, self.end_station)
+        
         # this is passed to SortedTrains if filter yields results
         self.train_obj_array = None
         # this is passed to TripError if filter produces empty array
@@ -193,7 +191,6 @@ class FilteredTrains:
         elif (self.filtered_train_data == []):
             self.trip_error_obj = TripError(train_data, self.start_station_id, self.end_station_id)
             
-        print('teo',self.trip_error_obj)
     def __repr__(self):
         if (self.train_obj_array != None):
             return f'<FilteredTrains #Trains {len(self.filtered_train_data)} between {self.start_station_id} and {self.end_station_id} >'
@@ -211,13 +208,11 @@ class TripError:
         # self.end_station = Station.query.filter(Station.gtfs_stop_id == self.end_station_id).first()
         # self.end_station_name = self.end_station.stop_name
         station_service_obj = modules_classes.check_for_station_service_on_failed_trip(train_data, start_station_id, end_station_id)
-        print('station_service', station_service_obj)
 
         self.start_station_service = station_service_obj['start_station_service']
         self.end_station_service = station_service_obj['end_station_service']
         self.between_station_service = station_service_obj['start_to_end_service']
         
-        print('serv', self.start_station_service, self.end_station_service)
     def __repr__(self):
         return f'<TripError {self.start_station_id} {self.start_station_service} {self.end_station_id} {self.end_station_service} trains between: {self.between_station_service}>'
 
@@ -230,19 +225,14 @@ class SortedTrains:
         self.train_array = train_obj_array
         self.start_station_id = start_station_id
         self.end_station_id = end_station_id
-        print('array',self.train_array)
-        print('sorted trains time', time)
-
         self.sorted_trains  = modules_classes.sort_trains_by_arrival_at_destination(train_obj_array, start_station_id, end_station_id, time)
         self.first_train_and_schedule = self.sorted_trains[0]
-        # print('first train departure',self.sorted_trains[0]['origin_departure_time'])
         self.first_train_only = self.first_train_and_schedule['train']
         self.first_train_id = self.first_train_only.trip_id
         self.dest_arrival_time = self.sorted_trains[0]['dest_arrival_time']
         self.origin_departure_time = self.sorted_trains[0]['origin_departure_time']
         self.dest_arrival_time_readable = datetime.fromtimestamp(self.sorted_trains[0]['dest_arrival_time']).strftime('%I:%M %p')
         self.origin_departure_time_readable = datetime.fromtimestamp(self.sorted_trains[0]['origin_departure_time']).strftime('%I:%M %p')
-        # print('origin dep', self.origin_departure_time_readable)
     def __repr__(self):
         return f'<SortedTrains {self.first_train_id} of {len(self.sorted_trains)} from {self.start_station_id} at {self.origin_departure_time_readable} to {self.end_station_id} at {self.dest_arrival_time_readable} >'
     
@@ -253,7 +243,6 @@ class FormattedTrainData:
     # trip sequence is sorted train objects?
     # what if it was just the first train?
     def __init__(self, trip_sequence):
-        print('ftd ts', trip_sequence)
         self.trip_sequence = trip_sequence
         # for each trip in trip_sequence, a json compatible object is created and appended to trains_for_react.
         # trains for react is sent to the client and the information is displaid. 
@@ -314,8 +303,6 @@ class FormattedTrainData:
                     "station_to_station_service" : trip.between_station_service
                 }
                 self.trains_for_react.append(error_for_react)
-
-        # print('s.ft', self.first_train)
     def __repr__(self):
         return f'<FormattedTrainData >'
 
@@ -327,7 +314,7 @@ class Train:
         self.start_date = start_date
         self.route_id = route_id
         self.schedule = schedule
-        # print('route id', self.route_id)
+
     def last_stop(self):
         return self.schedule[0]
     

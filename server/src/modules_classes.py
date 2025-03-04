@@ -55,26 +55,18 @@ def check_for_station_service_on_failed_trip(train_data, start_station_id, end_s
         'end_station_service' : end_service,
         'start_to_end_service' : start_to_end_service,
     }
-                         
-    # print('so', service_obj)
     return service_obj
 
 # can i figure out direction if no trains are returned from filter?
 def get_trip_direction(train_data, start_station_id, end_station_id):
      pass
-    #  start_station = Station.query.filter(Station.gtfs_stop_id == start_station_id).first()
-    #  end_station = Station.query.filter(Station.gtfs_stop_id == end_station_id).first()
-
-    #  print('get trip direction', start_station.line, end_station)
 
 # returns true if the station appears in the schedule of a train
 def check_for_station_service(stops, station_id):
      service = False
      if station_id in stops:
-        #   print('true', station_id)
           service = True
      else:
-        #   print('false', station_id)
           service = False
      return service
 
@@ -124,14 +116,10 @@ def filter_trains_for_stations_direction_future_arrival(train_data, start_statio
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
                     stops = create_stop_schedule(train)
-                    # print('stops', stops)
                     if ((check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id)) and (check_for_correct_direction(stops, start_station_id, end_station_id))):
                         stop_schedule = train.trip_update.stop_time_update
-                        
                         for stop in stop_schedule:
-                            # print('stop', stop)
                             if (check_station_arrival_or_departure(stop, end_station_id, "arrival")):
-                                #  print('train', train.trip_update)
                                  filtered_trains.append(train)
         return filtered_trains
          
@@ -140,7 +128,6 @@ def filter_trains_for_stations_direction_future_arrival(train_data, start_statio
              
 # 
 def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id):
-    # print('ftdo', filtered_train_data_object[0].schedule)
 
     trains_with_arrival = []
     for train in filtered_train_data_object:
@@ -152,7 +139,6 @@ def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_st
             elif stop.stop_id[:-1] == start_station_id:
                  arrival_train['origin_departure_time'] = stop.departure
         trains_with_arrival.append(arrival_train)
-    print('twa', trains_with_arrival)
     return trains_with_arrival
 
 # is quick sort efficient for a sorted array?
@@ -171,16 +157,12 @@ def quick_sort_trains_by_arrival_time(train_obj_array):
 # takes list of JSON trains (from filter_trains_for_stations_direction_future_arrival()) and returns list of trains sorted by arrival time at destination.
 # MULTI LEG TRIP PROBLEM WITH QUICK SORT
 def sort_trains_by_arrival_at_destination(filtered_train_data_object, start_station_id, dest_station_id, time):
-        # print('sort trains by arrival time', time)
         # NO DESTINATION ARRIVAL TIME
         # take JSON train array (filtered) and build objects with {train, dest arrival, origin arrival} key value pairs
         trains_with_arrival_objs_array = create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id)
-        # print('trains with arrival obj', trains_with_arrival_objs_array)
         # use quicksort to sort array of objects by arrival at destination.
-        # print('trainswarrivalobjarray',trains_with_arrival_objs_array) 
         # 7 TRAIN TERMINUSES GIVING ORIGIN ARRIVAL TIME OF ZERO
         sorted_trains = [train for train in quick_sort_trains_by_arrival_time(trains_with_arrival_objs_array) if train['origin_departure_time'] >= time]
-        # pprint.pp(sorted_trains)
         return sorted_trains
 
 # return a list of routes eg. [A,C,E] for a station
