@@ -148,10 +148,9 @@ class TrainData:
         if self.journey_object.end_station_origin:
             self.end_station_origin_id = self.journey_object.end_station_origin.gtfs_stop_id
         
-
+        
         all_endpoints = journey_object.start_station_endpoints + journey_object.end_station_endpoints
         
-
         de_duplicated_endpoints = list(set(all_endpoints))
         print('de dup eps', de_duplicated_endpoints)
         # THIS IS WHERE THE REQUESTS HAPPEN 
@@ -218,28 +217,6 @@ class TripError:
         self.end_station_service = station_service_obj['end_station_service']
         self.between_station_service = station_service_obj['start_to_end_service']
         
-        # modules_classes.get_trip_direction(train_data, start_station_id, end_station_id)
-
-
-        
-        # for train_feed in train_data:
-        #     for train in train_feed.entity: 
-        #         if train.HasField('trip_update'):
-        #             stops = modules_classes.create_stop_schedule(train)
-        #             if (modules_classes.check_for_station_service(stops, start_station_id) == False):
-        #                  self.start_station_service = False
-        #             else: 
-        #                 self.start_station_service = True
-
-        #             if (modules_classes.check_for_station_service(stops, end_station_id) == False):
-        #                  self.end_station_service = False
-        #             else:
-        #                 self.end_station_service = True
-                    # if (modules_classes.check_for_station_service(stops, start_station_id) and (not modules_classes.check_for_station_service(stops, end_station_id))):
-                    #      self.start_station_service = False
-                    #      self.end_station_service = False
-                    # if not modules_classes.check_for_train_direction(stops, start_station_id, end_station_id):
-                    #      self.direction_service = False
         print('serv', self.start_station_service, self.end_station_service)
     def __repr__(self):
         return f'<TripError {self.start_station_id} {self.start_station_service} {self.end_station_id} {self.end_station_service} trains between: {self.between_station_service}>'
@@ -253,19 +230,21 @@ class SortedTrains:
         self.train_array = train_obj_array
         self.start_station_id = start_station_id
         self.end_station_id = end_station_id
+        print('array',self.train_array)
         print('sorted trains time', time)
 
         self.sorted_trains  = modules_classes.sort_trains_by_arrival_at_destination(train_obj_array, start_station_id, end_station_id, time)
         self.first_train_and_schedule = self.sorted_trains[0]
+        # print('first train departure',self.sorted_trains[0]['origin_departure_time'])
         self.first_train_only = self.first_train_and_schedule['train']
         self.first_train_id = self.first_train_only.trip_id
         self.dest_arrival_time = self.sorted_trains[0]['dest_arrival_time']
-        self.origin_arrival_time = self.sorted_trains[0]['origin_arrival_time']
-        self.dest_arrival_time_readable = datetime.fromtimestamp(self.sorted_trains[0]['dest_arrival_time']).strftime('%H:%M:%S')
-        self.origin_arrival_time_readable = datetime.fromtimestamp(self.sorted_trains[0]['origin_arrival_time']).strftime('%H:%M:%S')
-
+        self.origin_departure_time = self.sorted_trains[0]['origin_departure_time']
+        self.dest_arrival_time_readable = datetime.fromtimestamp(self.sorted_trains[0]['dest_arrival_time']).strftime('%I:%M %p')
+        self.origin_departure_time_readable = datetime.fromtimestamp(self.sorted_trains[0]['origin_departure_time']).strftime('%I:%M %p')
+        # print('origin dep', self.origin_departure_time_readable)
     def __repr__(self):
-        return f'<SortedTrains {self.first_train_id} of {len(self.sorted_trains)} from {self.start_station_id} at {self.origin_arrival_time_readable} to {self.end_station_id} at {self.dest_arrival_time_readable} >'
+        return f'<SortedTrains {self.first_train_id} of {len(self.sorted_trains)} from {self.start_station_id} at {self.origin_departure_time_readable} to {self.end_station_id} at {self.dest_arrival_time_readable} >'
     
 # Takes data from SortedTrains object and formats it into an object that is sent to the client. 
 # only returns one object, from the first train in trip_sequence
@@ -304,16 +283,18 @@ class FormattedTrainData:
                     "train_id" : first_train.trip_id,
                     "start_station" : start_station.stop_name,
                     "start_station_gtfs" : trip.start_station_id,
-                    "start_station_arrival" : str(modules_classes.convert_timestamp(first_train.arrival_time(trip.start_station_id)))[10:16],
+                    # "start_station_departure" : str(modules_classes.convert_timestamp(first_train.arrival_time(trip.start_station_id)))[10:16],
+                    "start_station_departure" : trip.origin_departure_time_readable,
                     "end_station" : end_station.stop_name,
                     "end_station_gtfs" : trip.end_station_id,
-                    "end_station_arrival" : str(modules_classes.convert_timestamp(first_train.arrival_time(trip.end_station_id)))[10:16],
+                    "end_station_arrival" : trip.dest_arrival_time_readable,
                     "transfer_station" : None,
                     "route" : first_train.route(),
                     "direction_label" : None,
                     "schedule" : first_train_stop_schedule,
                     "number_of_stops" : stop_schedule_ids.index(trip.end_station_id) - stop_schedule_ids.index(trip.start_station_id),
-                    "trip_time" : round((first_train.arrival_time(trip.end_station_id) - first_train.arrival_time(trip.start_station_id)) / 60)
+                    # "trip_time" : round((first_train.arrival_time(trip.end_station_id) - first_train.arrival_time(trip.start_station_id)) / 60)
+                    "trip_time" : (trip.dest_arrival_time - trip.origin_departure_time)//60
                 }
                 if first_train.direction() == "N":
                     train_for_react['direction_label'] = start_station.north_direction_label
@@ -385,7 +366,7 @@ class Stop:
         self.stop_id = stop_id
 
     def __repr__(self):
-        return f'<Stop {self.stop_id} {str(modules_classes.convert_timestamp(self.arrival))[11:-3]}>'
+        return f'<Stop {self.stop_id} ARRIVAL {str(modules_classes.convert_timestamp(self.arrival))[11:-3]} DEPARTURE {str(modules_classes.convert_timestamp(self.departure))[11:-3]}>'
     
 # class TripError:
     

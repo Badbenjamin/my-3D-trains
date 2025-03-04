@@ -13,6 +13,7 @@ def return_sorted_trains_or_trip_error(leg_info, start_station_id, end_station_i
         info_for_trip_sequence = sorted_trains
     elif (leg_info.trip_error_obj != None):
         info_for_trip_sequence = leg_info.trip_error_obj
+    print('info for trip seq', info_for_trip_sequence)
     return info_for_trip_sequence
 
 def handle_multi_leg_trip(train_data_obj):

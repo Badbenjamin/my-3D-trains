@@ -5,6 +5,7 @@ import math
 # from Objects import Train, Stop
 from Classes import current_time
 from Classes import Station
+import pprint
 # from Objects import Stop
 
 # convert 10 digit POSIX timestamp used in feed to readable format
@@ -85,15 +86,22 @@ def check_for_correct_direction(stops, start_station_id, end_station_id):
           return False
 
 # returns True train if it arrives at a specified station in the future
-def check_if_station_arrival_is_in_future(stop, station_id):
+def check_station_arrival_or_departure(stop, station_id, deptarture_or_arrival):
         arrival_time = stop.arrival.time
+        departure_time = stop.departure.time
         current_time_int = int(math.ceil(current_time.timestamp()))
-        if (stop.stop_id[:-1] == station_id) and (arrival_time > current_time_int):
+        deptarture_or_arrival_time = None
+        if deptarture_or_arrival == "departure":
+             deptarture_or_arrival_time = departure_time
+        if deptarture_or_arrival == "arrival":
+             deptarture_or_arrival_time = arrival_time
+        
+        if (stop.stop_id[:-1] == station_id) and (deptarture_or_arrival_time > current_time_int):
             return True
         else:
             return False
 
-# express?
+# NOT SURE IF I NEED THIS. CHECK SS SERVICE AND CHECK ES SERVICE SHOULD COVER THIS. 
 def check_if_train_route_matches_end_station_routes_start_station_routes(start_station_routes, end_station_routes, train_route):
     #  return True
      train_route_sliced = train_route[0]
@@ -111,20 +119,19 @@ def check_if_train_route_matches_end_station_routes_start_station_routes(start_s
 def filter_trains_for_stations_direction_future_arrival(train_data, start_station, end_station):
         start_station_id = start_station.gtfs_stop_id
         end_station_id = end_station.gtfs_stop_id
-        start_station_routes = start_station.daytime_routes.split()
-        end_station_routes = end_station.daytime_routes.split()
-        print('ssr', end_station_routes)
         filtered_trains = []
         for train_feed in train_data:
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
-                    train_route = train.trip_update.trip.route_id
                     stops = create_stop_schedule(train)
-                    if ((check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id)) and (check_for_correct_direction(stops, start_station_id, end_station_id))) and (check_if_train_route_matches_end_station_routes_start_station_routes(start_station_routes, end_station_routes, train_route)):
+                    # print('stops', stops)
+                    if ((check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id)) and (check_for_correct_direction(stops, start_station_id, end_station_id))):
                         stop_schedule = train.trip_update.stop_time_update
+                        
                         for stop in stop_schedule:
-                            if (check_if_station_arrival_is_in_future(stop, start_station_id)):
-                                 
+                            # print('stop', stop)
+                            if (check_station_arrival_or_departure(stop, end_station_id, "arrival")):
+                                #  print('train', train.trip_update)
                                  filtered_trains.append(train)
         return filtered_trains
          
@@ -137,13 +144,15 @@ def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_st
 
     trains_with_arrival = []
     for train in filtered_train_data_object:
-        arrival_train = {"train" : train, "dest_arrival_time" : None, "origin_arrival_time" : None}
+        arrival_train = {"train" : train, "dest_arrival_time" : None, "origin_departure_time" : None}
         for stop in train.schedule:
+            
             if stop.stop_id[:-1] == dest_station_id:
                 arrival_train['dest_arrival_time'] = stop.arrival
             elif stop.stop_id[:-1] == start_station_id:
-                 arrival_train['origin_arrival_time'] = stop.arrival
+                 arrival_train['origin_departure_time'] = stop.departure
         trains_with_arrival.append(arrival_train)
+    print('twa', trains_with_arrival)
     return trains_with_arrival
 
 # is quick sort efficient for a sorted array?
@@ -158,18 +167,6 @@ def quick_sort_trains_by_arrival_time(train_obj_array):
          greater = [nto for nto in new_train_obj_array[1:] if nto['dest_arrival_time'] > pivot['dest_arrival_time']]
          return quick_sort_trains_by_arrival_time(less) + [pivot] + quick_sort_trains_by_arrival_time(greater)
 
-# def check_station_status(train_obj_array, start_station_id, end_station_id):
-#     #  include line info?
-#      for train_obj in train_obj_array:
-#           train_schedule = [stop.stop_id[0:-1] for stop in train_obj['train'].schedule]
-#           if start_station_id not in train_schedule:
-#                print("start station not in service")
-#           elif end_station_id not in train_schedule:
-#                print('end station not in service')
-#           else:
-#                print('both stations in service')
-               
-     
 
 # takes list of JSON trains (from filter_trains_for_stations_direction_future_arrival()) and returns list of trains sorted by arrival time at destination.
 # MULTI LEG TRIP PROBLEM WITH QUICK SORT
@@ -178,10 +175,12 @@ def sort_trains_by_arrival_at_destination(filtered_train_data_object, start_stat
         # NO DESTINATION ARRIVAL TIME
         # take JSON train array (filtered) and build objects with {train, dest arrival, origin arrival} key value pairs
         trains_with_arrival_objs_array = create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id)
+        # print('trains with arrival obj', trains_with_arrival_objs_array)
         # use quicksort to sort array of objects by arrival at destination.
         # print('trainswarrivalobjarray',trains_with_arrival_objs_array) 
-        sorted_trains = [train for train in quick_sort_trains_by_arrival_time(trains_with_arrival_objs_array) if train['origin_arrival_time'] > time]
-        # print('sort trains func sorted trains', sorted_trains)
+        # 7 TRAIN TERMINUSES GIVING ORIGIN ARRIVAL TIME OF ZERO
+        sorted_trains = [train for train in quick_sort_trains_by_arrival_time(trains_with_arrival_objs_array) if train['origin_departure_time'] >= time]
+        # pprint.pp(sorted_trains)
         return sorted_trains
 
 # return a list of routes eg. [A,C,E] for a station
@@ -196,6 +195,7 @@ def get_station_routes(station_daytime_routes):
 
 # returns True if a route from the start station routes is present in the end station routes
 # NEEDS TO BE ABLE TO HANDLE EXPRESS/LOCAL LOGIC
+
 def same_line(start_station_routes, end_station_routes):
     same_line = None
     for route in start_station_routes:
