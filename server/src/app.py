@@ -1,18 +1,31 @@
 from config import app
 from datetime import datetime
 from models import Station
-from Objects import Journey, TrainData
+from Classes import Journey, TrainData, FormattedTrainData
+# import modules
+import modules_app
+import pprint
 
 ct = datetime.now()
 
 # takes input from journey planner, returns train or trains going from start to end station
 @app.route('/api/plan_trip/<string:start_station_id>/<string:end_station_id>')
+# start and end station id are not gtfs ids but just ids from the id column in the Stations table. 
 def plan_trip(start_station_id, end_station_id):
+    
+    # new_journey contains endpoints for start and end stations, and calculates a transfer if applicable.
     new_journey = Journey(start_station_id, end_station_id)
-    new_data = TrainData(new_journey)
-    return new_data.format_for_react(), 200
+    # new_train_data takes the info from new_journey and uses it to make requests from the relevant MTA API route endpoints.
+    # it contains the JSON train data from the realtime gtfs feed. 
+    new_train_data = TrainData(new_journey)
+    # print('new train data', new_train_data)
+    # trip_sequence is an array that contains either a SortedTrains obj or a TripError object.
+    trip_sequence = modules_app.build_trip_sequence(new_journey, new_train_data)
+    # print('trip sequence', trip_sequence)
+    # FormattedTrainData class takes our trip sequence (one or two trips), and converts the first arriving train to a dict, which is sent to client. 
+    return FormattedTrainData(trip_sequence).trains_for_react, 200
 
-# get names and routes (and gtfs id) for search bar in journey planner
+# get names and routes (and gtfs id) for react-select search bar in journey planner
 @app.route('/api/stations')
 def get_all_stations():
     stations = Station.query.all()
@@ -28,9 +41,10 @@ def get_all_stations():
     return station_list, 200
 
 # get station names for HTML text on map
+# this request occurs in the Station component in the client. 
 @app.route('/api/stationname/<string:gtfs_id>')
 def get_station_name(gtfs_id):
-    print(gtfs_id)
+    # print(gtfs_id)
     station = Station.query.filter(Station.gtfs_stop_id == gtfs_id).first()
     return {"name" : station.stop_name, "daytime_routes" : station.daytime_routes}, 200
 

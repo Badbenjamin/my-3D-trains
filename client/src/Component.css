@@ -88,6 +88,10 @@ a:visited{
   color: blue;
 }
 
+.error-info{
+  color: blue;
+}
+
 .canvas_text{
   color:black;
 }
