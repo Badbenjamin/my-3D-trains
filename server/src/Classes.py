@@ -89,15 +89,8 @@ class Journey:
             # Assign correct shared station to start_terminus and end_origin
             # IF THERE ARE MULTIPLE SHARED STATIONS, WE NEED TO FIND THE FASTEST ROUTE
             if shared_stations:
-                start_stations = []
-                for station in shared_stations:
-                    shared_station_routes = station.daytime_routes.split()
-                    for route in self.start_station_routes:
-                        if route in shared_station_routes:
-                            self.start_station_terminus = station
-                    for route in self.end_station_routes:
-                        if route in shared_station_routes:
-                            self.end_station_origin = station
+                modules_classes.get_transfer_station_info(shared_stations, self.start_station_routes, self.end_station_routes)
+                
         
         start_station_endpoints = []
         for endpoint in self.start_station.station_endpoints:

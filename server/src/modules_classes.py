@@ -222,6 +222,23 @@ def get_shared_stations(stations_in_complexes, routes):
                 shared_stations.append(station) 
     return list(set(shared_stations))
 
+def get_transfer_station_info(shared_stations, start_station_routes, end_station_routes):
+    print('shared stations', shared_stations)
+    # transfer_info_array =[]
+    # transfer_info_obj = {
+    #         'start_term' : None,
+    #         'end_origin' : None
+    #     }
+    for station in shared_stations:
+        print(station.complex_id)
+        # shared_station_routes = station.daytime_routes.split()
+        # for route in self.start_station_routes:
+        #     if route in shared_station_routes:
+        #         self.start_station_terminus = station
+        # for route in self.end_station_routes:
+        #     if route in shared_station_routes:
+        #         self.end_station_origin = station
+
 # def build_trip_sequence(journey_obj, train_data_obj):
 #     trip_sequence = []
 #     if journey_obj.shared_stations == []:
