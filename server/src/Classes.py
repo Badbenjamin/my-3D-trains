@@ -53,6 +53,9 @@ class Journey:
         self.start_station_terminus = None
         self.end_station_origin = None
         
+        # REPLACED ABOVE WITH ARRAY OF OBJECTS WITH START TERM AND END ORIGIN
+        self.transfer_info_obj_array = None
+
         # LET USER INPUT TRANSFER STATIONS IF THEY WANT
         self.shared_stations = []
         
@@ -85,11 +88,11 @@ class Journey:
             # return all stations that serve a route that is served by the start and end station
             shared_stations = modules_classes.get_shared_stations(stations_in_complexes, start_and_end_routes)
             self.shared_stations = shared_stations
-            print('shared stations', shared_stations)
+            # print('shared stations', shared_stations)
             # Assign correct shared station to start_terminus and end_origin
             # IF THERE ARE MULTIPLE SHARED STATIONS, WE NEED TO FIND THE FASTEST ROUTE
             if shared_stations:
-                modules_classes.get_transfer_station_info(shared_stations, self.start_station_routes, self.end_station_routes)
+                self.transfer_info_obj_array = modules_classes.get_transfer_station_info(shared_stations, self.start_station_routes, self.end_station_routes)
                 
         
         start_station_endpoints = []
@@ -118,7 +121,7 @@ class TrainData:
 
     def __init__(self, journey_object):
         # 2/4 look for this atribute in app.py and return message to front end? 
-        self.missing_stations = None
+        # self.missing_stations = None
         self.start_station_name = journey_object.start_station.stop_name
         self.end_station_name = journey_object.end_station.stop_name
         self.shared_station_names = None
@@ -219,6 +222,7 @@ class SortedTrains:
         self.start_station_id = start_station_id
         self.end_station_id = end_station_id
         self.sorted_trains  = modules_classes.sort_trains_by_arrival_at_destination(train_obj_array, start_station_id, end_station_id, time)
+        # print('sorted ts', self.sorted_trains)
         self.first_train_and_schedule = self.sorted_trains[0]
         self.first_train_only = self.first_train_and_schedule['train']
         self.first_train_id = self.first_train_only.trip_id

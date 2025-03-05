@@ -223,22 +223,32 @@ def get_shared_stations(stations_in_complexes, routes):
     return list(set(shared_stations))
 
 def get_transfer_station_info(shared_stations, start_station_routes, end_station_routes):
-    print('shared stations', shared_stations)
-    # transfer_info_array =[]
-    # transfer_info_obj = {
-    #         'start_term' : None,
-    #         'end_origin' : None
-    #     }
+    # print('shared stations', shared_stations)
+    start_station_termini = []
+    end_station_origins = []
+    transfer_station_obj_array = []
     for station in shared_stations:
-        print(station.complex_id)
-        # shared_station_routes = station.daytime_routes.split()
-        # for route in self.start_station_routes:
-        #     if route in shared_station_routes:
-        #         self.start_station_terminus = station
-        # for route in self.end_station_routes:
-        #     if route in shared_station_routes:
-        #         self.end_station_origin = station
-
+        shared_station_routes = station.daytime_routes.split()
+        for route in start_station_routes:
+            if route in shared_station_routes:
+                start_station_termini.append(station)
+        for route in end_station_routes:
+            if route in shared_station_routes:
+                end_station_origins.append(station)
+    
+    for start_station in start_station_termini:
+          transfer_info_obj = {
+            'complex_id' : None,
+            'start_term' : None,
+            'end_origin' : None
+          }
+          for end_station in end_station_origins:
+               if start_station.complex_id == end_station.complex_id:
+                    transfer_info_obj['complex_id'] = start_station.complex_id
+                    transfer_info_obj['start_term'] = start_station
+                    transfer_info_obj['end_origin'] = end_station
+          transfer_station_obj_array.append(transfer_info_obj)
+    return transfer_station_obj_array
 # def build_trip_sequence(journey_obj, train_data_obj):
 #     trip_sequence = []
 #     if journey_obj.shared_stations == []:
