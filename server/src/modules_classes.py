@@ -179,18 +179,12 @@ def get_station_routes(station_daytime_routes):
 # NEEDS TO BE ABLE TO HANDLE EXPRESS/LOCAL LOGIC
 
 def same_line(start_station_routes, end_station_routes):
-    same_line = None
-    for route in start_station_routes:
-            if route not in end_station_routes:
-                same_line = False
-            else:
-                 same_line = True
-    for route in end_station_routes:
-            if route not in start_station_routes:
-                same_line = False
-            else:
-                same_line = True
-    return same_line
+    
+    shared_routes_between_start_end_stations = [route for route in end_station_routes if route in start_station_routes]
+    if shared_routes_between_start_end_stations == []:
+         return False
+    else:
+         return True
 
 # takes daytime routes of a station (start or end), and returns the complex ids of all stations that are served by that route (eg. "G")
 def find_complex_ids(daytime_routes):

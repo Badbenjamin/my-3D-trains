@@ -17,34 +17,36 @@ def return_sorted_trains_or_trip_error(leg_info, start_station_id, end_station_i
     return info_for_trip_sequence
 
 # WORKING BUT COULD USE REFACTORING AND DOCUMENTATION
+# STRANGELY WORKS FOR LOCAL TO EXPRESS? MIGHT NEED TO CHECK IN ON THIS...
+# Ok for two stations but kind of repetitive for lots of them
 def handle_multi_leg_trip(train_data_obj, journey_obj):
-    print('tioa', journey_obj.transfer_info_obj_array)
+    # print('tioa', journey_obj.transfer_info_obj_array)
     trip_sequences = []
     for transfer_obj in journey_obj.transfer_info_obj_array:
         start_terminus_gtfs_id = transfer_obj['start_term'].gtfs_stop_id
         end_origin_gtfs_id = transfer_obj['end_origin'].gtfs_stop_id
         trip_sequence = [] 
         leg_one = FilteredTrains(train_data_obj.all_train_data, train_data_obj.start_station_id, start_terminus_gtfs_id)
-        print('l1', leg_one)
+        # print('l1', leg_one)
         trip_sequence.append(return_sorted_trains_or_trip_error(leg_one, train_data_obj.start_station_id, start_terminus_gtfs_id))
 
         if isinstance(trip_sequence[0],SortedTrains):
             leg_two = FilteredTrains(train_data_obj.all_train_data, end_origin_gtfs_id, train_data_obj.end_station_id)
-            print('l2', leg_two)
+            # print('l2', leg_two)
             trip_sequence.append(return_sorted_trains_or_trip_error(leg_two, end_origin_gtfs_id, train_data_obj.end_station_id, trip_sequence[0].dest_arrival_time + 120))
         else:
-            return trip_sequences[0]
+            return trip_sequence[0]
         trip_sequences.append(trip_sequence)
         # print('trip sequence', trip_sequence)
     pprint.pp(trip_sequences)
     fastest_trip = None
     for trip in trip_sequences:
-        print(trip[-1].dest_arrival_time)
+        # print(trip[-1].dest_arrival_time)
         if fastest_trip == None:
             fastest_trip = trip
         elif trip[-1].dest_arrival_time < fastest_trip[-1].dest_arrival_time:
             fastest_trip = trip
-    print('fastest', fastest_trip)
+    # print('fastest', fastest_trip)
         
     return fastest_trip
 
@@ -54,6 +56,7 @@ def build_trip_sequence(journey_obj, train_data_obj):
     if journey_obj.shared_stations == []:
         leg = FilteredTrains(train_data_obj.all_train_data, train_data_obj.start_station_id, train_data_obj.end_station_id)
         trip_sequence = [return_sorted_trains_or_trip_error(leg, train_data_obj.start_station_id, train_data_obj.end_station_id)]
+        # print('ts', trip_sequence[0].first_train_id)
     else:
         trip_sequence = handle_multi_leg_trip(train_data_obj, journey_obj)
     return trip_sequence

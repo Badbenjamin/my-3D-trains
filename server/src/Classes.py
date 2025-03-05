@@ -93,7 +93,7 @@ class Journey:
             # IF THERE ARE MULTIPLE SHARED STATIONS, WE NEED TO FIND THE FASTEST ROUTE
             if shared_stations:
                 self.transfer_info_obj_array = modules_classes.get_transfer_station_info(shared_stations, self.start_station_routes, self.end_station_routes)
-                
+            print('shared', shared_stations)
         
         start_station_endpoints = []
         for endpoint in self.start_station.station_endpoints:
