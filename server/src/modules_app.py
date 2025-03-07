@@ -37,12 +37,13 @@ def handle_multi_leg_trip(train_data_obj, journey_obj):
         else:
             pass
         trip_sequences.append(trip_sequence)
-        # print('trip sequence', trip_sequence)
+    print('trip sequence', trip_sequence)
     # pprint.pp(trip_sequences)
+    # PROBLEM IS HERE
     fastest_trip = None
     for trip in trip_sequences:
-        # print(trip[-1].dest_arrival_time)
-        if isinstance(trip, SortedTrains):
+        # trip[-1] is the second sorted trains obj, with the arrival at destination
+        if isinstance(trip[-1], SortedTrains):
             if fastest_trip == None:
                 fastest_trip = trip
             elif trip[-1].dest_arrival_time < fastest_trip[-1].dest_arrival_time:
