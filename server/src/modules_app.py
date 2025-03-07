@@ -26,12 +26,12 @@ def handle_multi_leg_trip(train_data_obj, journey_obj):
         start_terminus_gtfs_id = transfer_obj['start_term'].gtfs_stop_id
         end_origin_gtfs_id = transfer_obj['end_origin'].gtfs_stop_id
         trip_sequence = [] 
-        leg_one_filtered_trains = FilteredTrains(train_data_obj.all_train_data, train_data_obj.start_station_id, start_terminus_gtfs_id)
+        leg_one_filtered_trains = FilteredTrains(train_data_obj, train_data_obj.start_station_id, start_terminus_gtfs_id)
         # print('l1', leg_one_filtered_trains)
         trip_sequence.append(return_sorted_trains_or_trip_error(leg_one_filtered_trains, train_data_obj.start_station_id, start_terminus_gtfs_id))
 
         if isinstance(trip_sequence[0],SortedTrains):
-            leg_two = FilteredTrains(train_data_obj.all_train_data, end_origin_gtfs_id, train_data_obj.end_station_id)
+            leg_two = FilteredTrains(train_data_obj, end_origin_gtfs_id, train_data_obj.end_station_id)
             # print('l2', leg_two)
             trip_sequence.append(return_sorted_trains_or_trip_error(leg_two, end_origin_gtfs_id, train_data_obj.end_station_id, trip_sequence[0].dest_arrival_time + 120))
         else:
@@ -56,7 +56,7 @@ def build_trip_sequence(journey_obj, train_data_obj):
     trip_sequence = []
     # an express to local trip or vice versa would not have shared stations, but would still require a transfer. 
     if journey_obj.shared_stations == []:
-        leg = FilteredTrains(train_data_obj.all_train_data, train_data_obj.start_station_id, train_data_obj.end_station_id)
+        leg = FilteredTrains(train_data_obj, train_data_obj.start_station_id, train_data_obj.end_station_id)
         trip_sequence = [return_sorted_trains_or_trip_error(leg, train_data_obj.start_station_id, train_data_obj.end_station_id)]
         # print('ts', trip_sequence[0].first_train_id)
     else:

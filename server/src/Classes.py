@@ -59,6 +59,7 @@ class Journey:
         # LET USER INPUT TRANSFER STATIONS IF THEY WANT
         self.shared_stations = []
         
+        self.local_express = False
         self.time = time
         self.start_station_routes = self.start_station.daytime_routes.split()
         self.end_station_routes = self.end_station.daytime_routes.split()
@@ -69,11 +70,12 @@ class Journey:
         # IF SAME LINE IS FALSE AND NO SHARED STATIONS, RETURN ERROR
         # same_line = modules_classes.same_line(self.start_station_routes, self.end_station_routes)
         # print('same line', same_line)
+        
         journey_info_obj = modules_classes.get_journey_info(self.start_station_routes, self.end_station_routes)
         pprint.pp(journey_info_obj)
         # print('le', local_express)
         # NEED TO MAKE BRANCH FOR SAME LINE BUT EXPRESS TO LOCAL OR LOCAL TO EXPRESS
-        if journey_info_obj['start_shares_routes_with_end'] == False:
+        if (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == False):
             print('here')
             start_line_complex_ids = modules_classes.find_complex_ids(self.start_station.daytime_routes)
             end_line_complex_ids = modules_classes.find_complex_ids(self.end_station.daytime_routes)
@@ -96,7 +98,8 @@ class Journey:
             if shared_stations:
                 self.transfer_info_obj_array = modules_classes.get_transfer_station_info(shared_stations, self.start_station_routes, self.end_station_routes)
             print('toa', self.transfer_info_obj_array)
-
+        elif (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == True):
+            self.local_express = True
         # SAME LINE EXPRESS?
         # involves_local_and_express = modules_classes.involves_local_and_exrpess(self.start_station_routes, self.end_station_routes, self.transfer_info_obj_array)
         # print('involves', involves_local_and_express)
@@ -134,10 +137,14 @@ class TrainData:
         self.shared_stations = None
         self.journey_object = journey_object
         self.routes = set(journey_object.start_station_routes + journey_object.end_station_routes)
+        self.local_express = None
 
         if journey_object.shared_stations:
             self.shared_station_names = set([station.stop_name for station in journey_object.shared_stations]).pop()
             self.shared_stations = journey_object.shared_stations
+        
+        if journey_object.local_express:
+            self.local_express = True
 
         self.start_station_id = self.journey_object.start_station.gtfs_stop_id
         self.end_station_id = self.journey_object.end_station.gtfs_stop_id
@@ -173,7 +180,7 @@ class TrainData:
 class FilteredTrains:
 
     def __init__(self, train_data, start_station_id, end_station_id):
-        
+        self.all_train_data = train_data.all_train_data
         self.start_station_id = start_station_id
         self.end_station_id = end_station_id
         self.start_station = Station.query.filter(Station.gtfs_stop_id == start_station_id).first()
@@ -183,15 +190,19 @@ class FilteredTrains:
         self.train_obj_array = None
         # this is passed to TripError if filter produces empty array
         self.trip_error_obj = None
+        self.local_express = None
+        print('td', train_data)
+        if train_data.local_express:
+            self.local_express = True
         # filter the gtfs json data for trains relevant to the user's trip.
         # a successful trip (both stations in service), will yield a list of trains for our trip.
         # if no trains are found, error info is returned with service status for each stop
-        self.filtered_train_data = modules_classes.filter_trains_for_stations_direction_future_arrival(train_data, self.start_station, self.end_station)
+        self.filtered_train_data = modules_classes.filter_trains_for_stations_direction_future_arrival(self.all_train_data, self.start_station, self.end_station)
         
         if len(self.filtered_train_data) > 0:
             self.train_obj_array = trains_to_objects(self.filtered_train_data)
         elif (self.filtered_train_data == []):
-            self.trip_error_obj = TripError(train_data, self.start_station_id, self.end_station_id)
+            self.trip_error_obj = TripError(self.all_train_data, self.start_station_id, self.end_station_id)
             
     def __repr__(self):
         if (self.train_obj_array != None):
