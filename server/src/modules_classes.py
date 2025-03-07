@@ -179,13 +179,145 @@ def get_station_routes(station_daytime_routes):
 # NEEDS TO BE ABLE TO HANDLE EXPRESS/LOCAL LOGIC
 
 def same_line(start_station_routes, end_station_routes):
-    
     shared_routes_between_start_end_stations = [route for route in end_station_routes if route in start_station_routes]
     if shared_routes_between_start_end_stations == []:
          return False
     else:
          return True
 
+
+def local_express(start_station_routes, end_station_routes):
+    # print('ssr,esr', start_station_routes, end_station_routes)
+    lines_with_express = {
+        # Blue lines
+        "ACE": {
+            "A": True,   # Express
+            "C": False,  # Local
+            "E": True    # Express
+        },
+        
+        # Orange lines
+        "BDFM": {
+            "B": True,   # Express
+            "D": True,   # Express
+            "F": True,   # Express on some segments
+            "M": False   # Local
+        },
+        
+        # Yellow lines
+        "NQRW": {
+            "N": True,   # Express
+            "Q": True,   # Express
+            "R": False,  # Local
+            "W": False   # Local
+        },
+        
+        # Red lines
+        "123": {
+            "1": False,  # Local
+            "2": True,   # Express
+            "3": True    # Express
+        },
+        
+        # Green lines
+        "456": {
+            "4": True,   # Express
+            "5": True,   # Express
+            "6": False,  # Local
+            "6x": True  # Express variant (rush hours)
+        },
+        
+        # Purple line
+        "7": {
+            "7": False,      # Local
+            "7x": True  # Express
+        },
+        
+        # Brown lines
+        "JZ": {
+            "J": False,  # Local (express during rush hours)
+            "Z": True    # Express (rush hours)
+        },
+        
+        # Light green line
+        "G": {
+            "G": False   # Local
+        },
+        
+        # Gray line
+        "L": {
+            "L": False   # Local
+        },
+        
+        # Shuttles
+        "S": {
+            "S": False   # All shuttle services
+        }
+    }
+    
+    result_obj ={
+         "start_routes" : [],
+         "end_routes" : [],
+         "on_same_line" : None,
+         "start_contains_express" : None,
+         "start_contains_local" : None,
+         "end_contains_express" : None,
+         "end_contains_local" : None
+    }
+    
+    for start_route in start_station_routes:
+        # result_obj['start_routes'].append(start_route)
+        for line_obj in lines_with_express:
+            if start_route in line_obj:
+                selected_line_obj = lines_with_express[line_obj]
+                for line_route in selected_line_obj:
+                     if start_route == line_route:
+                        # result_obj['start_route']
+                        result_obj['start_routes'].append({start_route : selected_line_obj[line_route]})
+                        # print('result',{start_route : selected_line_obj[line_route]})
+    for end_route in end_station_routes:
+        # result_obj['start_routes'].append(start_route)
+        for line_obj in lines_with_express:
+            if end_route in line_obj:
+                selected_line_obj = lines_with_express[line_obj]
+                for line_route in selected_line_obj:
+                     if end_route == line_route:
+                        # result_obj['start_route']
+                        result_obj['end_routes'].append({end_route : selected_line_obj[line_route]})
+    
+    on_same_line = False
+    for start_route in start_station_routes:
+         for end_route in end_station_routes:
+              for line_obj in lines_with_express:
+                   if start_route in line_obj and end_route in line_obj:
+                        on_same_line = True
+    result_obj['on_same_line'] = on_same_line               
+    
+    start_contains_express = False
+    start_contains_local = False
+    for route_obj in result_obj['start_routes']:
+         for key in route_obj:
+               if route_obj[key]:
+                    start_contains_express = True
+               elif route_obj[key] == False:
+                    start_contains_local = True
+               
+
+    end_contains_express = False
+    end_contains_local = False
+    for route_obj in result_obj['end_routes']:
+         for key in route_obj:
+               if route_obj[key]:
+                    end_contains_express = True
+               elif route_obj[key] == False:
+                    end_contains_local = True
+               
+    result_obj['start_contains_express'] = start_contains_express
+    result_obj['start_contains_local'] = start_contains_local
+    result_obj['end_contains_express'] = end_contains_express
+    result_obj['end_contains_local'] = end_contains_local
+    # print('ce', start_contains_express, end_contains_express)
+    return result_obj
 # takes daytime routes of a station (start or end), and returns the complex ids of all stations that are served by that route (eg. "G")
 def find_complex_ids(daytime_routes):
      complex_ids = []

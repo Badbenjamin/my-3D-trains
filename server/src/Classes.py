@@ -69,10 +69,12 @@ class Journey:
         # IF SAME LINE IS FALSE AND NO SHARED STATIONS, RETURN ERROR
         same_line = modules_classes.same_line(self.start_station_routes, self.end_station_routes)
         print('same line', same_line)
-        
+        journey_info_obj = modules_classes.local_express(self.start_station_routes, self.end_station_routes)
+        pprint.pp(journey_info_obj)
+        # print('le', local_express)
         # NEED TO MAKE BRANCH FOR SAME LINE BUT EXPRESS TO LOCAL OR LOCAL TO EXPRESS
-        if same_line == False:
-            # 
+        if journey_info_obj['on_same_line'] == False:
+            print('here')
             start_line_complex_ids = modules_classes.find_complex_ids(self.start_station.daytime_routes)
             end_line_complex_ids = modules_classes.find_complex_ids(self.end_station.daytime_routes)
 
@@ -88,13 +90,17 @@ class Journey:
             # return all stations that serve a route that is served by the start and end station
             shared_stations = modules_classes.get_shared_stations(stations_in_complexes, start_and_end_routes)
             self.shared_stations = shared_stations
-            # print('shared stations', shared_stations)
+            print('shared stations', shared_stations)
             # Assign correct shared station to start_terminus and end_origin
             # IF THERE ARE MULTIPLE SHARED STATIONS, WE NEED TO FIND THE FASTEST ROUTE
             if shared_stations:
                 self.transfer_info_obj_array = modules_classes.get_transfer_station_info(shared_stations, self.start_station_routes, self.end_station_routes)
-            print('shared', shared_stations)
-        
+            # print('shared', shared_stations)
+
+        # SAME LINE EXPRESS?
+        # involves_local_and_express = modules_classes.involves_local_and_exrpess(self.start_station_routes, self.end_station_routes, self.transfer_info_obj_array)
+        # print('involves', involves_local_and_express)
+
         start_station_endpoints = []
         for endpoint in self.start_station.station_endpoints:
             start_station_endpoints.append(endpoint.endpoint.endpoint)
