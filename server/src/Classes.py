@@ -76,16 +76,17 @@ class Journey:
         # print('le', local_express)
         # NEED TO MAKE BRANCH FOR SAME LINE BUT EXPRESS TO LOCAL OR LOCAL TO EXPRESS
         if (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == False):
-            print('here')
+            print('here', self.start_station.daytime_routes)
             start_line_complex_ids = modules_classes.find_complex_ids(self.start_station.daytime_routes)
             end_line_complex_ids = modules_classes.find_complex_ids(self.end_station.daytime_routes)
-
+            print('start line complex ids', sorted(start_line_complex_ids))
+            print('end line complex ids', sorted(end_line_complex_ids))
             all_complex_ids = start_line_complex_ids + end_line_complex_ids
-            
+            # print('all complex ids', all_complex_ids)
             # only return complex ids that appear more than once in the list
             # this means they appear both in start station and end station complexes
             shared_complexes = list(set([complex_id for complex_id in all_complex_ids if all_complex_ids.count(complex_id)>1]))
-            
+            print('shared complexes', shared_complexes)
             # takes the complex_id list of shared_complexes and returns stations for each complex
             stations_in_complexes =  modules_classes.complex_ids_to_stations(shared_complexes)
             

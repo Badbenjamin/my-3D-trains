@@ -316,7 +316,9 @@ def get_journey_info(start_station_routes, end_station_routes):
     # print('ce', start_contains_express, end_contains_express)
     return result_obj
 # takes daytime routes of a station (start or end), and returns the complex ids of all stations that are served by that route (eg. "G")
+# NOT TURING UP BROADWAY JUNCTION FOR MYRTLE AVE JMZ?
 def find_complex_ids(daytime_routes):
+     print('dtr', daytime_routes)
      complex_ids = []
      for route in (daytime_routes):
                 if route != " ":
@@ -325,7 +327,7 @@ def find_complex_ids(daytime_routes):
                         # add the complex id of that station to our result
                         if station.complex_id not in complex_ids:
                             complex_ids.append(station.complex_id)
-                return complex_ids
+     return complex_ids
 
 # convert complex ids to Stations   
 def complex_ids_to_stations(shared_complexes):
