@@ -69,11 +69,9 @@ class Journey:
         # True if they share a route
         # IF SAME LINE IS FALSE AND NO SHARED STATIONS, RETURN ERROR
         # same_line = modules_classes.same_line(self.start_station_routes, self.end_station_routes)
-        # print('same line', same_line)
         
         journey_info_obj = modules_classes.get_journey_info(self.start_station_routes, self.end_station_routes)
-        pprint.pp(journey_info_obj)
-        # print('le', local_express)
+      
         # NEED TO MAKE BRANCH FOR SAME LINE BUT EXPRESS TO LOCAL OR LOCAL TO EXPRESS
         if (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == False):
             print('here', self.start_station.daytime_routes)
@@ -82,7 +80,6 @@ class Journey:
             print('start line complex ids', sorted(start_line_complex_ids))
             print('end line complex ids', sorted(end_line_complex_ids))
             all_complex_ids = start_line_complex_ids + end_line_complex_ids
-            # print('all complex ids', all_complex_ids)
             # only return complex ids that appear more than once in the list
             # this means they appear both in start station and end station complexes
             shared_complexes = list(set([complex_id for complex_id in all_complex_ids if all_complex_ids.count(complex_id)>1]))
@@ -192,9 +189,11 @@ class FilteredTrains:
         # this is passed to TripError if filter produces empty array
         self.trip_error_obj = None
         self.local_express = None
-        print('td', train_data)
+        
         if train_data.local_express:
             self.local_express = True
+            best_transfer = modules_classes.find_best_transfer_local_express(train_data, start_station_id, end_station_id)
+
         # filter the gtfs json data for trains relevant to the user's trip.
         # a successful trip (both stations in service), will yield a list of trains for our trip.
         # if no trains are found, error info is returned with service status for each stop

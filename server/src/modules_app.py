@@ -37,10 +37,9 @@ def handle_multi_leg_trip(train_data_obj, journey_obj):
         else:
             pass
         trip_sequences.append(trip_sequence)
-    print('trip sequence', trip_sequence)
-    # pprint.pp(trip_sequences)
-    # PROBLEM IS HERE
+    
     fastest_trip = None
+    error_trip = None
     for trip in trip_sequences:
         # trip[-1] is the second sorted trains obj, with the arrival at destination
         if isinstance(trip[-1], SortedTrains):
@@ -48,9 +47,13 @@ def handle_multi_leg_trip(train_data_obj, journey_obj):
                 fastest_trip = trip
             elif trip[-1].dest_arrival_time < fastest_trip[-1].dest_arrival_time:
                 fastest_trip = trip
-    print('fastest', fastest_trip)
-        
-    return fastest_trip
+        else:
+            error_trip = trip
+    
+    if fastest_trip:  
+        return fastest_trip
+    elif error_trip:
+        return error_trip
 
 def build_trip_sequence(journey_obj, train_data_obj):
     trip_sequence = []

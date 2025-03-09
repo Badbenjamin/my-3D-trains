@@ -318,7 +318,6 @@ def get_journey_info(start_station_routes, end_station_routes):
 # takes daytime routes of a station (start or end), and returns the complex ids of all stations that are served by that route (eg. "G")
 # NOT TURING UP BROADWAY JUNCTION FOR MYRTLE AVE JMZ?
 def find_complex_ids(daytime_routes):
-     print('dtr', daytime_routes)
      complex_ids = []
      for route in (daytime_routes):
                 if route != " ":
@@ -375,5 +374,50 @@ def get_transfer_station_info(shared_stations, start_station_routes, end_station
           transfer_station_obj_array.append(transfer_info_obj)
     return transfer_station_obj_array
 
-def find_best_transfer_local_express():
-     pass
+def find_best_transfer_local_express(train_data, start_station_id, end_station_id):
+     trains_serving_start_station = []
+     trains_serving_end_station = []
+     for train_feed in train_data.all_train_data:
+            for train in train_feed.entity: 
+                if train.HasField('trip_update'):
+                    stops = create_stop_schedule(train)
+                    if check_for_station_service(stops, start_station_id):
+                         trains_serving_start_station.append(train)
+                    elif check_for_station_service(stops, end_station_id):
+                         trains_serving_end_station.append(train)
+     print('tsss', len(trains_serving_start_station), len(trains_serving_end_station))
+     train_pairs_with_possible_transfer = []
+     relevent_start_train_ids = []
+     relevent_end_train_ids = []
+     for start_train in trains_serving_start_station:
+          
+          start_train_stops = [stop for stop in start_train.trip_update.stop_time_update]
+          start_train_stops_no_direction = [stop.stop_id[:-1] for stop in start_train.trip_update.stop_time_update]
+          for end_train in trains_serving_end_station:
+               
+               end_train_stops = [stop for stop in end_train.trip_update.stop_time_update]
+               end_train_stops_no_direction = [stop.stop_id[:-1] for stop in end_train.trip_update.stop_time_update]
+               for start_train_stop in start_train_stops:
+                    for end_train_stop in end_train_stops:
+                         if (start_train_stop.stop_id[:-1] == end_train_stop.stop_id[:-1]) and (start_train_stop.arrival.time < end_train_stop.departure.time) and (start_train_stops_no_direction.index(start_station_id) < start_train_stops_no_direction.index(start_train_stop.stop_id[:-1]) and (end_train_stops_no_direction.index(end_station_id) > end_train_stops_no_direction.index(end_train_stop.stop_id[:-1]))):
+                            # print('res', start_train.id, end_train.id, start_train_stop.stop_id, end_train_stop.stop_id)
+                            if start_train.id not in relevent_start_train_ids:
+                                 relevent_start_train_ids.append(start_train.id)
+                            if end_train.id not in relevent_end_train_ids:
+                                 relevent_end_train_ids.append(end_train.id)
+                            new_train_pair_obj = {
+                                 'start_train_id' : start_train.id,
+                                 'end_train_id' : end_train.id
+                            }
+                            
+                            if new_train_pair_obj not in train_pairs_with_possible_transfer:
+                                 train_pairs_with_possible_transfer.append(new_train_pair_obj)
+                            else:
+                                 train_pairs_with_possible_transfer.append(new_train_pair_obj)
+                               
+                                 
+                            
+                                    
+    #  print('start', relevent_start_train_ids)
+    #  print('end', relevent_end_train_ids)
+     pprint.pp(train_pairs_with_possible_transfer)
