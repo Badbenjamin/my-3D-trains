@@ -192,8 +192,11 @@ class FilteredTrains:
         
         if train_data.local_express:
             self.local_express = True
-            best_transfer = modules_classes.find_best_transfer_local_express(train_data, start_station_id, end_station_id)
-
+            best_trains_and_transfer = modules_classes.find_best_trains_and_transfer_local_express(train_data, start_station_id, end_station_id)
+            start_train = best_trains_and_transfer['start_train_id']
+            print('st', start_train)
+            print('et', best_trains_and_transfer['end_train_id'])
+            print('at', best_trains_and_transfer['end_station_arrival'])
         # filter the gtfs json data for trains relevant to the user's trip.
         # a successful trip (both stations in service), will yield a list of trains for our trip.
         # if no trains are found, error info is returned with service status for each stop
