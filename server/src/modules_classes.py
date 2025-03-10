@@ -387,61 +387,93 @@ def get_transfer_station_info(shared_stations, start_station_routes, end_station
 def find_best_trains_and_transfer_local_express(train_data, start_station_id, end_station_id):
      trains_serving_start_station = []
      trains_serving_end_station = []
+     trains_traveling_between_stations = []
      for train_feed in train_data.all_train_data:
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
                     stops = create_stop_schedule(train)
-                    if check_for_station_service(stops, start_station_id):
+                    if check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id):
+                         trains_traveling_between_stations.append(train)
+                    elif check_for_station_service(stops, start_station_id):
                          trains_serving_start_station.append(train)
                     elif check_for_station_service(stops, end_station_id):
                          trains_serving_end_station.append(train)
+     print('lengs', len(trains_serving_start_station), len(trains_serving_end_station))
+    # pairs of trains where the start train and end train (each stoping at start or end station), have a shared station in schedules
      train_pairs_with_possible_transfer = []
+    #  looping throuth all trains that contain the start station in their stops
      for start_train in trains_serving_start_station:
-          
-          start_train_stops = [stop for stop in start_train.trip_update.stop_time_update]
-          start_train_stops_no_direction = [stop.stop_id[:-1] for stop in start_train.trip_update.stop_time_update]
-          
-          for end_train in trains_serving_end_station:
-               
-               end_train_stops = [stop for stop in end_train.trip_update.stop_time_update]
-               end_train_stops_no_direction = [stop.stop_id[:-1] for stop in end_train.trip_update.stop_time_update]
-               for start_train_stop in start_train_stops:
-                    
-                    for end_train_stop in end_train_stops:
-                         if (start_train_stop.stop_id[:-1] == end_train_stop.stop_id[:-1]) and (start_train_stop.arrival.time < end_train_stop.departure.time) and (start_train_stops_no_direction.index(start_station_id) < start_train_stops_no_direction.index(start_train_stop.stop_id[:-1]) and (end_train_stops_no_direction.index(end_station_id) > end_train_stops_no_direction.index(end_train_stop.stop_id[:-1]))):
-                
-                            new_train_pair_obj = {
-                                 'start_train_id' : start_train.id,
-                                 'end_train_id' : end_train.id,
-                                 'start_train' : start_train,
-                                 'end_train' : end_train,
-                                 'start_station_arrival' : get_station_arrival_or_departure_time(start_train_stops, start_station_id, "arrival"),
-                                 'end_station_arrival' : get_station_arrival_or_departure_time(end_train_stops, end_station_id, "arrival"),
-                                 'transfer_station_arrival' : start_train_stop.arrival.time,
-                                 'transfer_station_departure' : end_train_stop.departure.time,
-                                 'transfer_station_start_train' : start_train_stop.stop_id[:-1],
-                                 'transfer_station_end_train' : end_train_stop.stop_id[:-1],
-                            }
+        start_train_stops = [stop for stop in start_train.trip_update.stop_time_update]
+        start_train_stops_no_direction = [stop.stop_id[:-1] for stop in start_train.trip_update.stop_time_update]
+        # for each start train, loop through every train serving the end station
+        start_station_info = None
+        for end_train in trains_serving_end_station:   
+            end_train_stops = [stop for stop in end_train.trip_update.stop_time_update]
+            end_train_stops_no_direction = [stop.stop_id[:-1] for stop in end_train.trip_update.stop_time_update]
 
+            end_station_info = None
+
+            transfer_station_id = None
+            start_train_transfer_station_arrival_time = None
+            end_train_transfer_station_departure_time = None
+            # looping through stop schedule of train serving start station
+            for start_train_stop in start_train_stops:
+                    if start_train_stop.stop_id[:-1] == start_station_id:
+                        start_station_info = start_train_stop
+                    # looping through schedule of train arriving at dest station
+                    for end_train_stop in end_train_stops: 
+                        if end_train_stop.stop_id[:-1] == end_station_id:
+                            end_station_info = end_train_stop
+                            
+                        if start_train_stop.stop_id[:-1] == end_train_stop.stop_id[:-1]:
+                            transfer_station_id = start_train_stop.stop_id[:-1]
+                            start_train_transfer_station_arrival_time = start_train_stop.arrival.time
+                            end_train_transfer_station_departure_time = end_train_stop.arrival.time
+                        # print(bool(transfer_station_id), bool(start_station_info), bool(end_station_info)) 
+                        #  if (transfer_station_id != None) and (start_station != None) and (end_station != None) and (start_train_transfer_station_arrival_time < end_train_transfer_station_departure_time) and (start_train_stops_no_direction.index(start_station_id) < start_train_stops_no_direction.index(start_train_stop.stop_id[:-1]) and (end_train_stops_no_direction.index(end_station_id) > end_train_stops_no_direction.index(end_train_stop.stop_id[:-1]))):
+                        if (start_station_info) and (end_station_info) and (transfer_station_id) and (start_train_transfer_station_arrival_time < end_train_transfer_station_departure_time) and (end_train_transfer_station_departure_time - start_train_transfer_station_arrival_time <= 1200) and (start_train_stops_no_direction.index(start_station_id) < start_train_stops_no_direction.index(transfer_station_id) and (end_train_stops_no_direction.index(transfer_station_id) < end_train_stops_no_direction.index(end_station_id)) ):
+                            # print('worked 1')
+                            new_train_pair_obj = {
+                                'start_train_id' : start_train.id,
+                                'end_train_id' : end_train.id,
+                                #  'start_train' : start_train,
+                                #  'end_train' : end_train,
+                                # 'transfer_station'
+                                'start_station_arrival' : start_station_info.arrival.time,
+                                'end_station_arrival' : end_station_info.arrival.time,
+                                'transfer_station_arrival' : start_train_stop.arrival.time,
+                                'transfer_station_departure' : end_train_stop.departure.time,
+                                'transfer_station_start_train' : start_train_stop.stop_id[:-1],
+                                'transfer_station_end_train' : end_train_stop.stop_id[:-1],
+                            }
+                            
                             # make sure duplicates are not in array of train pair objs
+
                             if train_pairs_with_possible_transfer:
                                 in_array = False
                                 for prev_train_obj in train_pairs_with_possible_transfer:
-                                     if (prev_train_obj['start_train_id'] == new_train_pair_obj['start_train_id']) and (prev_train_obj['end_train_id'] == new_train_pair_obj['end_train_id']) and (new_train_pair_obj['start_station_arrival'] > int(math.ceil(current_time.timestamp()))):
+                                    if (prev_train_obj['start_train_id'] == new_train_pair_obj['start_train_id']) and (prev_train_obj['end_train_id'] == new_train_pair_obj['end_train_id']):
                                         in_array = True
-                                     else:
+                                    else:
                                         in_array = False
                                 if in_array == False:
-                                     train_pairs_with_possible_transfer.append(new_train_pair_obj)
+                                    train_pairs_with_possible_transfer.append(new_train_pair_obj)
                             else:
-                                 train_pairs_with_possible_transfer.append(new_train_pair_obj)
-                            
+                                train_pairs_with_possible_transfer.append(new_train_pair_obj)
+                            # print(new_train_pair_obj)
+    #  pprint.pp(train_pairs_with_possible_transfer)
+    #  print(end_station)
+    #  print(new_train_pair_obj)                       
      best_train_pair = None
      for train_pair in train_pairs_with_possible_transfer:
           if best_train_pair == None:
                best_train_pair = train_pair
           elif train_pair['end_station_arrival'] < best_train_pair['end_station_arrival']:
                best_train_pair = train_pair
-     
-                                  
-     return best_train_pair
+
+     print("start arrival",convert_timestamp(best_train_pair['start_station_arrival'])) 
+     print("transfer_station_arrival", convert_timestamp(best_train_pair['transfer_station_arrival']))
+     print("trans station",Station.query.filter(Station.gtfs_stop_id == best_train_pair['transfer_station_start_train']).first())
+     print("trans dep",convert_timestamp(best_train_pair['transfer_station_departure']))
+     print("end_arr",convert_timestamp(best_train_pair['end_station_arrival']))                       
+    #  return best_train_pair
