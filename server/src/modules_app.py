@@ -62,6 +62,8 @@ def build_trip_sequence(journey_obj, train_data_obj):
         leg = FilteredTrains(train_data_obj, train_data_obj.start_station_id, train_data_obj.end_station_id)
         trip_sequence = [return_sorted_trains_or_trip_error(leg, train_data_obj.start_station_id, train_data_obj.end_station_id)]
         # print('ts', trip_sequence[0].first_train_id)
+    elif (journey_obj.local_express):
+        
     else:
         trip_sequence = handle_multi_leg_trip(train_data_obj, journey_obj)
     return trip_sequence

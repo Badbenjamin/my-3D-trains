@@ -18,10 +18,8 @@ def plan_trip(start_station_id, end_station_id):
     # new_train_data takes the info from new_journey and uses it to make requests from the relevant MTA API route endpoints.
     # it contains the JSON train data from the realtime gtfs feed. 
     new_train_data = TrainData(new_journey)
-    # print('new train data', new_train_data)
     # trip_sequence is an array that contains either a SortedTrains obj or a TripError object.
     trip_sequence = modules_app.build_trip_sequence(new_journey, new_train_data)
-    # print('trip sequence', trip_sequence)
     # FormattedTrainData class takes our trip sequence (one or two trips), and converts the first arriving train to a dict, which is sent to client. 
     return FormattedTrainData(trip_sequence).trains_for_react, 200
 
@@ -44,7 +42,6 @@ def get_all_stations():
 # this request occurs in the Station component in the client. 
 @app.route('/api/stationname/<string:gtfs_id>')
 def get_station_name(gtfs_id):
-    # print(gtfs_id)
     station = Station.query.filter(Station.gtfs_stop_id == gtfs_id).first()
     return {"name" : station.stop_name, "daytime_routes" : station.daytime_routes}, 200
 

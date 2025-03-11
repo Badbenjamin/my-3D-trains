@@ -397,8 +397,8 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
                     stops_all_info = [stop for stop in train.trip_update.stop_time_update]
                     if check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id) and check_for_correct_direction(stops, start_station_id, end_station_id):
                          new_train_obj = {
-                              'train' : train.id,
-                              'start_station_departure' : get_station_arrival_or_departure_time(stops_all_info, start_station_id, "departure"),
+                              'train_id' : train.id,
+                              'start_station_arrival' : get_station_arrival_or_departure_time(stops_all_info, start_station_id, "arrival"),
                               'end_station_arrival' : get_station_arrival_or_departure_time(stops_all_info, end_station_id, 'arrival')
                          }
                          if new_train_obj['start_station_departure'] < new_train_obj['end_station_arrival']:
@@ -489,9 +489,20 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
                elif (train['end_station_arrival'] < best_single_train['end_station_arrival']) and (train['start_station_departure'] > current_time_int):
                     best_single_train = train
     # WRITE LOGIC FOR IF TRIP IS NOT POSSIBLE ERROR
-     print('best pair', best_train_pair)
-     print('best single dep', convert_timestamp(best_single_train['start_station_departure']))
-     print('best single arr', convert_timestamp(best_single_train['end_station_arrival']))
+     if best_train_pair and best_single_train:
+          if best_train_pair['end_station_arrival'] < best_single_train['end_station_arrival']:
+               return best_train_pair
+          else: 
+               return best_single_train
+     elif best_train_pair and not best_single_train:
+          return best_train_pair
+     elif best_single_train and not best_train_pair:
+          return best_single_train
+     else:
+          print('MAYYBE RETURN AN ERROR OBJECT')
+    #  print('best pair', bool(best_train_pair), bool(best_single_train))
+    #  print('best single dep', convert_timestamp(best_single_train['start_station_departure']))
+    #  print('best single arr', convert_timestamp(best_single_train['end_station_arrival']))
 
     #  print("start arrival",convert_timestamp(best_train_pair['start_station_arrival'])) 
     #  print("transfer_station_arrival", convert_timestamp(best_train_pair['transfer_station_arrival']))

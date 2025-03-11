@@ -74,28 +74,27 @@ class Journey:
       
         # NEED TO MAKE BRANCH FOR SAME LINE BUT EXPRESS TO LOCAL OR LOCAL TO EXPRESS
         if (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == False):
-            print('here', self.start_station.daytime_routes)
+        
             start_line_complex_ids = modules_classes.find_complex_ids(self.start_station.daytime_routes)
             end_line_complex_ids = modules_classes.find_complex_ids(self.end_station.daytime_routes)
-            print('start line complex ids', sorted(start_line_complex_ids))
-            print('end line complex ids', sorted(end_line_complex_ids))
+            
             all_complex_ids = start_line_complex_ids + end_line_complex_ids
             # only return complex ids that appear more than once in the list
             # this means they appear both in start station and end station complexes
             shared_complexes = list(set([complex_id for complex_id in all_complex_ids if all_complex_ids.count(complex_id)>1]))
-            print('shared complexes', shared_complexes)
+            
             # takes the complex_id list of shared_complexes and returns stations for each complex
             stations_in_complexes =  modules_classes.complex_ids_to_stations(shared_complexes)
             
             # return all stations that serve a route that is served by the start and end station
             shared_stations = modules_classes.get_shared_stations(stations_in_complexes, start_and_end_routes)
             self.shared_stations = shared_stations
-            print('shared stations', shared_stations)
+            
             # Assign correct shared station to start_terminus and end_origin
             # IF THERE ARE MULTIPLE SHARED STATIONS, WE NEED TO FIND THE FASTEST ROUTE
             if shared_stations:
                 self.transfer_info_obj_array = modules_classes.get_transfer_station_info(shared_stations, self.start_station_routes, self.end_station_routes)
-            print('toa', self.transfer_info_obj_array)
+            # print('toa', self.transfer_info_obj_array)
         elif (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == True):
             self.local_express = True
         # SAME LINE EXPRESS?
@@ -172,6 +171,41 @@ class TrainData:
     def __repr__(self):
         return f'<TrainData from {self.routes} for {self.journey_object}>'
         
+class LocalExpress:
+
+    def __init__(self, best_trains_and_transfer_obj, start_station_id, end_station_id):
+        self.start_station_id = start_station_id
+        self.end_station_id = end_station_id
+        self.two_trains = False
+        self.local_is_faster = False
+        if best_trains_and_transfer_obj['transfer_station_arrival']:
+            self.two_trains = True
+            self.start_train_id = best_trains_and_transfer_obj['start_train_id']
+            self.end_train_id = best_trains_and_transfer_obj['end_train_id']
+            self.start_station_arrival = best_trains_and_transfer_obj['start_station_arrival']
+            self.end_station_arrival = best_trains_and_transfer_obj['end_station_arrival']
+            self.transfer_station = best_trains_and_transfer_obj['transfer_station_start_train']
+            self.transfer_station_arrival = best_trains_and_transfer_obj['transfer_station_arrival']
+            self.transfer_station_departure = best_trains_and_transfer_obj['transfer_station_departure']
+        elif best_trains_and_transfer_obj['train_id']:
+            self.local_is_faster = True
+            self.train_id = best_trains_and_transfer_obj['train_id']
+            self.start_station_arrival = best_trains_and_transfer_obj['start_station_arrival']
+            self.end_station_arrival = best_trains_and_transfer_obj['end_station_arrival']
+        else:
+            print('ERROR')
+
+        print(best_trains_and_transfer_obj)
+
+    def __repr__(self):
+        if self.two_trains:
+            return f'<LocalExpress {self.start_station_id} through {self.transfer_station} to {self.end_station_id} at {modules_classes.convert_timestamp(self.end_station_arrival)}>'
+        elif self.local_is_faster:
+            return f'<LocalExpress local is faster {self.start_station_id} to {self.end_station_id} at {modules_classes.convert_timestamp(self.end_station_arrival)}>'
+
+
+
+
 
 # FilteredTrains class takes train_data (gtfs json response), and start and end station gtfs id.
 # It filters out trains that are irrelevant to our trip (not stoping at both stations) and converts json into an array of objects of the Train class.
@@ -188,16 +222,24 @@ class FilteredTrains:
         self.train_obj_array = None
         # this is passed to TripError if filter produces empty array
         self.trip_error_obj = None
-        self.local_express = None
+        self.local_express = False
+        self.local_express_obj = None
         
         if train_data.local_express:
             self.local_express = True
             best_trains_and_transfer = modules_classes.find_best_trains_and_transfer_local_express(train_data, start_station_id, end_station_id)
+            local_express_obj = LocalExpress(
+                best_trains_and_transfer_obj = best_trains_and_transfer,
+                start_station_id = start_station_id,
+                end_station_id= end_station_id
+            )
+            self.local_express_obj = local_express_obj
             # start_train = best_trains_and_transfer['start_train_id']
             # print('st', start_train)
             # print('et', best_trains_and_transfer['end_train_id'])
             # print('at', best_trains_and_transfer['end_station_arrival'])
 
+        print('leo', self.local_express_obj)
         # filter the gtfs json data for trains relevant to the user's trip.
         # a successful trip (both stations in service), will yield a list of trains for our trip.
         # if no trains are found, error info is returned with service status for each stop
