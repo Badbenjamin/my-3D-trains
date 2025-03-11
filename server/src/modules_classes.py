@@ -8,6 +8,8 @@ from Classes import Station
 import pprint
 # from Objects import Stop
 
+current_time_int = int(math.ceil(current_time.timestamp()))
+
 # convert 10 digit POSIX timestamp used in feed to readable format
 def convert_timestamp(timestamp):
     return datetime.fromtimestamp(timestamp)
@@ -81,7 +83,7 @@ def check_for_correct_direction(stops, start_station_id, end_station_id):
 def check_station_arrival_or_departure(stop, station_id, deptarture_or_arrival):
         arrival_time = stop.arrival.time
         departure_time = stop.departure.time
-        current_time_int = int(math.ceil(current_time.timestamp()))
+        # current_time_int = int(math.ceil(current_time.timestamp()))
         deptarture_or_arrival_time = None
         if deptarture_or_arrival == "departure":
              deptarture_or_arrival_time = departure_time
@@ -392,13 +394,21 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
                     stops = create_stop_schedule(train)
-                    if check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id):
-                         trains_traveling_between_stations.append(train)
-                    elif check_for_station_service(stops, start_station_id):
+                    stops_all_info = [stop for stop in train.trip_update.stop_time_update]
+                    if check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id) and check_for_correct_direction(stops, start_station_id, end_station_id):
+                         new_train_obj = {
+                              'train' : train.id,
+                              'start_station_departure' : get_station_arrival_or_departure_time(stops_all_info, start_station_id, "departure"),
+                              'end_station_arrival' : get_station_arrival_or_departure_time(stops_all_info, end_station_id, 'arrival')
+                         }
+                         if new_train_obj['start_station_departure'] < new_train_obj['end_station_arrival']:
+                            trains_traveling_between_stations.append(new_train_obj)
+                    elif check_for_station_service(stops, start_station_id) and (not check_for_station_service(stops, end_station_id)):
                          trains_serving_start_station.append(train)
-                    elif check_for_station_service(stops, end_station_id):
+                    elif check_for_station_service(stops, end_station_id) and (not check_for_station_service(stops, start_station_id)):
                          trains_serving_end_station.append(train)
-     print('lengs', len(trains_serving_start_station), len(trains_serving_end_station))
+     print('lengs', len(trains_serving_start_station), len(trains_serving_end_station), len(trains_traveling_between_stations))
+     
     # pairs of trains where the start train and end train (each stoping at start or end station), have a shared station in schedules
      train_pairs_with_possible_transfer = []
     #  looping throuth all trains that contain the start station in their stops
@@ -465,15 +475,27 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
     #  print(end_station)
     #  print(new_train_pair_obj)                       
      best_train_pair = None
-     for train_pair in train_pairs_with_possible_transfer:
-          if best_train_pair == None:
-               best_train_pair = train_pair
-          elif train_pair['end_station_arrival'] < best_train_pair['end_station_arrival']:
-               best_train_pair = train_pair
+     best_single_train = None
+     if train_pairs_with_possible_transfer:
+        for train_pair in train_pairs_with_possible_transfer:
+            if best_train_pair == None:
+                best_train_pair = train_pair
+            elif train_pair['end_station_arrival'] < best_train_pair['end_station_arrival']:
+                best_train_pair = train_pair
+     if trains_traveling_between_stations:
+          for train in trains_traveling_between_stations:
+               if best_single_train == None:
+                    best_single_train = train
+               elif (train['end_station_arrival'] < best_single_train['end_station_arrival']) and (train['start_station_departure'] > current_time_int):
+                    best_single_train = train
+    # WRITE LOGIC FOR IF TRIP IS NOT POSSIBLE ERROR
+     print('best pair', best_train_pair)
+     print('best single dep', convert_timestamp(best_single_train['start_station_departure']))
+     print('best single arr', convert_timestamp(best_single_train['end_station_arrival']))
 
-     print("start arrival",convert_timestamp(best_train_pair['start_station_arrival'])) 
-     print("transfer_station_arrival", convert_timestamp(best_train_pair['transfer_station_arrival']))
-     print("trans station",Station.query.filter(Station.gtfs_stop_id == best_train_pair['transfer_station_start_train']).first())
-     print("trans dep",convert_timestamp(best_train_pair['transfer_station_departure']))
-     print("end_arr",convert_timestamp(best_train_pair['end_station_arrival']))                       
+    #  print("start arrival",convert_timestamp(best_train_pair['start_station_arrival'])) 
+    #  print("transfer_station_arrival", convert_timestamp(best_train_pair['transfer_station_arrival']))
+    #  print("trans station",Station.query.filter(Station.gtfs_stop_id == best_train_pair['transfer_station_start_train']).first())
+    #  print("trans dep",convert_timestamp(best_train_pair['transfer_station_departure']))
+    #  print("end_arr",convert_timestamp(best_train_pair['end_station_arrival']))                       
     #  return best_train_pair
