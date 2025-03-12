@@ -401,7 +401,7 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
                               'start_station_arrival' : get_station_arrival_or_departure_time(stops_all_info, start_station_id, "arrival"),
                               'end_station_arrival' : get_station_arrival_or_departure_time(stops_all_info, end_station_id, 'arrival')
                          }
-                         if new_train_obj['start_station_departure'] < new_train_obj['end_station_arrival']:
+                         if new_train_obj['start_station_arrival'] < new_train_obj['end_station_arrival']:
                             trains_traveling_between_stations.append(new_train_obj)
                     elif check_for_station_service(stops, start_station_id) and (not check_for_station_service(stops, end_station_id)):
                          trains_serving_start_station.append(train)

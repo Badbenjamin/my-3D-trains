@@ -100,7 +100,7 @@ class Journey:
         # SAME LINE EXPRESS?
         # involves_local_and_express = modules_classes.involves_local_and_exrpess(self.start_station_routes, self.end_station_routes, self.transfer_info_obj_array)
         # print('involves', involves_local_and_express)
-
+        print('jo', self.shared_stations)
         start_station_endpoints = []
         for endpoint in self.start_station.station_endpoints:
             start_station_endpoints.append(endpoint.endpoint.endpoint)
@@ -363,6 +363,13 @@ class FormattedTrainData:
                     "station_to_station_service" : trip.between_station_service
                 }
                 self.trains_for_react.append(error_for_react)
+            # FIGURE OUT BEST WAY TO PASS THIS INFO ONWARD
+            # should I use sortedTrains objects, maybe I could insert this into a trip with a transfer
+            elif isinstance(trip, LocalExpress):
+                if trip.train_id:
+                    print(trip)
+                elif trip.transfer_station:
+                    print(trip)
     def __repr__(self):
         return f'<FormattedTrainData >'
 

@@ -57,14 +57,20 @@ def handle_multi_leg_trip(train_data_obj, journey_obj):
 
 def build_trip_sequence(journey_obj, train_data_obj):
     trip_sequence = []
-    # an express to local trip or vice versa would not have shared stations, but would still require a transfer. 
-    if journey_obj.shared_stations == []:
+    # no shared stations means that the trip is on the same line and does not need a local/express transfer
+    if journey_obj.shared_stations == [] and not journey_obj.local_express:
+        print('1')
         leg = FilteredTrains(train_data_obj, train_data_obj.start_station_id, train_data_obj.end_station_id)
         trip_sequence = [return_sorted_trains_or_trip_error(leg, train_data_obj.start_station_id, train_data_obj.end_station_id)]
         # print('ts', trip_sequence[0].first_train_id)
     elif (journey_obj.local_express):
-        
+        print('2')
+        local_express_trip = FilteredTrains(train_data_obj, train_data_obj.start_station_id, train_data_obj.end_station_id)
+        trip_sequence = [local_express_trip.local_express_obj]
+    # 
     else:
+        print('3')
         trip_sequence = handle_multi_leg_trip(train_data_obj, journey_obj)
+    print('ts', trip_sequence)
     return trip_sequence
 
