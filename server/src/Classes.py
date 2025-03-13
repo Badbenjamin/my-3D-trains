@@ -243,6 +243,7 @@ class FilteredTrains:
         # filter the gtfs json data for trains relevant to the user's trip.
         # a successful trip (both stations in service), will yield a list of trains for our trip.
         # if no trains are found, error info is returned with service status for each stop
+        
         self.filtered_train_data = modules_classes.filter_trains_for_stations_direction_future_arrival(self.all_train_data, self.start_station, self.end_station)
         
         if len(self.filtered_train_data) > 0:
