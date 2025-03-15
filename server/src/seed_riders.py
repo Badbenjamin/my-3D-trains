@@ -18,7 +18,7 @@ def add_riders():
     station = tommy_station
     
     )
-    print(tommy.station)
+  
 
     sally_station = Station.query.first()
     sally = Rider(
