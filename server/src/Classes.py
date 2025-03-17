@@ -193,15 +193,17 @@ class LocalExpress:
             self.local_express_seq = [
                 {
                     'train_id' : best_trains_and_transfer_obj['start_train_id'],
-                    'start_station' : start_station_id,
-                    'end_station' : best_trains_and_transfer_obj['transfer_station_start_train'],
+                    'train' : best_trains_and_transfer_obj['start_train'],
+                    'start_station_id' : start_station_id,
+                    'end_station_id' : best_trains_and_transfer_obj['transfer_station_start_train'],
                     'start_station_arrival' : best_trains_and_transfer_obj['start_station_arrival'],
                     'end_station_arrival' : best_trains_and_transfer_obj['transfer_station_arrival'],
                 },
                 {
                     'train_id' : best_trains_and_transfer_obj['end_train_id'],
-                    'start_station' : best_trains_and_transfer_obj['transfer_station_end_train'],
-                    'end_station' : end_station_id,
+                    'train' : best_trains_and_transfer_obj['end_train'], 
+                    'start_station_id' : best_trains_and_transfer_obj['transfer_station_end_train'],
+                    'end_station_id' : end_station_id,
                     'start_station_arrival' : best_trains_and_transfer_obj['transfer_station_arrival'],
                     'end_station_arrival' : best_trains_and_transfer_obj['end_station_arrival'],
                 }
@@ -212,6 +214,7 @@ class LocalExpress:
             self.local_express_seq = [
                 {
                     'train_id' : best_trains_and_transfer_obj['train_id'],
+                    'train' : best_trains_and_transfer_obj['train'],
                     'start_station' : start_station_id,
                     'end_station' : end_station_id,
                     'start_station_arrival' : best_trains_and_transfer_obj['start_station_arrival'],
@@ -250,6 +253,7 @@ class FilteredTrains:
         
         if train_data.local_express:
             self.local_express = True
+            # either a pair of trains with a transfer station, a single train (local faster), or no trains (should produce error later)
             best_trains_and_transfer = modules_classes.find_best_trains_and_transfer_local_express(train_data, start_station_id, end_station_id)
             
             
@@ -261,18 +265,16 @@ class FilteredTrains:
             )
             self.local_express_seq = local_express_obj.local_express_seq
 
-        
-        # print('leseq ft', self.local_express_seq)
-        # filter the gtfs json data for trains relevant to the user's trip.
-        # a successful trip (both stations in service), will yield a list of trains for our trip.
-        # if no trains are found, error info is returned with service status for each stop
-        
-        self.filtered_train_data = modules_classes.filter_trains_for_stations_direction_future_arrival(self.all_train_data, self.start_station, self.end_station)
-        
-        if len(self.filtered_train_data) > 0:
-            self.train_obj_array = trains_to_objects(self.filtered_train_data)
-        elif (self.filtered_train_data == []):
-            self.trip_error_obj = TripError(self.all_train_data, self.start_station_id, self.end_station_id)
+        else:
+            # filter the gtfs json data for trains relevant to the user's trip.
+            # a successful trip (both stations in service), will yield a list of trains for our trip.
+            # if no trains are found, error info is returned with service status for each stop
+            self.filtered_train_data = modules_classes.filter_trains_for_stations_direction_future_arrival(self.all_train_data, self.start_station, self.end_station)
+            
+            if len(self.filtered_train_data) > 0:
+                self.train_obj_array = trains_to_objects(self.filtered_train_data)
+            elif (self.filtered_train_data == []):
+                self.trip_error_obj = TripError(self.all_train_data, self.start_station_id, self.end_station_id)
             
     def __repr__(self):
         if (self.train_obj_array != None):
@@ -330,13 +332,18 @@ class FormattedTrainData:
     # what if it was just the first train?
     def __init__(self, trip_sequence):
         self.trip_sequence = trip_sequence
+        print('ft trip seq', self.trip_sequence)
         # for each trip in trip_sequence, a json compatible object is created and appended to trains_for_react.
         # trains for react is sent to the client and the information is displaid. 
         self.trains_for_react = []
         for trip in self.trip_sequence:
+            # LEFT OFF HERE
+            # handle tripsequencelement or besttrain obj? 
+            # getting close but still needs work. 
             if isinstance(trip, TripSequenceElement):
                 start_station = Station.query.filter(Station.gtfs_stop_id == trip.start_station_id).first()
                 end_station = Station.query.filter(Station.gtfs_stop_id == trip.end_station_id).first()
+                print('ftd start end', start_station, end_station)
                 # building our object from first train in trip_sequence
                 first_train = trip.first_train_only
                 first_train_schedule = first_train.schedule
@@ -389,13 +396,7 @@ class FormattedTrainData:
                     "station_to_station_service" : trip.between_station_service
                 }
                 self.trains_for_react.append(error_for_react)
-            # FIGURE OUT BEST WAY TO PASS THIS INFO ONWARD
-            # should I use BestTrain objects, maybe I could insert this into a trip with a transfer
-            elif isinstance(trip, LocalExpress):
-                if trip.train_id:
-                    print(trip)
-                elif trip.transfer_station:
-                    print(trip)
+            
     def __repr__(self):
         return f'<FormattedTrainData >'
 
@@ -452,28 +453,37 @@ class Stop:
 class TripSequenceElement:
 
     def __init__(self, trip_info):
-        # print('tse trip info', trip_info)
+        # print('tse trip info', type(trip_info))
         self.train_id = None
-        self.start_station = None
-        self.end_station = None
+        self.train = None
+        self.start_station_id = None
+        self.end_station_id = None
         self.start_station_arrival = None
         self.end_station_arrival = None
+
+        # ERROR INFO BELOW
+
         if isinstance(trip_info, BestTrain):
+            print('trip info', trip_info)
+            self.train = trip_info.first_train_only
             self.train_id = trip_info.first_train_id
             self.start_station = trip_info.start_station_id
             self.end_station = trip_info.end_station_id
             self.start_station_arrival = trip_info.origin_departure_time
             self.end_station_arrival = trip_info.dest_arrival_time
+            # print(self.train)
         # TripError element comes before build_trip_seq
         elif isinstance(trip_info, TripError):
             print('error', trip_info)
+        # THIS IS LOCAL EXPRESS BRANCH
         else:
             self.train_id = trip_info['train_id']
-            self.start_station = trip_info['start_station']
-            self.end_station = trip_info['end_station']
+            self.train = trip_info['train']
+            self.start_station = trip_info['start_station_id']
+            self.end_station = trip_info['end_station_id']
             self.start_station_arrival = trip_info['start_station_arrival']
             self.end_station_arrival = trip_info['end_station_arrival']
-
+            print(self.train_id, self.start_station, self.end_station)
     def __repr__(self):
         return f'<TripSequenceElement {self.train_id} from {self.start_station, self.start_station_arrival} to {self.end_station, self.end_station_arrival} >'
 

@@ -1,5 +1,5 @@
 from datetime import datetime
-from Classes import  FilteredTrains, BestTrain, TripSequenceElement
+from Classes import  FilteredTrains, BestTrain, TripSequenceElement, TripError
 import inspect
 import pprint
 current_time = datetime.now()
@@ -63,21 +63,32 @@ def build_trip_sequence(journey_obj, train_data_obj):
         pre_trip_sequence = [return_sorted_trains_or_trip_error(leg, train_data_obj.start_station_id, train_data_obj.end_station_id)]
         for pre_trip_seq_element in pre_trip_sequence:
             tse = TripSequenceElement(pre_trip_seq_element)
+            trip_sequence.append(tse)
     elif (journey_obj.local_express):
         print('2 local exp trip')
         local_express_trip = FilteredTrains(train_data_obj, train_data_obj.start_station_id, train_data_obj.end_station_id)
         # print('le_trip', local_express_trip)
         pre_trip_sequence = local_express_trip.local_express_seq
         # ERROR OBJ?
-        for pre_trip_seq_element in pre_trip_sequence:
-            tse = TripSequenceElement(pre_trip_seq_element)
-            trip_sequence.append(tse)
+        if pre_trip_sequence:
+            for pre_trip_seq_element in pre_trip_sequence:
+                tse = TripSequenceElement(pre_trip_seq_element)
+                trip_sequence.append(tse)
+        else:
+            le_error = TripError(
+                train_data= train_data_obj.all_train_data,
+                start_station_id= train_data_obj.start_station_id,
+                end_station_id= train_data_obj.end_station_id
+            )
+            trip_sequence.append(le_error)
     else:
         print('3 multi leg trip')
         pre_trip_sequence = handle_multi_leg_trip(train_data_obj, journey_obj)
+        # What about TripError element?
         for pre_trip_seq_element in pre_trip_sequence:
             tse = TripSequenceElement(pre_trip_seq_element)
-            # trip_sequence.append(tse)
+            trip_sequence.append(tse)
+       
     print('ts', trip_sequence)
     return trip_sequence
 

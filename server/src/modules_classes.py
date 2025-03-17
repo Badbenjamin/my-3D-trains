@@ -41,6 +41,7 @@ def check_for_station_service_on_failed_trip(train_data, start_station_id, end_s
     start_service = False
     end_service = False
     start_to_end_service = False
+    
     for train_feed in train_data:
             
             for train in train_feed.entity: 
@@ -395,6 +396,7 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
                     if check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id) and check_for_correct_direction(stops, start_station_id, end_station_id):
                          new_train_obj = {
                               'train_id' : train.id,
+                              'train' : train,
                               'start_station_arrival' : get_station_arrival_or_departure_time(stops_all_info, start_station_id, "arrival"),
                               'end_station_arrival' : get_station_arrival_or_departure_time(stops_all_info, end_station_id, 'arrival')
                          }
@@ -442,8 +444,8 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
                             new_train_pair_obj = {
                                 'start_train_id' : start_train.id,
                                 'end_train_id' : end_train.id,
-                                #  'start_train' : start_train,
-                                #  'end_train' : end_train,
+                                'start_train' : start_train,
+                                'end_train' : end_train,
                                 # 'transfer_station'
                                 'start_station_arrival' : start_station_info.arrival.time,
                                 'end_station_arrival' : end_station_info.arrival.time,
