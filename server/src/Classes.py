@@ -193,7 +193,7 @@ class LocalExpress:
             self.local_express_seq = [
                 {
                     'train_id' : best_trains_and_transfer_obj['start_train_id'],
-                    'train' : best_trains_and_transfer_obj['start_train'],
+                    'train' : trains_to_objects([best_trains_and_transfer_obj['start_train']])[0],
                     'start_station_id' : start_station_id,
                     'end_station_id' : best_trains_and_transfer_obj['transfer_station_start_train'],
                     'start_station_arrival' : best_trains_and_transfer_obj['start_station_arrival'],
@@ -201,7 +201,7 @@ class LocalExpress:
                 },
                 {
                     'train_id' : best_trains_and_transfer_obj['end_train_id'],
-                    'train' : best_trains_and_transfer_obj['end_train'], 
+                    'train' : trains_to_objects([best_trains_and_transfer_obj['end_train']])[0], 
                     'start_station_id' : best_trains_and_transfer_obj['transfer_station_end_train'],
                     'end_station_id' : end_station_id,
                     'start_station_arrival' : best_trains_and_transfer_obj['transfer_station_arrival'],
@@ -214,7 +214,7 @@ class LocalExpress:
             self.local_express_seq = [
                 {
                     'train_id' : best_trains_and_transfer_obj['train_id'],
-                    'train' : best_trains_and_transfer_obj['train'],
+                    'train' : trains_to_objects([best_trains_and_transfer_obj['train']])[0],
                     'start_station' : start_station_id,
                     'end_station' : end_station_id,
                     'start_station_arrival' : best_trains_and_transfer_obj['start_station_arrival'],
@@ -264,7 +264,7 @@ class FilteredTrains:
                 
             )
             self.local_express_seq = local_express_obj.local_express_seq
-
+            print('le seq', self.local_express_seq)
         else:
             # filter the gtfs json data for trains relevant to the user's trip.
             # a successful trip (both stations in service), will yield a list of trains for our trip.
@@ -332,7 +332,7 @@ class FormattedTrainData:
     # what if it was just the first train?
     def __init__(self, trip_sequence):
         self.trip_sequence = trip_sequence
-        print('ft trip seq', self.trip_sequence)
+        print('ftd trip seq', self.trip_sequence)
         # for each trip in trip_sequence, a json compatible object is created and appended to trains_for_react.
         # trains for react is sent to the client and the information is displaid. 
         self.trains_for_react = []
@@ -343,9 +343,11 @@ class FormattedTrainData:
             if isinstance(trip, TripSequenceElement):
                 start_station = Station.query.filter(Station.gtfs_stop_id == trip.start_station_id).first()
                 end_station = Station.query.filter(Station.gtfs_stop_id == trip.end_station_id).first()
-                print('ftd start end', start_station, end_station)
+                print('ftd trip', trip)
+                print('ss es', start_station, end_station)
                 # building our object from first train in trip_sequence
-                first_train = trip.first_train_only
+                first_train = trip.train
+                print('first train', first_train)
                 first_train_schedule = first_train.schedule
                 # create an array of stop objects, the schedule for the train. 
                 first_train_stop_schedule = []
@@ -366,17 +368,17 @@ class FormattedTrainData:
                     "start_station" : start_station.stop_name,
                     "start_station_gtfs" : trip.start_station_id,
                     # "start_station_departure" : str(modules_classes.convert_timestamp(first_train.arrival_time(trip.start_station_id)))[10:16],
-                    "start_station_departure" : trip.origin_departure_time_readable,
+                    "start_station_departure" : trip.start_station_arrival,
                     "end_station" : end_station.stop_name,
                     "end_station_gtfs" : trip.end_station_id,
-                    "end_station_arrival" : trip.dest_arrival_time_readable,
+                    "end_station_arrival" : trip.end_station_arrival,
                     "transfer_station" : None,
                     "route" : first_train.route(),
                     "direction_label" : None,
                     "schedule" : first_train_stop_schedule,
                     "number_of_stops" : stop_schedule_ids.index(trip.end_station_id) - stop_schedule_ids.index(trip.start_station_id),
                     # "trip_time" : round((first_train.arrival_time(trip.end_station_id) - first_train.arrival_time(trip.start_station_id)) / 60)
-                    "trip_time" : (trip.dest_arrival_time - trip.origin_departure_time)//60
+                    "trip_time" : (trip.end_station_arrival - trip.start_station_arrival)//60
                 }
                 if first_train.direction() == "N":
                     train_for_react['direction_label'] = start_station.north_direction_label
@@ -467,8 +469,8 @@ class TripSequenceElement:
             print('trip info', trip_info)
             self.train = trip_info.first_train_only
             self.train_id = trip_info.first_train_id
-            self.start_station = trip_info.start_station_id
-            self.end_station = trip_info.end_station_id
+            self.start_station_id = trip_info.start_station_id
+            self.end_station_id = trip_info.end_station_id
             self.start_station_arrival = trip_info.origin_departure_time
             self.end_station_arrival = trip_info.dest_arrival_time
             # print(self.train)
@@ -479,13 +481,13 @@ class TripSequenceElement:
         else:
             self.train_id = trip_info['train_id']
             self.train = trip_info['train']
-            self.start_station = trip_info['start_station_id']
-            self.end_station = trip_info['end_station_id']
+            self.start_station_id = trip_info['start_station_id']
+            self.end_station_id = trip_info['end_station_id']
             self.start_station_arrival = trip_info['start_station_arrival']
             self.end_station_arrival = trip_info['end_station_arrival']
-            print(self.train_id, self.start_station, self.end_station)
+            # print(self.train_id, self.start_station, self.end_station)
     def __repr__(self):
-        return f'<TripSequenceElement {self.train_id} from {self.start_station, self.start_station_arrival} to {self.end_station, self.end_station_arrival} >'
+        return f'<TripSequenceElement {self.train_id} from {self.start_station_id, self.start_station_arrival} to {self.end_station_id, self.end_station_arrival} >'
 
 if __name__ == "__main__":
     with app.app_context():
