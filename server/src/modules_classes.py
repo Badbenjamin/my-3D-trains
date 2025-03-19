@@ -415,6 +415,7 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
         start_train_stops = [stop for stop in start_train.trip_update.stop_time_update]
         start_train_stops_no_direction = [stop.stop_id[:-1] for stop in start_train.trip_update.stop_time_update]
         # for each start train, loop through every train serving the end station
+        # start_station_arrival_time = 
         start_station_info = None
         for end_train in trains_serving_end_station:   
             end_train_stops = [stop for stop in end_train.trip_update.stop_time_update]
@@ -436,11 +437,13 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
                             
                         if start_train_stop.stop_id[:-1] == end_train_stop.stop_id[:-1]:
                             transfer_station_id = start_train_stop.stop_id[:-1]
+                            # print('tsid', transfer_station_id, convert_timestamp(start_train_stop.arrival.time), convert_timestamp(end_train_stop.arrival.time), start_train_stop.arrival.time < end_train_stop.arrival.time)
                             start_train_transfer_station_arrival_time = start_train_stop.arrival.time
                             end_train_transfer_station_departure_time = end_train_stop.arrival.time
-                        
+                            # print('ss info', start_train_transfer_station_arrival_time < end_train_transfer_station_departure_time)
                         #  if (transfer_station_id != None) and (start_station != None) and (end_station != None) and (start_train_transfer_station_arrival_time < end_train_transfer_station_departure_time) and (start_train_stops_no_direction.index(start_station_id) < start_train_stops_no_direction.index(start_train_stop.stop_id[:-1]) and (end_train_stops_no_direction.index(end_station_id) > end_train_stops_no_direction.index(end_train_stop.stop_id[:-1]))):
-                        if (start_station_info) and (end_station_info) and (transfer_station_id) and (start_train_transfer_station_arrival_time < end_train_transfer_station_departure_time) and (end_train_transfer_station_departure_time - start_train_transfer_station_arrival_time <= 1200) and (start_train_stops_no_direction.index(start_station_id) < start_train_stops_no_direction.index(transfer_station_id) and (end_train_stops_no_direction.index(transfer_station_id) < end_train_stops_no_direction.index(end_station_id)) ):
+                        if (start_station_info) and (end_station_info) and (transfer_station_id) and (start_station_info.arrival.time > current_time_int) and (start_train_transfer_station_arrival_time + 30 < end_train_transfer_station_departure_time) and (end_train_transfer_station_departure_time - start_train_transfer_station_arrival_time <= 1200) and (start_train_stops_no_direction.index(start_station_id) < start_train_stops_no_direction.index(transfer_station_id) and (end_train_stops_no_direction.index(transfer_station_id) < end_train_stops_no_direction.index(end_station_id)) ):
+                            # print('tsid', transfer_station_id, convert_timestamp(start_train_transfer_station_arrival_time), convert_timestamp(end_train_transfer_station_departure_time), start_train_transfer_station_arrival_time < end_train_transfer_station_departure_time)
                             new_train_pair_obj = {
                                 'start_train_id' : start_train.id,
                                 'end_train_id' : end_train.id,
@@ -449,12 +452,12 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
                                 # 'transfer_station'
                                 'start_station_arrival' : start_station_info.arrival.time,
                                 'end_station_arrival' : end_station_info.arrival.time,
-                                'transfer_station_arrival' : start_train_stop.arrival.time,
-                                'transfer_station_departure' : end_train_stop.departure.time,
+                                'transfer_station_arrival' : start_train_transfer_station_arrival_time,
+                                'transfer_station_departure' : end_train_transfer_station_departure_time,
                                 'transfer_station_start_train' : start_train_stop.stop_id[:-1],
                                 'transfer_station_end_train' : end_train_stop.stop_id[:-1],
                             }
-                            
+                            # print('ntpo', convert_timestamp(new_train_pair_obj['transfer_station_arrival']), convert_timestamp(new_train_pair_obj['transfer_station_departure']))
                             # make sure duplicates are not in array of train pair objs
 
                             if train_pairs_with_possible_transfer:
@@ -485,7 +488,7 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
                elif (train['end_station_arrival'] < best_single_train['end_station_arrival']) and (train['start_station_departure'] > current_time_int):
                     best_single_train = train
     # WRITE LOGIC FOR IF TRIP IS NOT POSSIBLE ERROR
-  
+     print('btp', convert_timestamp(best_train_pair['transfer_station_arrival']), convert_timestamp(best_train_pair['transfer_station_departure']), best_train_pair['transfer_station_start_train'])
      if best_train_pair and best_single_train:
           if best_train_pair['end_station_arrival'] < best_single_train['end_station_arrival']:
                return best_train_pair

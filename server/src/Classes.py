@@ -199,7 +199,7 @@ class LocalExpress:
                     'train' : trains_to_objects([best_trains_and_transfer_obj['end_train']])[0], 
                     'start_station_id' : best_trains_and_transfer_obj['transfer_station_end_train'],
                     'end_station_id' : end_station_id,
-                    'start_station_arrival' : best_trains_and_transfer_obj['transfer_station_arrival'],
+                    'start_station_arrival' : best_trains_and_transfer_obj['transfer_station_departure'],
                     'end_station_arrival' : best_trains_and_transfer_obj['end_station_arrival'],
                 }
             ]
@@ -363,10 +363,10 @@ class FormattedTrainData:
                     "start_station" : start_station.stop_name,
                     "start_station_gtfs" : trip.start_station_id,
                     # "start_station_departure" : str(modules_classes.convert_timestamp(first_train.arrival_time(trip.start_station_id)))[10:16],
-                    "start_station_departure" : trip.start_station_arrival,
+                    "start_station_departure" : datetime.fromtimestamp(trip.start_station_arrival).strftime('%I:%M %p'),
                     "end_station" : end_station.stop_name,
                     "end_station_gtfs" : trip.end_station_id,
-                    "end_station_arrival" : trip.end_station_arrival,
+                    "end_station_arrival" : datetime.fromtimestamp(trip.end_station_arrival).strftime('%I:%M %p'),
                     "transfer_station" : None,
                     "route" : first_train.route(),
                     "direction_label" : None,
