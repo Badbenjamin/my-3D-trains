@@ -20,24 +20,25 @@ def return_sorted_trains_or_trip_error(leg_filtered_trains, start_station_id, en
 # STRANGELY WORKS FOR LOCAL TO EXPRESS? MIGHT NEED TO CHECK IN ON THIS...
 # Ok for two stations but kind of repetitive for lots of them
 def handle_multi_leg_trip(train_data_obj, journey_obj):
-    # 
+    # CHECK ALL POSSIBLE TRANSFER STATIONS AND THEN RETURN ONE WITH EARLIEST ARRIVAL
     trip_sequences = []
+    print('toa', journey_obj.transfer_info_obj_array)
     for transfer_obj in journey_obj.transfer_info_obj_array:
         start_terminus_gtfs_id = transfer_obj['start_term'].gtfs_stop_id
         end_origin_gtfs_id = transfer_obj['end_origin'].gtfs_stop_id
         trip_sequence = [] 
         leg_one_filtered_trains = FilteredTrains(train_data_obj, train_data_obj.start_station_id, start_terminus_gtfs_id)
         trip_sequence.append(return_sorted_trains_or_trip_error(leg_one_filtered_trains, train_data_obj.start_station_id, start_terminus_gtfs_id))
-
+        # LEFT OFF HERE. WHAT DO I DO WITH ERROR?
         if isinstance(trip_sequence[0],BestTrain):
             leg_two = FilteredTrains(train_data_obj, end_origin_gtfs_id, train_data_obj.end_station_id)
             trip_sequence.append(return_sorted_trains_or_trip_error(leg_two, end_origin_gtfs_id, train_data_obj.end_station_id, trip_sequence[0].dest_arrival_time + 120))
-        else:
-            pass
+        
         trip_sequences.append(trip_sequence)
     
     fastest_trip = None
     error_trip = None
+    print('trp sequenses', trip_sequences)
     for trip in trip_sequences:
         # trip[-1] is the second sorted trains obj, with the arrival at destination
         if isinstance(trip[-1], BestTrain):
@@ -45,7 +46,7 @@ def handle_multi_leg_trip(train_data_obj, journey_obj):
                 fastest_trip = trip
             elif trip[-1].dest_arrival_time < fastest_trip[-1].dest_arrival_time:
                 fastest_trip = trip
-        else:
+        elif isinstance(trip[-1], TripError):
             error_trip = trip
     
     if fastest_trip:  
@@ -89,10 +90,14 @@ def build_trip_sequence(journey_obj, train_data_obj):
     else:
         print('3 multi leg trip')
         pre_trip_sequence = handle_multi_leg_trip(train_data_obj, journey_obj)
+        print('mlt pretripseq', pre_trip_sequence)
         # What about TripError element?
         for pre_trip_seq_element in pre_trip_sequence:
-            tse = TripSequenceElement(pre_trip_seq_element)
-            trip_sequence.append(tse)
+            if isinstance(pre_trip_seq_element, TripError):
+                trip_sequence.append(pre_trip_seq_element)
+            elif isinstance(pre_trip_seq_element, BestTrain):
+                tse = TripSequenceElement(pre_trip_seq_element)
+                trip_sequence.append(tse)
        
     print('ts', trip_sequence)
     return trip_sequence
