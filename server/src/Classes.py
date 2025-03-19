@@ -63,18 +63,13 @@ class Journey:
         self.time = time
         self.start_station_routes = self.start_station.daytime_routes.split()
         self.end_station_routes = self.end_station.daytime_routes.split()
-        # am i using the routes variable correctly? is it needed?
         start_and_end_routes = list(set(self.start_station_routes + self.end_station_routes))
-        # False if end station does not share a route with start station
-        # True if they share a route
-        # IF SAME LINE IS FALSE AND NO SHARED STATIONS, RETURN ERROR
-        # same_line = modules_classes.same_line(self.start_station_routes, self.end_station_routes)
         
         journey_info_obj = modules_classes.get_journey_info(self.start_station_routes, self.end_station_routes)
       
-        # NEED TO MAKE BRANCH FOR SAME LINE BUT EXPRESS TO LOCAL OR LOCAL TO EXPRESS
+        # if not on same route, and also not on same colored line, the trip requires a transfer btw lines
         if (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == False):
-        
+            # we need to find stations or complexes shared between the start and end lines
             start_line_complex_ids = modules_classes.find_complex_ids(self.start_station.daytime_routes)
             end_line_complex_ids = modules_classes.find_complex_ids(self.end_station.daytime_routes)
             
@@ -94,7 +89,7 @@ class Journey:
             # IF THERE ARE MULTIPLE SHARED STATIONS, WE NEED TO FIND THE FASTEST ROUTE
             if shared_stations:
                 self.transfer_info_obj_array = modules_classes.get_transfer_station_info(shared_stations, self.start_station_routes, self.end_station_routes)
-           
+        # 
         elif (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == True):
             self.local_express = True
         # SAME LINE EXPRESS?
@@ -343,11 +338,11 @@ class FormattedTrainData:
             if isinstance(trip, TripSequenceElement):
                 start_station = Station.query.filter(Station.gtfs_stop_id == trip.start_station_id).first()
                 end_station = Station.query.filter(Station.gtfs_stop_id == trip.end_station_id).first()
-                print('ftd trip', trip)
-                print('ss es', start_station, end_station)
+                # print('ftd trip', trip)
+                # print('ss es', start_station, end_station)
                 # building our object from first train in trip_sequence
                 first_train = trip.train
-                print('first train', first_train)
+                # print('first train', first_train)
                 first_train_schedule = first_train.schedule
                 # create an array of stop objects, the schedule for the train. 
                 first_train_stop_schedule = []
@@ -462,11 +457,11 @@ class TripSequenceElement:
         self.end_station_id = None
         self.start_station_arrival = None
         self.end_station_arrival = None
-
+        self.error = None
         # ERROR INFO BELOW
-
+        
         if isinstance(trip_info, BestTrain):
-            print('trip info', trip_info)
+            
             self.train = trip_info.first_train_only
             self.train_id = trip_info.first_train_id
             self.start_station_id = trip_info.start_station_id
@@ -477,6 +472,7 @@ class TripSequenceElement:
         # TripError element comes before build_trip_seq
         elif isinstance(trip_info, TripError):
             print('error', trip_info)
+            self.error = trip_info
         # THIS IS LOCAL EXPRESS BRANCH
         else:
             self.train_id = trip_info['train_id']

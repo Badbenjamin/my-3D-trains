@@ -62,13 +62,18 @@ def build_trip_sequence(journey_obj, train_data_obj):
         # RETURN BEST TRAIN OR TRIP ERROR?
         pre_trip_sequence = [return_sorted_trains_or_trip_error(leg, train_data_obj.start_station_id, train_data_obj.end_station_id)]
         for pre_trip_seq_element in pre_trip_sequence:
-            tse = TripSequenceElement(pre_trip_seq_element)
-            trip_sequence.append(tse)
+            if isinstance(pre_trip_seq_element, TripError):
+                trip_sequence.append(pre_trip_seq_element)
+            # print('ptse', pre_trip_seq_element)
+            elif isinstance(pre_trip_seq_element, BestTrain):
+                tse = TripSequenceElement(pre_trip_seq_element)
+                trip_sequence.append(tse)
     elif (journey_obj.local_express):
         print('2 local exp trip')
         local_express_trip = FilteredTrains(train_data_obj, train_data_obj.start_station_id, train_data_obj.end_station_id)
         # print('le_trip', local_express_trip)
         pre_trip_sequence = local_express_trip.local_express_seq
+        print('pts', pre_trip_sequence)
         # ERROR OBJ?
         if pre_trip_sequence:
             for pre_trip_seq_element in pre_trip_sequence:
