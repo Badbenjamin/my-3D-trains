@@ -29,7 +29,7 @@ def handle_multi_leg_trip(train_data_obj, journey_obj):
         trip_sequence = [] 
         leg_one_filtered_trains = FilteredTrains(train_data_obj, train_data_obj.start_station_id, start_terminus_gtfs_id)
         trip_sequence.append(return_sorted_trains_or_trip_error(leg_one_filtered_trains, train_data_obj.start_station_id, start_terminus_gtfs_id))
-        # LEFT OFF HERE. WHAT DO I DO WITH ERROR?
+        # MIGHT WANT TO USE START AND END ENDPOINTS IN FUTURE
         if isinstance(trip_sequence[0],BestTrain):
             leg_two = FilteredTrains(train_data_obj, end_origin_gtfs_id, train_data_obj.end_station_id)
             trip_sequence.append(return_sorted_trains_or_trip_error(leg_two, end_origin_gtfs_id, train_data_obj.end_station_id, trip_sequence[0].dest_arrival_time + 120))
@@ -48,7 +48,7 @@ def handle_multi_leg_trip(train_data_obj, journey_obj):
                 fastest_trip = trip
         elif isinstance(trip[-1], TripError):
             error_trip = trip
-    
+     
     if fastest_trip:  
         return fastest_trip
     elif error_trip:
@@ -56,6 +56,7 @@ def handle_multi_leg_trip(train_data_obj, journey_obj):
 
 def build_trip_sequence(journey_obj, train_data_obj):
     trip_sequence = []
+    print('jo ss', journey_obj.shared_stations)
     # no shared stations means that the trip is on the same line and does not need a local/express transfer
     if journey_obj.shared_stations == [] and not journey_obj.local_express:
         print('1 single leg trip')
@@ -69,13 +70,14 @@ def build_trip_sequence(journey_obj, train_data_obj):
             elif isinstance(pre_trip_seq_element, BestTrain):
                 tse = TripSequenceElement(pre_trip_seq_element)
                 trip_sequence.append(tse)
-    elif (journey_obj.local_express):
+    elif (journey_obj.local_express) and journey_obj.shared_stations == []:
         print('2 local exp trip')
         local_express_trip = FilteredTrains(train_data_obj, train_data_obj.start_station_id, train_data_obj.end_station_id)
         # print('le_trip', local_express_trip)
         pre_trip_sequence = local_express_trip.local_express_seq
         print('pts', pre_trip_sequence)
         # ERROR OBJ?
+        # AM I MAKING THE ERROR TWICE? LEFT OFF HERE 3/19
         if pre_trip_sequence:
             for pre_trip_seq_element in pre_trip_sequence:
                 tse = TripSequenceElement(pre_trip_seq_element)
@@ -88,9 +90,7 @@ def build_trip_sequence(journey_obj, train_data_obj):
             )
             trip_sequence.append(le_error)
     else:
-        print('3 multi leg trip')
         pre_trip_sequence = handle_multi_leg_trip(train_data_obj, journey_obj)
-        print('mlt pretripseq', pre_trip_sequence)
         # What about TripError element?
         for pre_trip_seq_element in pre_trip_sequence:
             if isinstance(pre_trip_seq_element, TripError):

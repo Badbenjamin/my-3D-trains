@@ -66,7 +66,7 @@ class Journey:
         start_and_end_routes = list(set(self.start_station_routes + self.end_station_routes))
         
         journey_info_obj = modules_classes.get_journey_info(self.start_station_routes, self.end_station_routes)
-      
+        print('jio', journey_info_obj)
         # if not on same route, and also not on same colored line, the trip requires a transfer btw lines
         if (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == False):
             # we need to find stations or complexes shared between the start and end lines
@@ -89,7 +89,7 @@ class Journey:
             # IF THERE ARE MULTIPLE SHARED STATIONS, WE NEED TO FIND THE FASTEST ROUTE
             if shared_stations:
                 self.transfer_info_obj_array = modules_classes.get_transfer_station_info(shared_stations, self.start_station_routes, self.end_station_routes)
-        # 
+        # ERROR FOR SUTPHIN BLVD JZE TO CLINTON WASH C. RARE CASE WHEN A TRIP WITH A TRANSFER IS BETTER THAN STAYING ON ONE TRAIN.
         elif (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == True):
             self.local_express = True
         # SAME LINE EXPRESS?
