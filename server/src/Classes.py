@@ -9,6 +9,7 @@ from google.transit import gtfs_realtime_pb2
 from models import Station
 import pprint
 current_time = datetime.now()
+current_time_timestamp = round(current_time.timestamp())
 
 from collections import Counter
 
@@ -229,9 +230,11 @@ class LocalExpress:
 
 # FilteredTrains class takes train_data (gtfs json response), and start and end station gtfs id.
 # It filters out trains that are irrelevant to our trip (not stoping at both stations) and converts json into an array of objects of the Train class.
+# COULD PASS START ENDPOINT DATA OR END ENDPOINT DATA IN TO MAKE MORE EFFICIENT ON TWO LEG TRIPS
 class FilteredTrains:
 
-    def __init__(self, train_data, start_station_id, end_station_id):
+    def __init__(self, train_data, start_station_id, end_station_id, time=current_time_timestamp):
+        print('ctft', time)
         self.all_train_data = train_data.all_train_data
         self.start_station_id = start_station_id
         self.end_station_id = end_station_id
@@ -242,22 +245,23 @@ class FilteredTrains:
         self.train_obj_array = None
         # this is passed to TripError if filter produces empty array
         self.trip_error_obj = None
-        self.local_express = False
+        self.best_train = None
         self.local_express_seq = None
         
         if train_data.local_express:
-            self.local_express = True
+            
             # either a pair of trains with a transfer station, a single train (local faster), or no trains (should produce error later)
             best_trains_and_transfer = modules_classes.find_best_trains_and_transfer_local_express(train_data, start_station_id, end_station_id)
             
-            
-            local_express_obj = LocalExpress(
-                best_trains_and_transfer_obj = best_trains_and_transfer,
-                start_station_id = start_station_id,
-                end_station_id= end_station_id
-            )
-            self.local_express_seq = local_express_obj.local_express_seq
-            print('le seq', self.local_express_seq)
+            if best_trains_and_transfer:
+                local_express_obj = LocalExpress(
+                    best_trains_and_transfer_obj = best_trains_and_transfer,
+                    start_station_id = start_station_id,
+                    end_station_id= end_station_id
+                )
+                self.local_express_seq = local_express_obj.local_express_seq
+            else:
+                self.trip_error_obj = TripError(self.all_train_data, self.start_station, self.end_station)
         else:
             # filter the gtfs json data for trains relevant to the user's trip.
             # a successful trip (both stations in service), will yield a list of trains for our trip.
@@ -265,7 +269,10 @@ class FilteredTrains:
             self.filtered_train_data = modules_classes.filter_trains_for_stations_direction_future_arrival(self.all_train_data, self.start_station, self.end_station)
             
             if len(self.filtered_train_data) > 0:
-                self.train_obj_array = trains_to_objects(self.filtered_train_data)
+                
+                train_obj_array = trains_to_objects(self.filtered_train_data)
+                self.best_train = BestTrain(train_obj_array, start_station_id, end_station_id, time)
+                # print('bt', best_train)
             elif (self.filtered_train_data == []):
                 self.trip_error_obj = TripError(self.all_train_data, self.start_station_id, self.end_station_id)
             

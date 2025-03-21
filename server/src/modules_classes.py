@@ -506,10 +506,4 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
      elif best_single_train and not best_train_pair:
           return best_single_train
      else:
-          from Classes import TripError
-          local_express_error = TripError(
-               train_data= train_data.all_train_data,
-               start_station_id= start_station_id,
-               end_station_id= end_station_id
-          )
-          return local_express_error
+          return False
