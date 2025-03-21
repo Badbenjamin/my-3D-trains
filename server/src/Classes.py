@@ -114,9 +114,7 @@ class Journey:
         return f'<Journey {self.start_station.stop_name} to {self.end_station.stop_name} through{self.shared_stations} at {self.time}>'
 
 # accepts journey object as arg
-# 
 # all_train_data will provide every relevant train for a multi leg trip
-
 class TrainData:
 
     def __init__(self, journey_object):
@@ -180,6 +178,7 @@ class LocalExpress:
         if isinstance(best_trains_and_transfer_obj, TripError):
             self.error = True
         elif best_trains_and_transfer_obj['transfer_station_start_train']:
+            # Bug if best train is local and not express pair
             self.two_trains = True
             self.transfer_station = best_trains_and_transfer_obj['transfer_station_start_train']
             self.start_station_arrival = best_trains_and_transfer_obj['start_station_arrival']
@@ -256,7 +255,6 @@ class FilteredTrains:
                 best_trains_and_transfer_obj = best_trains_and_transfer,
                 start_station_id = start_station_id,
                 end_station_id= end_station_id
-                
             )
             self.local_express_seq = local_express_obj.local_express_seq
             print('le seq', self.local_express_seq)
