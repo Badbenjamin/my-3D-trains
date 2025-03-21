@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import math
+from operator import attrgetter
 
 # CIRCULAR IMPORT ISSUE
 # from Objects import Train, Stop
@@ -7,6 +8,8 @@ from Classes import current_time
 from Classes import Station
 import pprint
 # from Objects import Stop
+
+current_time_int = int(math.ceil(current_time.timestamp()))
 
 # convert 10 digit POSIX timestamp used in feed to readable format
 def convert_timestamp(timestamp):
@@ -39,6 +42,7 @@ def check_for_station_service_on_failed_trip(train_data, start_station_id, end_s
     start_service = False
     end_service = False
     start_to_end_service = False
+    
     for train_feed in train_data:
             
             for train in train_feed.entity: 
@@ -81,7 +85,7 @@ def check_for_correct_direction(stops, start_station_id, end_station_id):
 def check_station_arrival_or_departure(stop, station_id, deptarture_or_arrival):
         arrival_time = stop.arrival.time
         departure_time = stop.departure.time
-        current_time_int = int(math.ceil(current_time.timestamp()))
+        # current_time_int = int(math.ceil(current_time.timestamp()))
         deptarture_or_arrival_time = None
         if deptarture_or_arrival == "departure":
              deptarture_or_arrival_time = departure_time
@@ -178,21 +182,143 @@ def get_station_routes(station_daytime_routes):
 # returns True if a route from the start station routes is present in the end station routes
 # NEEDS TO BE ABLE TO HANDLE EXPRESS/LOCAL LOGIC
 
-def same_line(start_station_routes, end_station_routes):
-    same_line = None
-    for route in start_station_routes:
-            if route not in end_station_routes:
-                same_line = False
-            else:
-                 same_line = True
-    for route in end_station_routes:
-            if route not in start_station_routes:
-                same_line = False
-            else:
-                same_line = True
-    return same_line
+def start_shares_routes_with_end(start_station_routes, end_station_routes):
+    shared_routes_between_start_end_stations = [route for route in end_station_routes if route in start_station_routes]
+    if shared_routes_between_start_end_stations == []:
+         return False
+    else:
+         return True
 
+def get_station_express_local_info(lines_with_express_obj, station_routes):
+    #  returns and array 
+    routes_with_express_or_local = []
+    for route in station_routes:
+        # result_obj['start_routes'].append(start_route)
+        for line_obj in lines_with_express_obj:
+            if route in line_obj:
+                selected_line_obj = lines_with_express_obj[line_obj]
+                for line_route in selected_line_obj:
+                     if route == line_route:
+                        # result_obj['start_route']
+                        routes_with_express_or_local.append({route : selected_line_obj[line_route]})
+    return routes_with_express_or_local
+
+def on_same_line(lines_with_express_obj, start_station_routes, end_station_routes):
+    on_same_line = False
+    for start_route in start_station_routes:
+         for end_route in end_station_routes:
+              for line_obj in lines_with_express_obj:
+                   if start_route in line_obj and end_route in line_obj:
+                        on_same_line = True
+    return on_same_line 
+
+def station_contains_express(station_routes_array_with_express_or_local, local_or_express):
+    station_contains_express = False
+    station_contains_local = False
+    for route_obj in station_routes_array_with_express_or_local:
+         for key in route_obj:
+               if route_obj[key]:
+                    station_contains_express = True
+               elif route_obj[key] == False:
+                    station_contains_local = True
+    if local_or_express == "local":
+         return station_contains_local
+    elif local_or_express == "express":
+         return station_contains_express
+               
+
+def get_journey_info(start_station_routes, end_station_routes):
+
+    lines_with_express = {
+        # Blue lines
+        "ACE": {
+            "A": True,   # Express
+            "C": False,  # Local
+            "E": True    # Express
+        },
+        
+        # Orange lines
+        "BDFM": {
+            "B": True,   # Express
+            "D": True,   # Express
+            "F": True,   # Express on some segments
+            "M": False   # Local
+        },
+        
+        # Yellow lines
+        "NQRW": {
+            "N": True,   # Express
+            "Q": True,   # Express
+            "R": False,  # Local
+            "W": False   # Local
+        },
+        
+        # Red lines
+        "123": {
+            "1": False,  # Local
+            "2": True,   # Express
+            "3": True    # Express
+        },
+        
+        # Green lines
+        "456": {
+            "4": True,   # Express
+            "5": True,   # Express
+            "6": False,  # Local
+            "6x": True  # Express variant (rush hours)
+        },
+        
+        # Purple line
+        "7": {
+            "7": False,      # Local
+            "7x": True  # Express
+        },
+        
+        # Brown lines
+        "JZ": {
+            "J": False,  # Local (express during rush hours)
+            "Z": True    # Express (rush hours)
+        },
+        
+        # Light green line
+        "G": {
+            "G": False   # Local
+        },
+        
+        # Gray line
+        "L": {
+            "L": False   # Local
+        },
+        
+        # Shuttles
+        "S": {
+            "S": False   # All shuttle services
+        }
+    }
+    
+    result_obj ={
+         "start_routes" : [],
+         "end_routes" : [],
+         "on_same_colored_line" : None,
+         "start_shares_routes_with_end" : None,
+         "start_contains_express" : None,
+         "start_contains_local" : None,
+         "end_contains_express" : None,
+         "end_contains_local" : None
+    }
+    
+    result_obj['start_routes'] = get_station_express_local_info(lines_with_express, start_station_routes)
+    result_obj['end_routes'] = get_station_express_local_info(lines_with_express, end_station_routes)
+    result_obj['on_same_colored_line'] = on_same_line(lines_with_express, start_station_routes, end_station_routes)
+    result_obj['start_shares_routes_with_end'] = start_shares_routes_with_end(start_station_routes, end_station_routes)             
+    result_obj['start_contains_express'] = station_contains_express(result_obj['start_routes'], "express")
+    result_obj['start_contains_local'] = station_contains_express(result_obj['start_routes'], "local")
+    result_obj['end_contains_express'] = station_contains_express(result_obj['end_routes'], "express")
+    result_obj['end_contains_local'] = station_contains_express(result_obj['end_routes'], "local")
+
+    return result_obj
 # takes daytime routes of a station (start or end), and returns the complex ids of all stations that are served by that route (eg. "G")
+# NOT TURING UP BROADWAY JUNCTION FOR MYRTLE AVE JMZ?
 def find_complex_ids(daytime_routes):
      complex_ids = []
      for route in (daytime_routes):
@@ -202,7 +328,7 @@ def find_complex_ids(daytime_routes):
                         # add the complex id of that station to our result
                         if station.complex_id not in complex_ids:
                             complex_ids.append(station.complex_id)
-                return complex_ids
+     return complex_ids
 
 # convert complex ids to Stations   
 def complex_ids_to_stations(shared_complexes):
@@ -222,18 +348,168 @@ def get_shared_stations(stations_in_complexes, routes):
                 shared_stations.append(station) 
     return list(set(shared_stations))
 
-# def build_trip_sequence(journey_obj, train_data_obj):
-#     trip_sequence = []
-#     if journey_obj.shared_stations == []:
-#         train_objs = FilteredTrains(train_data_obj.all_train_data, train_data_obj.start_station_id, train_data_obj.end_station_id)
-#         if (train_objs.train_obj_array):
-#             sorted_trains = SortedTrains(train_objs.train_obj_array, train_data_obj.start_station_id, train_data_obj.end_station_id)
-#             trip_sequence.append(sorted_trains)
-#         else:
-#             error = TripError(train_objs)
-#             trip_sequence.append(error)
-#     else:
-#         leg_one = FilteredTrains(train_data_obj.all_train_data, train_data_obj.start_station_id, train_data_obj.start_station_terminus_id)
-#         trip_sequence.append(leg_one)
-#         leg_two = FilteredTrains(train_data_obj.all_train_data, train_data_obj.end_station_origin_id, train_data_obj.end_station_id, trip_sequence[0].dest_arrival_time + 120)
-#         trip_sequence.append(leg_two)
+def get_station_arrival_or_departure_time(stops, station_id, arrival_or_departure):
+     
+     for stop in stops:
+          if stop.stop_id[:-1] == station_id:
+               if arrival_or_departure == "arrival":
+                    return stop.arrival.time
+               elif arrival_or_departure == "departure":
+                    return stop.departure.time
+
+def get_transfer_station_info(shared_stations, start_station_routes, end_station_routes):
+
+    start_station_termini = []
+    end_station_origins = []
+    transfer_station_obj_array = []
+    for station in shared_stations:
+        shared_station_routes = station.daytime_routes.split()
+        for route in start_station_routes:
+            if route in shared_station_routes:
+                start_station_termini.append(station)
+        for route in end_station_routes:
+            if route in shared_station_routes:
+                end_station_origins.append(station)
+    
+    for start_station in start_station_termini:
+          transfer_info_obj = {
+            'complex_id' : None,
+            'start_term' : None,
+            'end_origin' : None
+          }
+          for end_station in end_station_origins:
+               if start_station.complex_id == end_station.complex_id:
+                    transfer_info_obj['complex_id'] = start_station.complex_id
+                    transfer_info_obj['start_term'] = start_station
+                    transfer_info_obj['end_origin'] = end_station
+          transfer_station_obj_array.append(transfer_info_obj)
+    return transfer_station_obj_array
+
+def get_trains_serving_start_station_end_station_or_both(train_data, start_station_id, end_station_id):
+     trains_serving_start_station = []
+     trains_serving_end_station = []
+     trains_traveling_between_stations = []
+     for train_feed in train_data.all_train_data:
+            for train in train_feed.entity: 
+                if train.HasField('trip_update'):
+                    stops = create_stop_schedule(train)
+                    stops_all_info = [stop for stop in train.trip_update.stop_time_update]
+                    if check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id) and check_for_correct_direction(stops, start_station_id, end_station_id):
+                         new_train_obj = {
+                              'train_id' : train.id,
+                              'train' : train,
+                              'start_station_arrival' : get_station_arrival_or_departure_time(stops_all_info, start_station_id, "arrival"),
+                              'end_station_arrival' : get_station_arrival_or_departure_time(stops_all_info, end_station_id, 'arrival')
+                         }
+                         if new_train_obj['start_station_arrival'] < new_train_obj['end_station_arrival']:
+                            trains_traveling_between_stations.append(new_train_obj)
+                    elif check_for_station_service(stops, start_station_id) and (not check_for_station_service(stops, end_station_id)):
+                         trains_serving_start_station.append(train)
+                    elif check_for_station_service(stops, end_station_id) and (not check_for_station_service(stops, start_station_id)):
+                         trains_serving_end_station.append(train)
+     return {'trains_serving_start_station' : trains_serving_start_station, 'trains_serving_end_station' : trains_serving_end_station, 'trains_traveling_between_stations' : trains_traveling_between_stations}
+
+# MOSTLY WORKS. CHECK IF TRANSFER IS POSSIBLE. MIGHT HAVE SOME FLAW THERE. 
+def find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array):
+     # pairs of trains where the start train and end train (each stoping at start or end station), have a shared station in schedules
+     train_pairs_with_transfer = []
+    #  looping throuth all trains that serve the start station
+     for start_train in trains_serving_start_station_array:
+        start_train_stops = [stop for stop in start_train.trip_update.stop_time_update]
+        start_train_stops_no_direction = [stop.stop_id[:-1] for stop in start_train.trip_update.stop_time_update]
+        start_station_info = None
+        # for each start train, loop through every train serving the end station
+        for end_train in trains_serving_end_station_array:   
+            end_train_stops = [stop for stop in end_train.trip_update.stop_time_update]
+            end_train_stops_no_direction = [stop.stop_id[:-1] for stop in end_train.trip_update.stop_time_update]
+
+            end_station_info = None
+
+            transfer_station_id = None
+            start_train_transfer_station_arrival_time = None
+            end_train_transfer_station_departure_time = None
+            # looping through stop schedule of train serving start station
+            for start_train_stop in start_train_stops:
+                    if start_train_stop.stop_id[:-1] == start_station_id:
+                        start_station_info = start_train_stop
+                    # looping through schedule of train arriving at dest station
+                    for end_train_stop in end_train_stops: 
+                        if end_train_stop.stop_id[:-1] == end_station_id:
+                            end_station_info = end_train_stop
+                            
+                        if start_train_stop.stop_id[:-1] == end_train_stop.stop_id[:-1]:
+                            transfer_station_id = start_train_stop.stop_id[:-1]
+                            start_train_transfer_station_arrival_time = start_train_stop.arrival.time
+                            end_train_transfer_station_departure_time = end_train_stop.arrival.time
+                            
+                        if (start_station_info) and (end_station_info) and (transfer_station_id) and (start_station_info.arrival.time > current_time_int) and (start_train_transfer_station_arrival_time + 60 < end_train_transfer_station_departure_time) and (end_train_transfer_station_departure_time - start_train_transfer_station_arrival_time <= 1200) and (start_train_stops_no_direction.index(start_station_id) < start_train_stops_no_direction.index(transfer_station_id) and (end_train_stops_no_direction.index(transfer_station_id) < end_train_stops_no_direction.index(end_station_id))):
+                            new_train_pair_obj = {
+                                'start_train_id' : start_train.id,
+                                'end_train_id' : end_train.id,
+                                'start_train' : start_train,
+                                'end_train' : end_train,
+                                'start_station_arrival' : start_station_info.arrival.time,
+                                'end_station_arrival' : end_station_info.arrival.time,
+                                'transfer_station_arrival' : start_train_transfer_station_arrival_time,
+                                'transfer_station_departure' : end_train_transfer_station_departure_time,
+                                'transfer_station_start_train' : start_train_stop.stop_id[:-1],
+                                'transfer_station_end_train' : end_train_stop.stop_id[:-1],
+                            }
+                            
+                            # make sure duplicates are not in array of train pair objs. Only include unique pairs with unique transfers. 
+                            if train_pairs_with_transfer:
+                                in_array = False
+                                for prev_train_obj in train_pairs_with_transfer:
+                                    if (prev_train_obj['start_train_id'] == new_train_pair_obj['start_train_id']) and (prev_train_obj['end_train_id'] == new_train_pair_obj['end_train_id']) and (prev_train_obj['transfer_station_start_train'] == new_train_pair_obj['transfer_station_start_train']):
+                                        in_array = True
+                                    else:
+                                        in_array = False
+                                if in_array == False:
+                                    train_pairs_with_transfer.append(new_train_pair_obj)
+                            else:
+                                train_pairs_with_transfer.append(new_train_pair_obj)
+                           
+     
+     return train_pairs_with_transfer
+
+def find_train_with_soonest_arrival(train_array):
+     best_train = None
+     if train_array:
+          for train in train_array:
+               if (best_train == None) and (train['start_station_arrival'] > current_time_int):
+                    best_train = train
+               elif (train['end_station_arrival'] < best_train['end_station_arrival']) and (train['start_station_arrival'] > current_time_int):
+                    best_train = train
+     return best_train
+               
+
+def find_best_trains_and_transfer_local_express(train_data, start_station_id, end_station_id):
+    
+     trains_serving_stations_obj = get_trains_serving_start_station_end_station_or_both(train_data, start_station_id, end_station_id)
+     trains_serving_start_station_array = trains_serving_stations_obj['trains_serving_start_station']
+     trains_serving_end_station_array = trains_serving_stations_obj['trains_serving_end_station']
+     trains_traveling_between_stations_array = trains_serving_stations_obj['trains_traveling_between_stations']
+     
+     
+     train_pairs_with_transfer_array = find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array)
+          
+     best_train_pair = find_train_with_soonest_arrival(train_pairs_with_transfer_array)
+     best_single_train = find_train_with_soonest_arrival(trains_traveling_between_stations_array)
+     
+     if best_train_pair and best_single_train:
+          if best_train_pair['end_station_arrival'] < best_single_train['end_station_arrival']:
+               return best_train_pair
+          else: 
+               return best_single_train
+     elif best_train_pair and not best_single_train:
+          return best_train_pair
+     elif best_single_train and not best_train_pair:
+          return best_single_train
+     else:
+          from Classes import TripError
+          local_express_error = TripError(
+               train_data= train_data.all_train_data,
+               start_station_id= start_station_id,
+               end_station_id= end_station_id
+          )
+          return local_express_error
