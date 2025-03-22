@@ -241,8 +241,6 @@ class FilteredTrains:
         self.start_station = Station.query.filter(Station.gtfs_stop_id == start_station_id).first()
         self.end_station = Station.query.filter(Station.gtfs_stop_id == end_station_id).first()
         
-        # this is passed to BestTrain if filter yields results
-        self.train_obj_array = None
         # this is passed to TripError if filter produces empty array
         self.trip_error_obj = None
         self.best_train = None
@@ -275,9 +273,9 @@ class FilteredTrains:
                 # print('bt', best_train)
             elif (self.filtered_train_data == []):
                 self.trip_error_obj = TripError(self.all_train_data, self.start_station_id, self.end_station_id)
-            
+        print('leseq', self.local_express_seq)
     def __repr__(self):
-        if (self.train_obj_array != None):
+        if (self.best_train):
             return f'<FilteredTrains #Trains {len(self.filtered_train_data)} between {self.start_station_id} and {self.end_station_id} >'
         elif (self.local_express):
             return f'<FilteredTrains Local->Exp trip {self.local_express_seq} >'
@@ -309,11 +307,12 @@ class TripError:
 class BestTrain:
 
     def __init__(self, train_obj_array, start_station_id, end_station_id, time):
+        # print('time', time)
         self.train_array = train_obj_array
         self.start_station_id = start_station_id
         self.end_station_id = end_station_id
         self.sorted_trains  = modules_classes.sort_trains_by_arrival_at_destination(train_obj_array, start_station_id, end_station_id, time)
-
+        print('st', self.sorted_trains)
         self.first_train_and_schedule = self.sorted_trains[0]
         self.first_train_only = self.first_train_and_schedule['train']
         self.first_train_id = self.first_train_only.trip_id
