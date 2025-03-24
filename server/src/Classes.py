@@ -259,7 +259,7 @@ class FilteredTrains:
                 )
                 self.local_express_seq = local_express_obj.local_express_seq
             else:
-                self.trip_error_obj = TripError(self.all_train_data, self.start_station, self.end_station)
+                self.trip_error_obj = TripError(self.all_train_data, self.start_station.gtfs_stop_id, self.end_station.gtfs_stop_id)
         else:
             # filter the gtfs json data for trains relevant to the user's trip.
             # a successful trip (both stations in service), will yield a list of trains for our trip.
@@ -277,7 +277,7 @@ class FilteredTrains:
     def __repr__(self):
         if (self.best_train):
             return f'<FilteredTrains #Trains {len(self.filtered_train_data)} between {self.start_station_id} and {self.end_station_id} >'
-        elif (self.local_express):
+        elif (self.local_express_seq):
             return f'<FilteredTrains Local->Exp trip {self.local_express_seq} >'
         else:
             return f'<FilteredTrains ERROR {self.trip_error_obj.start_station_id} {self.trip_error_obj.start_station_service} {self.trip_error_obj.end_station_id} {self.trip_error_obj.end_station_service}>'
