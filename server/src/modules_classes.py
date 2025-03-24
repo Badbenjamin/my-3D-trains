@@ -455,6 +455,7 @@ def find_local_and_express_train_pairs_with_transfer(start_station_id, end_stati
                                 'end_station_arrival' : end_station_info.arrival.time,
                                 'transfer_station_arrival' : start_train_transfer_station_arrival_time,
                                 'transfer_station_departure' : end_train_transfer_station_departure_time,
+                                'transfer_station_time_gap' : end_train_transfer_station_departure_time - start_train_transfer_station_arrival_time,
                                 'transfer_station_start_train' : start_train_stop.stop_id[:-1],
                                 'transfer_station_end_train' : end_train_stop.stop_id[:-1],
                             }
@@ -484,6 +485,8 @@ def find_train_with_soonest_arrival(train_array):
                elif (train['end_station_arrival'] < best_train['end_station_arrival']) and (train['start_station_arrival'] > current_time_int):
                     best_train = train
      return best_train
+
+
                
 
 def find_best_trains_and_transfer_local_express(train_data, start_station_id, end_station_id):
@@ -496,9 +499,18 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
      
      train_pairs_with_transfer_array = find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array)
           
-     best_train_pair = find_train_with_soonest_arrival(train_pairs_with_transfer_array)
-     best_single_train = find_train_with_soonest_arrival(trains_traveling_between_stations_array)
+     best_train_pairs_sorted = sorted(train_pairs_with_transfer_array, key= lambda tp : (tp['end_station_arrival'], -tp['transfer_station_time_gap']))
+     best_train_pair = None
+     if best_train_pairs_sorted:
+          best_train_pair = best_train_pairs_sorted[0]
+    
      
+     best_single_trains_sorted = sorted(trains_traveling_between_stations_array, key = lambda bst: bst['end_station_arrival'])
+     best_single_train = None
+     if best_single_trains_sorted:
+          best_single_train = best_single_trains_sorted[0]
+
+
      if best_train_pair and best_single_train:
           if best_train_pair['end_station_arrival'] < best_single_train['end_station_arrival']:
                return best_train_pair
