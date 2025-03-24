@@ -510,7 +510,7 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
      if best_single_trains_sorted:
           best_single_train = best_single_trains_sorted[0]
 
-     print('best train pair', best_single_train)
+     
      if best_train_pair and best_single_train:
           if best_train_pair['end_station_arrival'] < best_single_train['end_station_arrival']:
                return best_train_pair
