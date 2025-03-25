@@ -19,29 +19,7 @@ def filtered_trains_to_trip_sequence_element_or_trip_error(filtered_trains):
         trip_sequence.append(tse)
     return trip_sequence
 
-# Build a trip sequence on a multi leg trip   
-# Not currently working if the second leg of the trip requires a local to express transfer
-def handle_trip_with_transfer_btw_lines(train_data_obj, journey_obj):
-    # all possible trips for multiple transfer stations
-    possible_trip_sequences = []
-    
-    for transfer_obj in journey_obj.transfer_info_obj_array:
-        
-        start_terminus_gtfs_id = transfer_obj['start_term'].gtfs_stop_id
-        end_origin_gtfs_id = transfer_obj['end_origin'].gtfs_stop_id
-        trip_sequence = [] 
-
-        leg_one_filtered_trains = FilteredTrains(train_data_obj, train_data_obj.start_station_id, start_terminus_gtfs_id, current_time_int)
-        trip_sequence = filtered_trains_to_trip_sequence_element_or_trip_error(leg_one_filtered_trains)
-        
-        if isinstance(trip_sequence[0],TripSequenceElement):
-            leg_two_filtered_trains = FilteredTrains(train_data_obj, end_origin_gtfs_id, train_data_obj.end_station_id, leg_one_filtered_trains.best_train.dest_arrival_time)
-            
-            leg_2_trip_sequence_element = filtered_trains_to_trip_sequence_element_or_trip_error(leg_two_filtered_trains)
-            for trip_seq in leg_2_trip_sequence_element:
-                trip_sequence.append(trip_seq)
-        possible_trip_sequences.append(trip_sequence)
-
+def find_fastest_trip_or_return_error(possible_trip_sequences):
     fastest_trip = None
     error_trip = None
     # Find fasted trip sequence in possible trip sequences array.
@@ -58,7 +36,30 @@ def handle_trip_with_transfer_btw_lines(train_data_obj, journey_obj):
     elif error_trip:
         return error_trip
 
-    
+# Build a trip sequence on a multi leg trip   
+# Not currently working if the second leg of the trip requires a local to express transfer
+def handle_trip_with_transfer_btw_lines(train_data_obj, journey_obj):
+    # all possible trips for multiple transfer stations
+    possible_trip_sequences = []
+    for transfer_obj in journey_obj.transfer_info_obj_array:
+        
+        start_terminus_gtfs_id = transfer_obj['start_term'].gtfs_stop_id
+        end_origin_gtfs_id = transfer_obj['end_origin'].gtfs_stop_id
+        trip_sequence = [] 
+
+        leg_one_filtered_trains = FilteredTrains(train_data_obj, train_data_obj.start_station_id, start_terminus_gtfs_id, current_time_int)
+        trip_sequence = filtered_trains_to_trip_sequence_element_or_trip_error(leg_one_filtered_trains)
+        
+        if isinstance(trip_sequence[0],TripSequenceElement):
+            leg_two_filtered_trains = FilteredTrains(train_data_obj, end_origin_gtfs_id, train_data_obj.end_station_id, leg_one_filtered_trains.best_train.dest_arrival_time)
+            leg_2_trip_sequence_element = filtered_trains_to_trip_sequence_element_or_trip_error(leg_two_filtered_trains)
+
+            for trip_seq in leg_2_trip_sequence_element:
+                trip_sequence.append(trip_seq)
+        possible_trip_sequences.append(trip_sequence)
+
+    return find_fastest_trip_or_return_error(possible_trip_sequences)
+
 
 def build_trip_sequence(journey_obj, train_data_obj):
     trip_sequence = []
@@ -66,6 +67,7 @@ def build_trip_sequence(journey_obj, train_data_obj):
         trip_sequence = handle_trip_with_transfer_btw_lines(train_data_obj, journey_obj)
     else:
         leg = FilteredTrains(train_data_obj, train_data_obj.start_station_id, train_data_obj.end_station_id, current_time_int)
+        
         trip_sequence = filtered_trains_to_trip_sequence_element_or_trip_error(leg)
        
     return trip_sequence

@@ -161,7 +161,7 @@ def quick_sort_trains_by_arrival_time(train_obj_array):
 # takes list of JSON trains (from filter_trains_for_stations_direction_future_arrival()) and returns list of trains sorted by arrival time at destination.
 # MULTI LEG TRIP PROBLEM WITH QUICK SORT
 def sort_trains_by_arrival_at_destination(filtered_train_data_object, start_station_id, dest_station_id, time):
-        print('sort func', time)
+        
         # NO DESTINATION ARRIVAL TIME
         # take JSON train array (filtered) and build objects with {train, dest arrival, origin arrival} key value pairs
         trains_with_arrival_objs_array = create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id)
@@ -169,7 +169,6 @@ def sort_trains_by_arrival_at_destination(filtered_train_data_object, start_stat
         # use quicksort to sort array of objects by arrival at destination.
         # 7 TRAIN TERMINUSES GIVING ORIGIN ARRIVAL TIME OF ZERO
         sorted_trains = [train for train in quick_sort_trains_by_arrival_time(trains_with_arrival_objs_array) if train['origin_departure_time'] >= time]
-        print('st in func',sorted_trains)
         return sorted_trains
 
 # return a list of routes eg. [A,C,E] for a station
@@ -321,7 +320,6 @@ def get_journey_info(start_station_routes, end_station_routes):
 
     return result_obj
 # takes daytime routes of a station (start or end), and returns the complex ids of all stations that are served by that route (eg. "G")
-# NOT TURING UP BROADWAY JUNCTION FOR MYRTLE AVE JMZ?
 def find_complex_ids(daytime_routes):
      complex_ids = []
      for route in (daytime_routes):
@@ -333,7 +331,6 @@ def find_complex_ids(daytime_routes):
                             complex_ids.append(station.complex_id)
      return complex_ids
 
-# convert complex ids to Stations   
 def complex_ids_to_stations(shared_complexes):
     complex_stations =  []
     for complex_number in shared_complexes:
@@ -342,7 +339,6 @@ def complex_ids_to_stations(shared_complexes):
             complex_stations.append(complex)
     return complex_stations
 
-# 
 def get_shared_stations(stations_in_complexes, routes):
     shared_stations = []
     for station in stations_in_complexes:
@@ -500,7 +496,6 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
      best_train_pair = None
      if best_train_pairs_sorted:
           best_train_pair = best_train_pairs_sorted[0]
-     print('btp', best_train_pair )
      
      best_single_trains_sorted = sorted(trains_traveling_between_stations_array, key = lambda bst: bst['end_station_arrival'])
      best_single_train = None
@@ -523,7 +518,6 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
 def get_endpoints_for_station(station_endpoints):
     endpoints = []
     for endpoint in station_endpoints:
-        # print('ep', endpoint.endpoint.endpoint)
         endpoints.append(endpoint.endpoint.endpoint)
     
     de_duped_endpoints = list(set(endpoints))
