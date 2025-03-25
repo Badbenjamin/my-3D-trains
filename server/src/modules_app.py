@@ -1,106 +1,74 @@
 from datetime import datetime
-from Classes import  FilteredTrains, BestTrain, TripSequenceElement, TripError
-import inspect
-import pprint
+import math
+from Classes import  FilteredTrains, TripSequenceElement, TripError
+
 current_time = datetime.now()
+current_time_int = int(math.ceil(current_time.timestamp()))
 
-def return_trip_sequcence_element_or_trip_error(filtered_trains, start_station_id, end_station_id, time=(round(current_time.timestamp()))):
-    pass
-# if FilteredTrains obj (leg) has train info, the trains are sorted and set to info_for_trip_sequence
-# if leg has TripError object instead, then that is set to info_for_trip_sequence
-def return_best_train_or_trip_error(leg_filtered_trains, start_station_id, end_station_id, time=(round(current_time.timestamp()))):
-    info_for_trip_sequence = None
-    # LEFT OFF HERE, need to get error passed to trip sequence, getting close...
-    if (leg_filtered_trains.train_obj_array != None):
-        sorted_trains = BestTrain(leg_filtered_trains.train_obj_array, start_station_id, end_station_id, time)
-        info_for_trip_sequence = sorted_trains
-    elif (leg_filtered_trains.trip_error_obj != None):
-        info_for_trip_sequence = leg_filtered_trains.trip_error_obj
-    return info_for_trip_sequence
+def filtered_trains_to_trip_sequence_element_or_trip_error(filtered_trains):
+    trip_sequence = []
+    # FilteredTrains returns nothing, a TripError object is created and stored in Filterdty
+    if filtered_trains.trip_error_obj:
+        trip_sequence.append(filtered_trains.trip_error_obj)
+    elif (filtered_trains.local_express_seq):
+        for train in filtered_trains.local_express_seq:
+            tse = TripSequenceElement(train)
+            trip_sequence.append(tse)
+    elif (filtered_trains.best_train):
+        tse = TripSequenceElement(filtered_trains.best_train)
+        trip_sequence.append(tse)
+    return trip_sequence
 
-# WORKING BUT COULD USE REFACTORING AND DOCUMENTATION
-# STRANGELY WORKS FOR LOCAL TO EXPRESS? MIGHT NEED TO CHECK IN ON THIS...
-# Ok for two stations but kind of repetitive for lots of them
-def handle_multi_leg_trip(train_data_obj, journey_obj):
-    # CHECK ALL POSSIBLE TRANSFER STATIONS AND THEN RETURN ONE WITH EARLIEST ARRIVAL
-    trip_sequences = []
-    print('toa', journey_obj.transfer_info_obj_array)
-    for transfer_obj in journey_obj.transfer_info_obj_array:
-        start_terminus_gtfs_id = transfer_obj['start_term'].gtfs_stop_id
-        end_origin_gtfs_id = transfer_obj['end_origin'].gtfs_stop_id
-        trip_sequence = [] 
-        leg_one_filtered_trains = FilteredTrains(train_data_obj, train_data_obj.start_station_id, start_terminus_gtfs_id)
-        trip_sequence.append(return_best_train_or_trip_error(leg_one_filtered_trains, train_data_obj.start_station_id, start_terminus_gtfs_id))
-        # MIGHT WANT TO USE START AND END ENDPOINTS IN FUTURE
-        if isinstance(trip_sequence[0],BestTrain):
-            leg_two = FilteredTrains(train_data_obj, end_origin_gtfs_id, train_data_obj.end_station_id)
-            trip_sequence.append(return_best_train_or_trip_error(leg_two, end_origin_gtfs_id, train_data_obj.end_station_id, trip_sequence[0].dest_arrival_time + 120))
-        
-        trip_sequences.append(trip_sequence)
-    
+def find_fastest_trip_or_return_error(possible_trip_sequences):
     fastest_trip = None
     error_trip = None
-    print('trp sequenses', trip_sequences)
-    for trip in trip_sequences:
-        # trip[-1] is the second sorted trains obj, with the arrival at destination
-        if isinstance(trip[-1], BestTrain):
+    # Find fasted trip sequence in possible trip sequences array.
+    for trip in possible_trip_sequences:
+        if isinstance(trip[-1], TripSequenceElement):
             if fastest_trip == None: 
                 fastest_trip = trip
-            elif trip[-1].dest_arrival_time < fastest_trip[-1].dest_arrival_time:
+            elif trip[-1].end_station_arrival < fastest_trip[-1].end_station_arrival:
                 fastest_trip = trip
         elif isinstance(trip[-1], TripError):
             error_trip = trip
-     
     if fastest_trip:  
         return fastest_trip
     elif error_trip:
         return error_trip
 
+# Build a trip sequence on a multi leg trip   
+# Not currently working if the second leg of the trip requires a local to express transfer
+def handle_trip_with_transfer_btw_lines(train_data_obj, journey_obj):
+    # all possible trips for multiple transfer stations
+    possible_trip_sequences = []
+    for transfer_obj in journey_obj.transfer_info_obj_array:
+        
+        start_terminus_gtfs_id = transfer_obj['start_term'].gtfs_stop_id
+        end_origin_gtfs_id = transfer_obj['end_origin'].gtfs_stop_id
+        trip_sequence = [] 
+
+        leg_one_filtered_trains = FilteredTrains(train_data_obj, train_data_obj.start_station_id, start_terminus_gtfs_id, current_time_int)
+        trip_sequence = filtered_trains_to_trip_sequence_element_or_trip_error(leg_one_filtered_trains)
+        
+        if isinstance(trip_sequence[0],TripSequenceElement):
+            leg_two_filtered_trains = FilteredTrains(train_data_obj, end_origin_gtfs_id, train_data_obj.end_station_id, leg_one_filtered_trains.best_train.dest_arrival_time)
+            leg_2_trip_sequence_element = filtered_trains_to_trip_sequence_element_or_trip_error(leg_two_filtered_trains)
+
+            for trip_seq in leg_2_trip_sequence_element:
+                trip_sequence.append(trip_seq)
+        possible_trip_sequences.append(trip_sequence)
+
+    return find_fastest_trip_or_return_error(possible_trip_sequences)
+
+
 def build_trip_sequence(journey_obj, train_data_obj):
     trip_sequence = []
-    print('jo ss', journey_obj.shared_stations)
-    # no shared stations means that the trip is on the same line and does not need a local/express transfer
-    if journey_obj.shared_stations == [] and not journey_obj.local_express:
-        print('1 single leg trip')
-        leg = FilteredTrains(train_data_obj, train_data_obj.start_station_id, train_data_obj.end_station_id)
-        # RETURN BEST TRAIN OR TRIP ERROR?
-        pre_trip_sequence = [return_best_train_or_trip_error(leg, train_data_obj.start_station_id, train_data_obj.end_station_id)]
-        for pre_trip_seq_element in pre_trip_sequence:
-            if isinstance(pre_trip_seq_element, TripError):
-                trip_sequence.append(pre_trip_seq_element)
-            # print('ptse', pre_trip_seq_element)
-            elif isinstance(pre_trip_seq_element, BestTrain):
-                tse = TripSequenceElement(pre_trip_seq_element)
-                trip_sequence.append(tse)
-    elif (journey_obj.local_express) and journey_obj.shared_stations == []:
-        print('2 local exp trip')
-        local_express_trip = FilteredTrains(train_data_obj, train_data_obj.start_station_id, train_data_obj.end_station_id)
-        # print('le_trip', local_express_trip)
-        pre_trip_sequence = local_express_trip.local_express_seq
-        print('pts', pre_trip_sequence)
-        # ERROR OBJ?
-        # AM I MAKING THE ERROR TWICE? LEFT OFF HERE 3/19
-        if pre_trip_sequence:
-            for pre_trip_seq_element in pre_trip_sequence:
-                tse = TripSequenceElement(pre_trip_seq_element)
-                trip_sequence.append(tse)
-        else:
-            le_error = TripError(
-                train_data= train_data_obj.all_train_data,
-                start_station_id= train_data_obj.start_station_id,
-                end_station_id= train_data_obj.end_station_id
-            )
-            trip_sequence.append(le_error)
+    if (journey_obj.shared_stations):
+        trip_sequence = handle_trip_with_transfer_btw_lines(train_data_obj, journey_obj)
     else:
-        pre_trip_sequence = handle_multi_leg_trip(train_data_obj, journey_obj)
-        # What about TripError element?
-        for pre_trip_seq_element in pre_trip_sequence:
-            if isinstance(pre_trip_seq_element, TripError):
-                trip_sequence.append(pre_trip_seq_element)
-            elif isinstance(pre_trip_seq_element, BestTrain):
-                tse = TripSequenceElement(pre_trip_seq_element)
-                trip_sequence.append(tse)
+        leg = FilteredTrains(train_data_obj, train_data_obj.start_station_id, train_data_obj.end_station_id, current_time_int)
+        
+        trip_sequence = filtered_trains_to_trip_sequence_element_or_trip_error(leg)
        
-    print('ts', trip_sequence)
     return trip_sequence
 

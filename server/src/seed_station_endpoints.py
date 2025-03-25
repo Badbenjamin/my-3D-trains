@@ -14,21 +14,15 @@ def add_station_endpoints():
             
             for endpoint in endpoints[:-1]:
                 if station_route in endpoint.lines:
-                    # print(station.id, station_route, endpoint.id)
                     station_endpoint = StationEndpoint(
                         route = station_route,
                         station_name = station.stop_name,
                         station = station,
                         endpoint = endpoint
                     )
-                    # print(type(station_endpoint))
                     station_endpoints.append(station_endpoint)
-    # pprint.pprint(station_endpoints)
     db.session.add_all(station_endpoints)
     db.session.commit()
-
-
-            # print(station, route, endpoints)
 
 with app.app_context():
     add_station_endpoints()
