@@ -6,16 +6,12 @@ current_time = datetime.now()
 current_time_int = int(math.ceil(current_time.timestamp()))
 
 def filtered_trains_to_trip_sequence_element_or_trip_error(filtered_trains):
-    print('i worked')
     trip_sequence = []
     # FilteredTrains returns nothing, a TripError object is created and stored in Filterdty
     if filtered_trains.trip_error_obj:
         trip_sequence.append(filtered_trains.trip_error_obj)
     elif (filtered_trains.local_express_seq):
-        
         for train in filtered_trains.local_express_seq:
-            print('train', train)
-            
             tse = TripSequenceElement(train)
             trip_sequence.append(tse)
     elif (filtered_trains.best_train):
@@ -35,10 +31,12 @@ def handle_trip_with_transfer_btw_lines(train_data_obj, journey_obj):
         trip_sequence = [] 
 
         leg_one_filtered_trains = FilteredTrains(train_data_obj, train_data_obj.start_station_id, start_terminus_gtfs_id, current_time_int)
+        print('leseq handle transfer', leg_one_filtered_trains.trip_error_obj)
         trip_sequence = filtered_trains_to_trip_sequence_element_or_trip_error(leg_one_filtered_trains)
         
         if isinstance(trip_sequence[0],TripSequenceElement):
             leg_two_filtered_trains = FilteredTrains(train_data_obj, end_origin_gtfs_id, train_data_obj.end_station_id, leg_one_filtered_trains.best_train.dest_arrival_time)
+            
             leg_2_trip_sequence_element = filtered_trains_to_trip_sequence_element_or_trip_error(leg_two_filtered_trains)
             for trip_seq in leg_2_trip_sequence_element:
                 trip_sequence.append(trip_seq)
@@ -55,7 +53,6 @@ def handle_trip_with_transfer_btw_lines(train_data_obj, journey_obj):
                 fastest_trip = trip
         elif isinstance(trip[-1], TripError):
             error_trip = trip
-    print('123',fastest_trip,error_trip)
     if fastest_trip:  
         return fastest_trip
     elif error_trip:
@@ -66,12 +63,10 @@ def handle_trip_with_transfer_btw_lines(train_data_obj, journey_obj):
 def build_trip_sequence(journey_obj, train_data_obj):
     trip_sequence = []
     if (journey_obj.shared_stations):
-        print('multi leg trip')
         trip_sequence = handle_trip_with_transfer_btw_lines(train_data_obj, journey_obj)
     else:
         leg = FilteredTrains(train_data_obj, train_data_obj.start_station_id, train_data_obj.end_station_id, current_time_int)
         trip_sequence = filtered_trains_to_trip_sequence_element_or_trip_error(leg)
        
-    print('ts', trip_sequence)
     return trip_sequence
 

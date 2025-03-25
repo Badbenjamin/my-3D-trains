@@ -235,21 +235,18 @@ class LocalExpress:
 class FilteredTrains:
 
     def __init__(self, train_data, start_station_id, end_station_id, time=current_time_timestamp):
-        print('ctft', time)
         self.all_train_data = train_data.all_train_data
         self.start_station_id = start_station_id
         self.end_station_id = end_station_id
         self.start_station = Station.query.filter(Station.gtfs_stop_id == start_station_id).first()
         self.end_station = Station.query.filter(Station.gtfs_stop_id == end_station_id).first()
         
-        # this is passed to TripError if filter produces empty array
         self.trip_error_obj = None
         self.best_train = None
         self.local_express_seq = None
         
         if train_data.local_express:
-            
-            # either a pair of trains with a transfer station, a single train (local faster), or no trains (should produce error later)
+            # finds either a pair of trains with a transfer station, a single train (local faster), or no trains. No trains produces TripError object.
             best_trains_and_transfer = modules_classes.find_best_trains_and_transfer_local_express(train_data, start_station_id, end_station_id)
             
             if best_trains_and_transfer:
@@ -271,7 +268,6 @@ class FilteredTrains:
                 
                 train_obj_array = trains_to_objects(self.filtered_train_data)
                 self.best_train = BestTrain(train_obj_array, start_station_id, end_station_id, time)
-                # print('bt', best_train)
             elif (self.filtered_train_data == []):
                 self.trip_error_obj = TripError(self.all_train_data, self.start_station_id, self.end_station_id)
         print('leseq', self.local_express_seq)
