@@ -151,6 +151,7 @@ class TrainData:
         de_duplicated_endpoints = list(set(all_endpoints))
        
         # THIS IS WHERE THE REQUESTS HAPPEN 
+        # MAYBE SPLIT INTO START STATION AND END STATION ENDPOINTS IN FUTURE FOR EFFICIENT TWO LEG TRIPS
         all_train_data = []
         for endpoint in de_duplicated_endpoints:
             feed = gtfs_realtime_pb2.FeedMessage()
