@@ -519,3 +519,12 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
           return best_single_train
      else:
           return False
+
+def get_endpoints_for_station(station_endpoints):
+    endpoints = []
+    for endpoint in station_endpoints:
+        # print('ep', endpoint.endpoint.endpoint)
+        endpoints.append(endpoint.endpoint.endpoint)
+    
+    de_duped_endpoints = list(set(endpoints))
+    return de_duped_endpoints

@@ -50,15 +50,11 @@ class Journey:
         self.start_station = Station.query.filter(Station.id == start_station_id).first()
         self.end_station = Station.query.filter(Station.id == end_station_id).first()
         
-        # these will be reset or used as base case for recursive version
-        self.start_station_terminus = None
-        self.end_station_origin = None
-        
-        # REPLACED ABOVE WITH ARRAY OF OBJECTS WITH START TERM AND END ORIGIN
-        self.transfer_info_obj_array = None
-
-        # LET USER INPUT TRANSFER STATIONS IF THEY WANT
+        # accounting for stations in complexes, these are the stations that are shared between two lines on a two part trip.
         self.shared_stations = []
+
+        # This array contains objects with start terminus and end origin stations, which have been derived from the shared stations array
+        self.transfer_info_obj_array = None
         
         self.local_express = False
         self.time = time
@@ -70,13 +66,11 @@ class Journey:
         print('jio', journey_info_obj)
         # if not on same route, and also not on same colored line, the trip requires a transfer btw lines
         if (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == False):
-            # we need to find stations or complexes shared between the start and end lines
+            # find complexes on start and end lines
             start_line_complex_ids = modules_classes.find_complex_ids(self.start_station.daytime_routes)
             end_line_complex_ids = modules_classes.find_complex_ids(self.end_station.daytime_routes)
             
             all_complex_ids = start_line_complex_ids + end_line_complex_ids
-            # only return complex ids that appear more than once in the list
-            # this means they appear both in start station and end station complexes
             shared_complexes = list(set([complex_id for complex_id in all_complex_ids if all_complex_ids.count(complex_id)>1]))
             
             # takes the complex_id list of shared_complexes and returns stations for each complex
@@ -87,27 +81,15 @@ class Journey:
             self.shared_stations = shared_stations
             
             # Assign correct shared station to start_terminus and end_origin
-            # IF THERE ARE MULTIPLE SHARED STATIONS, WE NEED TO FIND THE FASTEST ROUTE
             if shared_stations:
                 self.transfer_info_obj_array = modules_classes.get_transfer_station_info(shared_stations, self.start_station_routes, self.end_station_routes)
-        # ERROR FOR SUTPHIN BLVD JZE TO CLINTON WASH C. RARE CASE WHEN A TRIP WITH A TRANSFER IS BETTER THAN STAYING ON ONE TRAIN.
+        # IF ON SAME COLORED LINE, BUT NOT SHARING ROUTE BTW START AND END, IT IS A LOCAL TO EXPRESS OR EXPRESS TO LOCAL TRIP
         elif (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == True):
             self.local_express = True
-        # SAME LINE EXPRESS?
-        # involves_local_and_express = modules_classes.involves_local_and_exrpess(self.start_station_routes, self.end_station_routes, self.transfer_info_obj_array)
         
-        start_station_endpoints = []
-        for endpoint in self.start_station.station_endpoints:
-            start_station_endpoints.append(endpoint.endpoint.endpoint)
-        
-        self.start_station_endpoints = list(set(start_station_endpoints))
-
-        # End station endpoints might not be needed 
-        end_station_endpoints = []
-        for endpoint in self.end_station.station_endpoints:
-            end_station_endpoints.append(endpoint.endpoint.endpoint)
-        
-        self.end_station_endpoints = list(set(end_station_endpoints))
+        # Might not need end station endpoints? Train is leaving from a station that is served by a start station line to get to end station. 
+        self.start_station_endpoints = modules_classes.get_endpoints_for_station(self.start_station.station_endpoints)
+        self.end_station_endpoints = modules_classes.get_endpoints_for_station(self.end_station.station_endpoints)
 
         # self.all_endpoints = [self.start_station_endpoints] + [self.end_station_endpoints]
 
@@ -138,12 +120,12 @@ class TrainData:
 
         self.start_station_id = self.journey_object.start_station.gtfs_stop_id
         self.end_station_id = self.journey_object.end_station.gtfs_stop_id
-        self.start_station_terminus_id = None
-        self.end_station_origin_id = None
-        if self.journey_object.start_station_terminus:
-            self.start_station_terminus_id = self.journey_object.start_station_terminus.gtfs_stop_id
-        if self.journey_object.end_station_origin:
-            self.end_station_origin_id = self.journey_object.end_station_origin.gtfs_stop_id
+        # self.start_station_terminus_id = None
+        # self.end_station_origin_id = None
+        # if self.journey_object.start_station_terminus:
+        #     self.start_station_terminus_id = self.journey_object.start_station_terminus.gtfs_stop_id
+        # if self.journey_object.end_station_origin:
+        #     self.end_station_origin_id = self.journey_object.end_station_origin.gtfs_stop_id
         
         
         all_endpoints = journey_object.start_station_endpoints + journey_object.end_station_endpoints

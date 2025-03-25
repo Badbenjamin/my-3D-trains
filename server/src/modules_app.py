@@ -20,6 +20,7 @@ def filtered_trains_to_trip_sequence_element_or_trip_error(filtered_trains):
     return trip_sequence
 
 # Build a trip sequence on a multi leg trip   
+# Not currently working if the second leg of the trip requires a local to express transfer
 def handle_trip_with_transfer_btw_lines(train_data_obj, journey_obj):
     # all possible trips for multiple transfer stations
     possible_trip_sequences = []
@@ -31,7 +32,6 @@ def handle_trip_with_transfer_btw_lines(train_data_obj, journey_obj):
         trip_sequence = [] 
 
         leg_one_filtered_trains = FilteredTrains(train_data_obj, train_data_obj.start_station_id, start_terminus_gtfs_id, current_time_int)
-        print('leseq handle transfer', leg_one_filtered_trains.trip_error_obj)
         trip_sequence = filtered_trains_to_trip_sequence_element_or_trip_error(leg_one_filtered_trains)
         
         if isinstance(trip_sequence[0],TripSequenceElement):
