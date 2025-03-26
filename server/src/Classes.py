@@ -15,27 +15,27 @@ import modules_classes
 
 # Converts JSON train into a easier to read object
 # circular import issue, couldn't move to modules_classes
-def trains_to_objects(filtered_trains):
-        train_object_list = []
-        for train in filtered_trains:
-            new_schedule = []
-            for stop in train.trip_update.stop_time_update:
-                new_stop = Stop(
-                    arrival= stop.arrival.time,
-                    departure= stop.departure.time,
-                    stop_id= stop.stop_id
-                )
-                new_schedule.append(new_stop)
+# def trains_to_objects(filtered_trains):
+#         train_object_list = []
+#         for train in filtered_trains:
+#             new_schedule = []
+#             for stop in train.trip_update.stop_time_update:
+#                 new_stop = Stop(
+#                     arrival= stop.arrival.time,
+#                     departure= stop.departure.time,
+#                     stop_id= stop.stop_id
+#                 )
+#                 new_schedule.append(new_stop)
             
-            new_train = Train(
-                trip_id= train.trip_update.trip.trip_id,
-                start_time= train.trip_update.trip.start_time,
-                start_date= train.trip_update.trip.start_date,
-                route_id= train.trip_update.trip.route_id,
-                schedule= new_schedule
-            )
-            train_object_list.append(new_train)
-        return train_object_list
+#             new_train = Train(
+#                 trip_id= train.trip_update.trip.trip_id,
+#                 start_time= train.trip_update.trip.start_time,
+#                 start_date= train.trip_update.trip.start_date,
+#                 route_id= train.trip_update.trip.route_id,
+#                 schedule= new_schedule
+#             )
+#             train_object_list.append(new_train)
+#         return train_object_list
 
 
 # the journey object takes a start and end station
@@ -151,7 +151,7 @@ class LocalExpress:
             self.local_express_seq = [
                 {
                     'train_id' : best_trains_and_transfer_obj['start_train_id'],
-                    'train' : trains_to_objects([best_trains_and_transfer_obj['start_train']])[0],
+                    'train' : modules_classes.trains_to_objects([best_trains_and_transfer_obj['start_train']])[0],
                     'start_station_id' : start_station_id,
                     'end_station_id' : best_trains_and_transfer_obj['transfer_station_start_train'],
                     'start_station_arrival' : best_trains_and_transfer_obj['start_station_arrival'],
@@ -159,7 +159,7 @@ class LocalExpress:
                 },
                 {
                     'train_id' : best_trains_and_transfer_obj['end_train_id'],
-                    'train' : trains_to_objects([best_trains_and_transfer_obj['end_train']])[0], 
+                    'train' : modules_classes.trains_to_objects([best_trains_and_transfer_obj['end_train']])[0], 
                     'start_station_id' : best_trains_and_transfer_obj['transfer_station_end_train'],
                     'end_station_id' : end_station_id,
                     'start_station_arrival' : best_trains_and_transfer_obj['transfer_station_departure'],
@@ -172,7 +172,7 @@ class LocalExpress:
             self.local_express_seq = [
                 {
                     'train_id' : best_trains_and_transfer_obj['train_id'],
-                    'train' : trains_to_objects([best_trains_and_transfer_obj['train']])[0],
+                    'train' : modules_classes.trains_to_objects([best_trains_and_transfer_obj['train']])[0],
                     'start_station' : start_station_id,
                     'end_station' : end_station_id,
                     'start_station_arrival' : best_trains_and_transfer_obj['start_station_arrival'],
@@ -225,7 +225,7 @@ class FilteredTrains:
             self.filtered_train_data = modules_classes.filter_trains_for_stations_direction_future_arrival(self.all_train_data, self.start_station, self.end_station)
             # if filter yields results (trip can be completed by one or more trains), we will turn the first train into a BestTrain object.
             if len(self.filtered_train_data) > 0:
-                train_obj_array = trains_to_objects(self.filtered_train_data)
+                train_obj_array = modules_classes.trains_to_objects(self.filtered_train_data)
                 self.best_train = BestTrain(train_obj_array, start_station_id, end_station_id, time)
             # if no trains are returned from the filter, we create a TripError object
             elif (self.filtered_train_data == []):

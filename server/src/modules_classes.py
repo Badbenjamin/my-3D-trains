@@ -35,6 +35,29 @@ def create_stop_schedule(train):
 def create_stop_scheudle_for_frontend():
      pass
 
+def trains_to_objects(filtered_trains):
+        train_object_list = []
+        for train in filtered_trains:
+            new_schedule = []
+            for stop in train.trip_update.stop_time_update:
+                from Classes import Stop
+                new_stop = Stop(
+                    arrival= stop.arrival.time,
+                    departure= stop.departure.time,
+                    stop_id= stop.stop_id
+                )
+                new_schedule.append(new_stop)
+            from Classes import Train
+            new_train = Train(
+                trip_id= train.trip_update.trip.trip_id,
+                start_time= train.trip_update.trip.start_time,
+                start_date= train.trip_update.trip.start_date,
+                route_id= train.trip_update.trip.route_id,
+                schedule= new_schedule
+            )
+            train_object_list.append(new_train)
+        return train_object_list
+
 # could I combine this into filter trains for station direction current?
 def check_for_station_service_on_failed_trip(train_data, start_station_id, end_station_id):
     
