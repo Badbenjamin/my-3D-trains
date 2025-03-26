@@ -13,33 +13,9 @@ current_time_timestamp = round(current_time.timestamp())
 
 import modules_classes
 
-# Converts JSON train into a easier to read object
-# circular import issue, couldn't move to modules_classes
-# def trains_to_objects(filtered_trains):
-#         train_object_list = []
-#         for train in filtered_trains:
-#             new_schedule = []
-#             for stop in train.trip_update.stop_time_update:
-#                 new_stop = Stop(
-#                     arrival= stop.arrival.time,
-#                     departure= stop.departure.time,
-#                     stop_id= stop.stop_id
-#                 )
-#                 new_schedule.append(new_stop)
-            
-#             new_train = Train(
-#                 trip_id= train.trip_update.trip.trip_id,
-#                 start_time= train.trip_update.trip.start_time,
-#                 start_date= train.trip_update.trip.start_date,
-#                 route_id= train.trip_update.trip.route_id,
-#                 schedule= new_schedule
-#             )
-#             train_object_list.append(new_train)
-#         return train_object_list
 
-
-# the journey object takes a start and end station
-# it will contain endpoints for the start and end station, as well as the transfer station if applicable
+# the journey class recieves start and end station ids from the front end.
+# it determines what type of trip is being taken (a to b on one line, a to b through c, a to b with local to express transfer), and also gathers relevant endpoints for the trip. 
 class Journey:
 
     def __init__(self, start_station_id, end_station_id, time=None):
@@ -59,7 +35,9 @@ class Journey:
         self.end_station_routes = self.end_station.daytime_routes.split()
         start_and_end_routes = list(set(self.start_station_routes + self.end_station_routes))
         
+        # This variable contains info for the type of trip. Whether there is a transfer or if it involves local and express trains. 
         journey_info_obj = modules_classes.get_journey_info(self.start_station_routes, self.end_station_routes)
+
         # if not on same route, and also not on same colored line, the trip requires a transfer btw lines
         if (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == False):
             # find complexes on start and end lines
@@ -72,11 +50,11 @@ class Journey:
             # takes the complex_id list of shared_complexes and returns stations for each complex
             stations_in_complexes =  modules_classes.complex_ids_to_stations(shared_complexes)
             
-            # return all stations that serve a route that is served by the start and end station
+            # return all stations that serve a route that is served by both the start and end station
             shared_stations = modules_classes.get_shared_stations(stations_in_complexes, start_and_end_routes)
             self.shared_stations = shared_stations
             
-            # Assign correct shared station to start_terminus and end_origin
+            # Assign correct shared station to start_terminus and end_origin. This array will be used to create routes for a trip involving two different lines. 
             if shared_stations:
                 self.transfer_info_obj_array = modules_classes.get_transfer_station_info(shared_stations, self.start_station_routes, self.end_station_routes)
         # IF ON SAME COLORED LINE, BUT NOT SHARING ROUTE BTW START AND END, IT IS A LOCAL TO EXPRESS OR EXPRESS TO LOCAL TRIP
@@ -126,7 +104,9 @@ class TrainData:
     
     def __repr__(self):
         return f'<TrainData from {self.routes} lines for trip from {self.start_station_name} to {self.end_station_name}>'
-        
+
+# Created in FilteredTrains class if the trip involves both local and express trains. 
+# A best_trains_and_transfer object is translated into an array that will later be turned into TripSequenceElement objs
 class LocalExpress:
 
     def __init__(self, best_trains_and_transfer_obj, start_station_id, end_station_id):
@@ -139,8 +119,10 @@ class LocalExpress:
         self.error = False
         self.local_express_seq = None
         
+        # if the filter doesn't yield results, it produces a TripError object, which is passed on to here. 
         if isinstance(best_trains_and_transfer_obj, TripError):
             self.error = True
+        # If the trip can be completed with two trains, those two will be added to an array and formatted to be converted to TripSequenceElements later.
         elif best_trains_and_transfer_obj['transfer_station_start_train']:
             # Bug if best train is local and not express pair
             self.two_trains = True
@@ -166,7 +148,7 @@ class LocalExpress:
                     'end_station_arrival' : best_trains_and_transfer_obj['end_station_arrival'],
                 }
             ]
-
+        # if a local is available and faster, there is just one train for the trip.
         elif best_trains_and_transfer_obj['train_id']:
             self.local_is_faster = True
             self.local_express_seq = [
@@ -207,6 +189,7 @@ class FilteredTrains:
         self.best_train = None
         self.local_express_seq = None
         
+        # if the trip involves a transfer from local to express trains or vice versa. 
         if train_data.local_express:
             # finds either a pair of trains with a transfer station, a single train (local faster), or no trains. No trains produces TripError object.
             best_trains_and_transfer = modules_classes.find_best_trains_and_transfer_local_express(train_data, start_station_id, end_station_id)
@@ -238,7 +221,9 @@ class FilteredTrains:
             return f'<FilteredTrains Local->Exp trip {self.local_express_seq} >'
         else:
             return f'<FilteredTrains ERROR {self.trip_error_obj.start_station_id} {self.trip_error_obj.start_station_service} {self.trip_error_obj.end_station_id} {self.trip_error_obj.end_station_service}>'
-        
+
+# Created when a trip between stations yields no results from the FilteredTrains class.
+# Checks for service at start station, end station, and if trains run between stations. 
 class TripError:
     def __init__(self, train_data, start_station_id, end_station_id):
         self.train_data = train_data
@@ -253,7 +238,7 @@ class TripError:
     def __repr__(self):
         return f'<TripError {self.start_station_id} {self.start_station_service} {self.end_station_id} {self.end_station_service} trains between: {self.between_station_service}>'
 
-# BestTrain takes an array of Train objects, sorts them by arrival at destination. 
+# BestTrain takes an array of Train objects, sorts them by arrival at destination, and saves the first train.
 class BestTrain:
 
     def __init__(self, train_obj_array, start_station_id, end_station_id, time):
@@ -366,7 +351,7 @@ class Stop:
     def __repr__(self):
         return f'<Stop {self.stop_id} ARRIVAL {str(modules_classes.convert_timestamp(self.arrival))[11:-3]} DEPARTURE {str(modules_classes.convert_timestamp(self.departure))[11:-3]}>'
     
-# class TripError:
+# This class accepts a BestTrain obj, or info from the local_express_sequence of a LocalExpress object, and saves the info to itself. 
 class TripSequenceElement:
 
     def __init__(self, trip_info):
@@ -385,8 +370,6 @@ class TripSequenceElement:
             self.end_station_id = trip_info.end_station_id
             self.start_station_arrival = trip_info.origin_departure_time
             self.end_station_arrival = trip_info.dest_arrival_time
-        elif isinstance(trip_info, TripError):
-            self.error = trip_info
         # TRIP HAS A LOCAL TO EXPRESS OR EXP TO LOC TRANSFER
         else:
             self.train_id = trip_info['train_id']

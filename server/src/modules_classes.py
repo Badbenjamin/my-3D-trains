@@ -1,13 +1,9 @@
 from datetime import datetime, timedelta
 import math
-from operator import attrgetter
 
-# CIRCULAR IMPORT ISSUE
-# from Objects import Train, Stop
 from Classes import current_time
 from Classes import Station
 import pprint
-# from Objects import Stop
 
 current_time_int = int(math.ceil(current_time.timestamp()))
 
@@ -84,10 +80,6 @@ def check_for_station_service_on_failed_trip(train_data, start_station_id, end_s
     }
     return service_obj
 
-# can i figure out direction if no trains are returned from filter?
-def get_trip_direction(train_data, start_station_id, end_station_id):
-     pass
-
 # returns true if the station appears in the schedule of a train
 def check_for_station_service(stops, station_id):
      service = False
@@ -134,7 +126,6 @@ def check_if_train_route_matches_end_station_routes_start_station_routes(start_s
 
 # takes all json data from endpoints and returns array of trains relevant for our trip
 # if there are trains serving both stations currently, and in the correct direction, return array of JSON trains, each containing a schedule. 
-# if the trip is not possible, a trip_error_obj is returned with info about stations
 def filter_trains_for_stations_direction_future_arrival(train_data, start_station, end_station):
         start_station_id = start_station.gtfs_stop_id
         end_station_id = end_station.gtfs_stop_id
@@ -149,11 +140,8 @@ def filter_trains_for_stations_direction_future_arrival(train_data, start_statio
                             if (check_station_arrival_or_departure(stop, end_station_id, "arrival")):
                                  filtered_trains.append(train)
         return filtered_trains
-         
-        
-       
-             
-# 
+                    
+# creates objs that make it easier to sort trains by arrival time.
 def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id):
 
     trains_with_arrival = []
@@ -182,31 +170,16 @@ def quick_sort_trains_by_arrival_time(train_obj_array):
 
 
 # takes list of JSON trains (from filter_trains_for_stations_direction_future_arrival()) and returns list of trains sorted by arrival time at destination.
-# MULTI LEG TRIP PROBLEM WITH QUICK SORT
 def sort_trains_by_arrival_at_destination(filtered_train_data_object, start_station_id, dest_station_id, time):
-        
-        # NO DESTINATION ARRIVAL TIME
+    
         # take JSON train array (filtered) and build objects with {train, dest arrival, origin arrival} key value pairs
         trains_with_arrival_objs_array = create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id)
 
         # use quicksort to sort array of objects by arrival at destination.
-        # 7 TRAIN TERMINUSES GIVING ORIGIN ARRIVAL TIME OF ZERO
         sorted_trains = [train for train in quick_sort_trains_by_arrival_time(trains_with_arrival_objs_array) if train['origin_departure_time'] >= time]
         return sorted_trains
 
-# return a list of routes eg. [A,C,E] for a station
-# This doesn't appear to be used!
-def get_station_routes(station_daytime_routes):
-    routes = []
-    for route in station_daytime_routes:
-        if route != " ":
-            routes.append(route)
-    return routes
-
-
 # returns True if a route from the start station routes is present in the end station routes
-# NEEDS TO BE ABLE TO HANDLE EXPRESS/LOCAL LOGIC
-
 def start_shares_routes_with_end(start_station_routes, end_station_routes):
     shared_routes_between_start_end_stations = [route for route in end_station_routes if route in start_station_routes]
     if shared_routes_between_start_end_stations == []:
@@ -214,20 +187,20 @@ def start_shares_routes_with_end(start_station_routes, end_station_routes):
     else:
          return True
 
+# Takes a dict that contains info on express and local trains for each line. Returns an array of objects that state whether lines served by the station are express or local. 
 def get_station_express_local_info(lines_with_express_obj, station_routes):
-    #  returns and array 
+    #  returns an array 
     routes_with_express_or_local = []
     for route in station_routes:
-        # result_obj['start_routes'].append(start_route)
         for line_obj in lines_with_express_obj:
             if route in line_obj:
                 selected_line_obj = lines_with_express_obj[line_obj]
                 for line_route in selected_line_obj:
                      if route == line_route:
-                        # result_obj['start_route']
                         routes_with_express_or_local.append({route : selected_line_obj[line_route]})
     return routes_with_express_or_local
 
+# Determines if a trip from start to dest is on one single line. 
 def on_same_line(lines_with_express_obj, start_station_routes, end_station_routes):
     on_same_line = False
     for start_route in start_station_routes:
@@ -237,6 +210,7 @@ def on_same_line(lines_with_express_obj, start_station_routes, end_station_route
                         on_same_line = True
     return on_same_line 
 
+# takes array fro get_station_express_local_info() and determines if it contains local or express routes. 
 def station_contains_express(station_routes_array_with_express_or_local, local_or_express):
     station_contains_express = False
     station_contains_local = False
@@ -251,7 +225,7 @@ def station_contains_express(station_routes_array_with_express_or_local, local_o
     elif local_or_express == "express":
          return station_contains_express
                
-
+# Build an object that has info about what type of trip our user is trying to embark on. 
 def get_journey_info(start_station_routes, end_station_routes):
 
     lines_with_express = {
@@ -342,6 +316,7 @@ def get_journey_info(start_station_routes, end_station_routes):
     result_obj['end_contains_local'] = station_contains_express(result_obj['end_routes'], "local")
 
     return result_obj
+
 # takes daytime routes of a station (start or end), and returns the complex ids of all stations that are served by that route (eg. "G")
 def find_complex_ids(daytime_routes):
      complex_ids = []
@@ -370,8 +345,7 @@ def get_shared_stations(stations_in_complexes, routes):
                 shared_stations.append(station) 
     return list(set(shared_stations))
 
-def get_station_arrival_or_departure_time(stops, station_id, arrival_or_departure):
-     
+def get_station_arrival_or_departure_time(stops, station_id, arrival_or_departure):   
      for stop in stops:
           if stop.stop_id[:-1] == station_id:
                if arrival_or_departure == "arrival":
@@ -379,6 +353,7 @@ def get_station_arrival_or_departure_time(stops, station_id, arrival_or_departur
                elif arrival_or_departure == "departure":
                     return stop.departure.time
 
+# build an object with info for a transfer station. Start station trip terminus, and end station trip origin. 
 def get_transfer_station_info(shared_stations, start_station_routes, end_station_routes):
 
     start_station_termini = []
@@ -407,6 +382,7 @@ def get_transfer_station_info(shared_stations, start_station_routes, end_station
           transfer_station_obj_array.append(transfer_info_obj)
     return transfer_station_obj_array
 
+# build object containing arrays of trains serving the start station, end station, or both. 
 def get_trains_serving_start_station_end_station_or_both(train_data, start_station_id, end_station_id):
      trains_serving_start_station = []
      trains_serving_end_station = []
@@ -431,7 +407,7 @@ def get_trains_serving_start_station_end_station_or_both(train_data, start_stati
                          trains_serving_end_station.append(train)
      return {'trains_serving_start_station' : trains_serving_start_station, 'trains_serving_end_station' : trains_serving_end_station, 'trains_traveling_between_stations' : trains_traveling_between_stations}
 
-# MOSTLY WORKS. CHECK IF TRANSFER IS POSSIBLE. MIGHT HAVE SOME FLAW THERE. 
+# WORKS. MIGHT WANT TO OPTIMIZE LATER.
 def find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array):
      # pairs of trains where the start train and end train (each stoping at start or end station), have a shared station in schedules
      train_pairs_with_transfer = []
@@ -514,7 +490,7 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
      
      
      train_pairs_with_transfer_array = find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array)
-          
+    # sort for earliest arrival at end station, AND largest gap between transfer station arrival and departure. 
      best_train_pairs_sorted = sorted(train_pairs_with_transfer_array, key= lambda tp : (tp['end_station_arrival'], -tp['transfer_station_time_gap']))
      best_train_pair = None
      if best_train_pairs_sorted:
