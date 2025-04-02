@@ -21,7 +21,7 @@ function App() {
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
   console.log('ti', tripInfo)
-  // get station info for trip planner for station search. 
+  // get station info for trip planner  for station search. 
   useEffect(() => {
     // remove local host for deployment
     fetch("http://127.0.0.1:5555/api/stations")
