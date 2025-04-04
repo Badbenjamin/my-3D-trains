@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react"
 import * as THREE from 'three'
 import { Html } from "@react-three/drei"
 
+import StationToolTip from "./StationTooltip"
+
 import './App.css'
 import { useFrame } from "@react-three/fiber"
 // import { is } from "@react-three/fiber/dist/declarations/src/core/utils"
@@ -10,6 +12,7 @@ function Station( { status, materials, mesh, index, getStationCode, id}){
 
         const [readableName, setReadableName] = useState("")
         const [displayName, setDisplayName] = useState(false)
+        const [isClicked, setIsClicked] = useState(false)
         let stationRef = useRef()
 
         const selectedMaterial = new THREE.MeshStandardMaterial()
@@ -59,6 +62,12 @@ function Station( { status, materials, mesh, index, getStationCode, id}){
 
         function handleClick(){
             getStationCode(newName)
+            
+                fetch(`http://127.0.0.1:5555/api/stationname/${newName}`)
+                .then(response => response.json())
+                .then(decodedName => {setReadableName(decodedName.name + " " + decodedName.daytime_routes), console.log(newName)})
+                .catch((error)=>{console.log(error, newName)})
+            
         }
 
         
@@ -78,7 +87,8 @@ function Station( { status, materials, mesh, index, getStationCode, id}){
                   scale={newScale}
                   
             />
-                {<Html wrapperClass="station_label" distanceFactor={10} position={newPosition}>{readableName}</Html>}
+                {<Html  wrapperClass="station_label" distanceFactor={10} position={newPosition}>{readableName}</Html>}
+                <StationToolTip mesh={mesh}/>
         </group>
     )
 }
