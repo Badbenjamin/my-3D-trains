@@ -41,9 +41,10 @@ def get_all_stations():
 # get station names for HTML text on map
 # this request occurs in the Station component in the client. 
 @app.route('/api/stationname/<string:gtfs_id>')
+
 def get_station_name(gtfs_id):
     station = Station.query.filter(Station.gtfs_stop_id == gtfs_id).first()
-    return {"name" : station.stop_name, "daytime_routes" : station.daytime_routes}, 200
+    return {"name" : station.stop_name, "daytime_routes" : station.daytime_routes, "id" : station.id, "gtfs_stop_id" : station.gtfs_stop_id}, 200
 
 # get train locations 
 @app.route('/api/trainlocations')

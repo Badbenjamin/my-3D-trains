@@ -5,7 +5,7 @@ import { useGLTF } from '@react-three/drei'
 
 import './App.css'
 import Station from './Station'
-import { getAllIds, createStatusObjectArray, createStationComponentsObj, updateStatusArray, getStationCode } from './ModularFunctions'
+import { getAllIds, createStatusObjectArray, createStationComponentsObj, updateStatusArray, getStationCode} from './ModularFunctions'
 
 
 function App() {
@@ -29,13 +29,17 @@ function App() {
       .then(stationsData => setStations(stationsData))
   }, [])
 
+  function retrieveStationId(id, startOrEnd){
+    console.log('app retrieve',id, startOrEnd)
+  }
+
   // build stationArray of 3D station components for LinesAndMap
   // this useEffect creates Station objects for each geometry in our model
   useEffect(()=>{
     // newStatusArray is an array of objects with names of stations/meshes and a boolean to determine whether they are selected or not
     const newStatusArray = createStatusObjectArray(nodes)
     // newMapModelObj contains the info for all the station and track geometries in our scene
-    const newMapModelObj = createStationComponentsObj(nodes, materials, newStatusArray)
+    const newMapModelObj = createStationComponentsObj(nodes, materials, newStatusArray, retrieveStationId)
     // this loop populates newStationArray with meshes from our newMapModelObject
     const newStationArray = [...stationArray]
     for (const station in newMapModelObj){
@@ -105,6 +109,13 @@ function App() {
     }
   }, [tripInfo])
 
+  // function retrieveId(id, startOrEnd){
+  //    console.log(id, startOrEnd)
+  //   }
+  // console.log(typeof(retrieveId))
+
+  let retrieveId = "STRING"
+  
   if (!nodes || !stationArray){
     return (
       <>loading</>
@@ -127,6 +138,7 @@ function App() {
         materials : materials,
         tripInfo : tripInfo,
         setTripInfo : setTripInfo,
+        retrieveId : retrieveId
         }}/>
     </>
   )
