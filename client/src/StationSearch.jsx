@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import Select from 'react-select'
 import './Component.css'
 
-function StationSearch({getStations, position, stations}) {
-    // console.log(stations)
+function StationSearch({getStations, position, stations, stationId}) {
+    console.log('sid',stationId)
     const [selectedOption, setSelectedOption] = useState(null)
 
     const customStyles = {

@@ -20,7 +20,7 @@ function App() {
   const [statusArray, setStatusArray] = useState([])
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
-  const [stationIdStartAndEnd, setStationIdStartAndEnd] = useState({startId : null, endId : null})
+  const [stationIdStartAndEnd, setStationIdStartAndEnd] = useState({"startId" : null, "endId" : null})
   console.log('ti', tripInfo)
   // get station info for trip planner  for station search. 
   useEffect(() => {
@@ -30,17 +30,18 @@ function App() {
       .then(stationsData => setStations(stationsData))
   }, [])
 
-  // STUCK HERE! Keeps making new obj
-  function retrieveStationId(id, startOrEnd){
-    let newStationIdStartOrEnd = {...stationIdStartAndEnd}
-    console.log(newStationIdStartOrEnd)
-    if (startOrEnd == "start"){
-      newStationIdStartOrEnd['startId'] = id
-    } else if (startOrEnd == "end"){
-      newStationIdStartOrEnd['endId'] = id
-    }
-    setStationIdStartAndEnd(newStationIdStartOrEnd)
+  function retrieveStationId(id, startOrEnd) {
+    setStationIdStartAndEnd(prevState => {
+      const newStationIdStartOrEnd = { ...prevState };
+      if (startOrEnd === "start") {
+        newStationIdStartOrEnd['startId'] = id;
+      } else if (startOrEnd === "end") {
+        newStationIdStartOrEnd['endId'] = id;
+      }
+      return newStationIdStartOrEnd;
+    });
   }
+  
   console.log('start or end',stationIdStartAndEnd)
 
   // useEffect(()=>{
@@ -151,6 +152,7 @@ function App() {
         materials : materials,
         tripInfo : tripInfo,
         setTripInfo : setTripInfo,
+        stationIdStartAndEnd : stationIdStartAndEnd
         // retrieveId : retrieveId
         }}/>
     </>

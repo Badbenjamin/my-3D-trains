@@ -8,10 +8,10 @@ import TripInfo from "./TripInfo";
 
 function JourneyPlanner() {
 
-    const {tripInfo, stations, setTripInfo} = useOutletContext()
+    const {tripInfo, stations, setTripInfo, stationIdStartAndEnd} = useOutletContext()
     
     const [journeyStations, setJourneyStations] = useState([null, null])
-    
+    // console.log('sidsae jp', stationIdStartAndEnd)
     function getStations(station, position){
         console.log(station.pos.position)
         const journey = [...journeyStations]
@@ -40,8 +40,8 @@ function JourneyPlanner() {
     return (
         <div>
             <div className='journey-planner'>
-                <StationSearch className='station_search' stations={stations} getStations={getStations} position={"start"}/>
-                <StationSearch className='station_search' stations={stations} getStations={getStations} position={"end"}/>
+                <StationSearch className='station_search' stations={stations} getStations={getStations} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
+                <StationSearch className='station_search' stations={stations} getStations={getStations} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
                 <br></br>
                 <button className="plan-trip-button" onClick={planTrip}>Plan Trip</button>
             </div>
