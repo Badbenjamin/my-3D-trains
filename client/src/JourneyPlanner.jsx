@@ -11,7 +11,7 @@ function JourneyPlanner() {
     const {tripInfo, stations, setTripInfo, stationIdStartAndEnd} = useOutletContext()
     
     const [journeyStations, setJourneyStations] = useState([null, null])
-    // console.log('sidsae jp', stationIdStartAndEnd)
+    console.log('js', journeyStations)
     function getStations(station, position){
         console.log(station.pos.position)
         const journey = [...journeyStations]

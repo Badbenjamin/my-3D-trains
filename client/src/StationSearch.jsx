@@ -6,6 +6,9 @@ import './Component.css'
 function StationSearch({getStations, position, stations, stationId}) {
     console.log('sid',stationId)
     const [selectedOption, setSelectedOption] = useState(null)
+    console.log('selectedOption', selectedOption)
+
+    
 
     const customStyles = {
         control : (provided) => ({
@@ -33,6 +36,17 @@ function StationSearch({getStations, position, stations, stationId}) {
         optionsArray.push(stationObj);
     }
     // console.log(optionsArray)
+
+    useEffect(()=>{
+        let buttonSelectedStationObj = null
+        for (const optionStation of optionsArray){
+            if (stationId == optionStation.value){
+                buttonSelectedStationObj = optionStation
+            }
+        }
+        setSelectedOption(buttonSelectedStationObj)
+        getStations(buttonSelectedStationObj, position)
+    },[stationId])
 
     return (
         <div>
