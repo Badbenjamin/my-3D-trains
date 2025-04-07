@@ -12,8 +12,9 @@ function JourneyPlanner() {
     
     const [journeyStations, setJourneyStations] = useState([null, null])
     console.log('js', journeyStations)
+    
     function getStations(station, position){
-        console.log(station.pos.position)
+        // console.log(station.pos.position)
         const journey = [...journeyStations]
         if (station.pos.position === 'start'){
             journey[0] = station.value;

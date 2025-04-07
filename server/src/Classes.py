@@ -381,6 +381,39 @@ class TripSequenceElement:
     def __repr__(self):
         return f'<TripSequenceElement {self.train_id} from {self.start_station_id, self.start_station_arrival} to {self.end_station_id, self.end_station_arrival} >'
 
+class ArrivalsForStation:
+
+    def __init__(self, gtfs_stop_id):
+        # get endpoint for route that station is on
+        self.station = Station.query.filter(Station.gtfs_stop_id == gtfs_stop_id).first()
+        # self.routes = self.station.daytime_routes.split()
+        self.north_direction_label = self.station.north_direction_label
+        self.south_direction_label = self.station.south_direction_label
+        self.station_endpoints = modules_classes.get_endpoints_for_station(self.station.station_endpoints)
+        print('ss', self.station_endpoints)
+
+        gtfs_trains_for_station = []
+        for endpoint in self.station_endpoints:
+            feed = gtfs_realtime_pb2.FeedMessage()
+            response = requests.get(endpoint)
+            feed.ParseFromString(response.content)
+            gtfs_trains_for_station.append(feed)
+
+        self.trains_for_station = modules_classes.get_station_arrival_times(gtfs_trains_for_station, gtfs_stop_id)
+        self.n_bound_arrivals = self.trains_for_station['n_bound_arrivals']
+        self.s_bound_arrivals = self.trains_for_station['s_bound_arrivals']
+
+        self.arrivals_for_react = {
+            "north_direction_label" : self.north_direction_label,
+            "south_direction_label" : self.south_direction_label,
+            "n_bound_arrivals" : [n_bound_arrival['route'] + " " + datetime.fromtimestamp(n_bound_arrival['arrival_time']).strftime('%I:%M %p') for n_bound_arrival in self.n_bound_arrivals],
+            "s_bound_arrivals" : [s_bound_arrival['route'] + " " + datetime.fromtimestamp(s_bound_arrival['arrival_time']).strftime('%I:%M %p') for s_bound_arrival in self.s_bound_arrivals]
+        }
+        
+    def __repr__(self):
+        return f'<ArrivalsForStation>'
+
 if __name__ == "__main__":
     with app.app_context():
+
         pass

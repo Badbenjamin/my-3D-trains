@@ -140,6 +140,41 @@ def filter_trains_for_stations_direction_future_arrival(train_data, start_statio
                             if (check_station_arrival_or_departure(stop, end_station_id, "arrival")):
                                  filtered_trains.append(train)
         return filtered_trains
+
+def check_for_future_arrival_at_station(stops_with_info, gtfs_stop_id):
+    result = False
+    for stop in stops_with_info:
+        #  print('sat', stop.stop_id)
+         if stop.stop_id[:-1] == gtfs_stop_id and stop.arrival.time >= current_time_int:
+              result = True
+    # print(result)
+    return result
+
+def get_station_arrival_times(gtfs_trains_for_station, gtfs_stop_id):
+    
+    trains_arriving_at_station_n = []
+    trains_arriving_at_station_s = []
+    for train_feed in gtfs_trains_for_station:
+        for train in train_feed.entity: 
+            if train.HasField('trip_update'):
+                stops_no_direction = create_stop_schedule(train)
+                stops_full_info = [stop for stop in train.trip_update.stop_time_update]
+                if check_for_station_service(stops_no_direction, gtfs_stop_id) and check_for_future_arrival_at_station(stops_full_info, gtfs_stop_id):
+                     our_stop = None
+                     for stop in stops_full_info:
+                          if gtfs_stop_id == stop.stop_id[:-1]:
+                               our_stop = stop
+                     
+                     train_obj = {"route" : train.trip_update.trip.route_id, "train_id" : train.id, "arrival_time" : our_stop.arrival.time, "direction" : our_stop.stop_id[-1]}
+                     if (train_obj['direction'] == "N"):
+                          trains_arriving_at_station_n.append(train_obj)
+                     elif (train_obj['direction'] == "S"):
+                          trains_arriving_at_station_s.append(train_obj)
+                                # sorted(trains_traveling_between_stations_array, key= lambda bst: bst['end_station_arrival'])
+    sorted_north_bound_trains = sorted(trains_arriving_at_station_n, key= lambda train : (train['arrival_time']))
+    sorted_south_bound_trains = sorted(trains_arriving_at_station_s, key= lambda train : (train['arrival_time']))
+    return {"n_bound_arrivals" : sorted_north_bound_trains[0:3], "s_bound_arrivals" : sorted_south_bound_trains[0:3]}
+                          
                     
 # creates objs that make it easier to sort trains by arrival time.
 def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id):

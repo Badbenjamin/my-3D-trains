@@ -38,14 +38,17 @@ function StationSearch({getStations, position, stations, stationId}) {
     // console.log(optionsArray)
 
     useEffect(()=>{
-        let buttonSelectedStationObj = null
+        let buttonSelectedStationObj = selectedOption
         for (const optionStation of optionsArray){
             if (stationId == optionStation.value){
                 buttonSelectedStationObj = optionStation
             }
         }
         setSelectedOption(buttonSelectedStationObj)
-        getStations(buttonSelectedStationObj, position)
+        if (stationId != null){
+            getStations(buttonSelectedStationObj, position)
+        }
+        
     },[stationId])
 
     return (
