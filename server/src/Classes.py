@@ -127,17 +127,17 @@ class LocalExpress:
         elif self.first_train['transfer_station_start_train']:
             # THIS NEEDS WORK 
             first_three_trains = []
-            arrivals = []
+            train_ids = []
             for train in best_trains_and_transfer_obj:
-                print('le',train['start_station_arrival'])
-                if arrivals == [] or train['start_station_arrival'] not in arrivals:
-                    arrivals.append(train['start_station_arrival'])
-                if first_three_trains == [] or train['start_station_arrival'] not in arrivals:
+                print(train['start_train_id'])
+                if first_three_trains == []:
                     first_three_trains.append(train)
-                # arrivals.append(train['start_station_arrival'])
-                # if train['start_station_arrival'] not in arrivals or first_three_trains == []:
-                #     first_three_trains.append(train)
-            # print(first_three_arrival_times) 
+                    train_ids.append(train['start_train_id'])
+                elif (len(first_three_trains) < 3) and (train['start_train_id'] not in train_ids):
+
+                    first_three_trains.append(train)
+                    train_ids.append(train['start_train_id'])
+
             self.two_trains = True
             self.transfer_station = self.first_train['transfer_station_start_train']
             self.start_station_arrival = self.first_train['start_station_arrival']
@@ -337,7 +337,7 @@ class FormattedTrainData:
                     # print([train['start_station_arrival']for train in trip.first_three_trains])
                     first_three_trains_formatted = []
                     for train in trip.first_three_trains:
-                        print(train)
+                        # print(train)
                         if 'start_station_arrival' in train:
                             print('worked')
                             formatted_string = train['start_train_id'][-1] + " " + datetime.fromtimestamp(train['start_station_arrival']).strftime('%-I:%M')
