@@ -10,7 +10,7 @@ function LegInfo({leg}){
             <div className="start-station-info">
                 <div className="top">{leg.start_station}</div>
                 <div className="middle">{leg.direction_label} Bound {leg.route}</div>
-                <div className="bottom">Departs {leg.start_station_departure}</div>
+                <div className="bottom">Departs {leg.start_station_departure}</div><>{leg.first_three_trains}</>
             </div>
             <div className="middle-info">
                 <div className="top">{leg.number_of_stops} Stops</div>

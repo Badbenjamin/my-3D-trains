@@ -173,7 +173,7 @@ def get_station_arrival_times(gtfs_trains_for_station, gtfs_stop_id):
                                 # sorted(trains_traveling_between_stations_array, key= lambda bst: bst['end_station_arrival'])
     sorted_north_bound_trains = sorted(trains_arriving_at_station_n, key= lambda train : (train['arrival_time']))
     sorted_south_bound_trains = sorted(trains_arriving_at_station_s, key= lambda train : (train['arrival_time']))
-    return {"n_bound_arrivals" : sorted_north_bound_trains[0:3], "s_bound_arrivals" : sorted_south_bound_trains[0:3]}
+    return {"n_bound_arrivals" : sorted_north_bound_trains[0:3], "s_bound_arrivals" : sorted_south_bound_trains}
                           
                     
 # creates objs that make it easier to sort trains by arrival time.
@@ -527,25 +527,25 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
      train_pairs_with_transfer_array = find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array)
     # sort for earliest arrival at end station, AND largest gap between transfer station arrival and departure. 
      best_train_pairs_sorted = sorted(train_pairs_with_transfer_array, key= lambda tp : (tp['end_station_arrival'], -tp['transfer_station_time_gap']))
-     best_train_pair = None
-     if best_train_pairs_sorted:
-          best_train_pair = best_train_pairs_sorted[0]
+    #  best_train_pair = None
+    #  if best_train_pairs_sorted:
+    #       best_train_pair = best_train_pairs_sorted[0]
      
      best_single_trains_sorted = sorted(trains_traveling_between_stations_array, key = lambda bst: bst['end_station_arrival'])
-     best_single_train = None
-     if best_single_trains_sorted:
-          best_single_train = best_single_trains_sorted[0]
+    #  best_single_train = None
+    #  if best_single_trains_sorted:
+    #       best_single_train = best_single_trains_sorted[0]
 
      
-     if best_train_pair and best_single_train:
-          if best_train_pair['end_station_arrival'] < best_single_train['end_station_arrival']:
-               return best_train_pair
+     if best_train_pairs_sorted and best_single_trains_sorted:
+          if best_train_pairs_sorted[0]['end_station_arrival'] < best_single_trains_sorted[0]['end_station_arrival']:
+               return best_train_pairs_sorted
           else: 
-               return best_single_train
-     elif best_train_pair and not best_single_train:
-          return best_train_pair
-     elif best_single_train and not best_train_pair:
-          return best_single_train
+               return best_single_trains_sorted
+     elif best_train_pairs_sorted and not best_single_trains_sorted:
+          return best_train_pairs_sorted
+     elif best_single_trains_sorted and not best_train_pairs_sorted:
+          return best_single_trains_sorted
      else:
           return False
 

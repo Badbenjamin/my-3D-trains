@@ -49,7 +49,7 @@ function Station( { status, materials, mesh, index, getStationCode, id, retrieve
 
         function handleHtmlClick(){
             console.log('clicked')
-            setIsClicked(!isClicked)
+            // setIsClicked(!isClicked)
         }
 
         let stationHTML =   <Html
@@ -62,10 +62,12 @@ function Station( { status, materials, mesh, index, getStationCode, id, retrieve
                             >
                                 <div onClick={handleHtmlClick} className="station-html">
                                     <h2 className="station-html-text">{stationInfoObject.name + " " + stationInfoObject.daytime_routes}</h2>
-                                    <>{arrivalInfo.north_direction_label + arrivalInfo.n_bound_arrivals}</>
-                                    <>{arrivalInfo.south_direction_label + arrivalInfo.s_bound_arrivals}</>
-                                    <button onClick={()=>handleSetStationClick(stationInfoObject.id, "start")}>set as start</button>
-                                    <button onClick={()=>handleSetStationClick(stationInfoObject.id, "end")}>set as end</button>
+                                    <div className="arrivals-html">
+                                        <div>{arrivalInfo.north_direction_label + ": " + arrivalInfo.n_bound_arrivals}</div>
+                                        <div>{arrivalInfo.south_direction_label + ": " + arrivalInfo.s_bound_arrivals}</div>
+                                    </div>
+                                    <button onClick={()=>handleSetStationClick(stationInfoObject.id, "start")}>ORIGIN</button>
+                                    <button onClick={()=>handleSetStationClick(stationInfoObject.id, "end")}>DESTINATION</button>
                                 </div>
                             </Html>
         

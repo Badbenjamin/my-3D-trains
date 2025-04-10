@@ -44,7 +44,10 @@ def get_all_stations():
 
 def get_station_name(gtfs_id):
     station = Station.query.filter(Station.gtfs_stop_id == gtfs_id).first()
-    return {"name" : station.stop_name, "daytime_routes" : station.daytime_routes, "id" : station.id, "gtfs_stop_id" : station.gtfs_stop_id}, 200
+    if station:
+        return {"name" : station.stop_name, "daytime_routes" : station.daytime_routes, "id" : station.id, "gtfs_stop_id" : station.gtfs_stop_id}, 200
+    else:
+        return {"error" : "error"}, 500 
 
 @app.route('/api/arrivals/<string:gtfs_id>')
 def get_arrivals(gtfs_id):
