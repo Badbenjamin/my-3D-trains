@@ -288,7 +288,7 @@ class BestTrain:
 class NextTrains:
 
     def __init__(self, journey_obj, ):
-        pass
+        self.journey_obj = journey_obj
 
 
 # accepts trip_sequence, which is made up of TripSequenceElement objs or TripError objs, and converts to JSON style for front end. 
