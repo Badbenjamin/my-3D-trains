@@ -5,7 +5,7 @@ import { useGLTF } from '@react-three/drei'
 
 import './App.css'
 import Station from './Station'
-import { getAllIds, createStatusObjectArray, createStationComponentsObj, updateStatusArray, getStationCode } from './ModularFunctions'
+import { getAllIds, createStatusObjectArray, createStationComponentsObj, updateStatusArray, getStationCode} from './ModularFunctions'
 
 
 function App() {
@@ -20,8 +20,9 @@ function App() {
   const [statusArray, setStatusArray] = useState([])
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
+  const [stationIdStartAndEnd, setStationIdStartAndEnd] = useState({"startId" : null, "endId" : null})
   console.log('ti', tripInfo)
-  // get station info for trip planner for station search. 
+  // get station info for trip planner  for station search. 
   useEffect(() => {
     // remove local host for deployment
     fetch("http://127.0.0.1:5555/api/stations")
@@ -29,13 +30,30 @@ function App() {
       .then(stationsData => setStations(stationsData))
   }, [])
 
+  function retrieveStationId(id, startOrEnd) {
+    setStationIdStartAndEnd(prevState => {
+      const newStationIdStartOrEnd = { ...prevState };
+      if (startOrEnd === "start") {
+        newStationIdStartOrEnd['startId'] = id;
+      } else if (startOrEnd === "end") {
+        newStationIdStartOrEnd['endId'] = id;
+      }
+      return newStationIdStartOrEnd;
+    });
+  }
+  
+  console.log('start or end',stationIdStartAndEnd)
+
+  // useEffect(()=>{
+  //   setStationIdStartAndEnd(stationIdStartOrEnd['startId'])
+  // }, [stationIdStartAndEnd])
   // build stationArray of 3D station components for LinesAndMap
   // this useEffect creates Station objects for each geometry in our model
   useEffect(()=>{
     // newStatusArray is an array of objects with names of stations/meshes and a boolean to determine whether they are selected or not
     const newStatusArray = createStatusObjectArray(nodes)
     // newMapModelObj contains the info for all the station and track geometries in our scene
-    const newMapModelObj = createStationComponentsObj(nodes, materials, newStatusArray)
+    const newMapModelObj = createStationComponentsObj(nodes, materials, newStatusArray, retrieveStationId)
     // this loop populates newStationArray with meshes from our newMapModelObject
     const newStationArray = [...stationArray]
     for (const station in newMapModelObj){
@@ -105,6 +123,13 @@ function App() {
     }
   }, [tripInfo])
 
+  // function retrieveId(id, startOrEnd){
+  //    console.log(id, startOrEnd)
+  //   }
+  // console.log(typeof(retrieveId))
+
+  // let retrieveId = "STRING"
+  
   if (!nodes || !stationArray){
     return (
       <>loading</>
@@ -127,6 +152,8 @@ function App() {
         materials : materials,
         tripInfo : tripInfo,
         setTripInfo : setTripInfo,
+        stationIdStartAndEnd : stationIdStartAndEnd
+        // retrieveId : retrieveId
         }}/>
     </>
   )

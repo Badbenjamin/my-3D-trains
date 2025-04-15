@@ -69,6 +69,6 @@ def build_trip_sequence(journey_obj, train_data_obj):
         leg = FilteredTrains(train_data_obj, train_data_obj.start_station_id, train_data_obj.end_station_id, current_time_int)
         
         trip_sequence = filtered_trains_to_trip_sequence_element_or_trip_error(leg)
-       
+    print('ts',trip_sequence)
     return trip_sequence
 

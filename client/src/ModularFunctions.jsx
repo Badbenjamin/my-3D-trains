@@ -2,6 +2,7 @@ import Station from "./Station"
 
 export  function getStationCode(name){
   console.log('name',name)
+  
 }
 // takes a train (tripInfo) and statusArray as args, returns a list of station and track ids
 // these are used to update the status array and highlight a route
@@ -53,9 +54,13 @@ export function createStatusObjectArray(nodes){
   return newStatusArray
 }
 
-export function createStationComponentsObj(nodes, materials, newStatusArray){
+
+export function createStationComponentsObj(nodes, materials, newStatusArray, retrieveStationId){
     // this loop creates Station components for every mesh in the nodes from our model import.
     // count and index are used to assign status from newStatusArray to each Station
+    // function retrieveStationId(id, startOrEnd){
+    //   console.log('mf retrieve',id, startOrEnd)
+    // }
     let newMapModelObj = {}
     let count = 0
     for (const mesh in nodes){
@@ -70,7 +75,9 @@ export function createStationComponentsObj(nodes, materials, newStatusArray){
                       key={nodes[mesh].name} 
                       mesh={nodes[mesh]} 
                       materials={materials}
-                      getStationCode={getStationCode}/>
+                      getStationCode={getStationCode}
+                      retrieveStationId = {retrieveStationId}
+                      />
         } 
       };
     // console.log("nmmo func", newMapModelObj)
@@ -95,3 +102,6 @@ export function updateStatusArray(selectedIdArray, newStatusArray){
   return updatedStatusArray
 }
 
+// export function retrieveId(id, startOrEnd){
+//   return id, startOrEnd
+// }

@@ -3,9 +3,12 @@ import { useState, useEffect } from "react";
 import Select from 'react-select'
 import './Component.css'
 
-function StationSearch({getStations, position, stations}) {
-    // console.log(stations)
+function StationSearch({getStations, position, stations, stationId}) {
+    console.log('sid',stationId)
     const [selectedOption, setSelectedOption] = useState(null)
+    console.log('selectedOption', selectedOption)
+
+    
 
     const customStyles = {
         control : (provided) => ({
@@ -33,6 +36,20 @@ function StationSearch({getStations, position, stations}) {
         optionsArray.push(stationObj);
     }
     // console.log(optionsArray)
+
+    useEffect(()=>{
+        let buttonSelectedStationObj = selectedOption
+        for (const optionStation of optionsArray){
+            if (stationId == optionStation.value){
+                buttonSelectedStationObj = optionStation
+            }
+        }
+        setSelectedOption(buttonSelectedStationObj)
+        if (stationId != null){
+            getStations(buttonSelectedStationObj, position)
+        }
+        
+    },[stationId])
 
     return (
         <div>
