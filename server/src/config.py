@@ -9,6 +9,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from sqlalchemy import MetaData, create_engine
 
+
+
 # metadata to fix alembic bug
 convention = {
     "ix": "ix_%(column_0_label)s",
@@ -21,6 +23,13 @@ convention = {
 # init flask app
 # ADD STATIC FOLDER PATHS FOR DEPLOYMENT
 app = Flask(__name__)
+
+# JUST SHOW ERRORS FOR REQUESTS
+import logging
+log = logging.getLogger('werkzeug')
+# log.setLevel(logging.ERROR)
+log.disabled = True
+
 # pip install python-dotenv in command line 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URI']
 

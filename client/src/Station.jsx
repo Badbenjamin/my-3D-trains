@@ -95,6 +95,7 @@ function Station( { status, materials, mesh, index, getStationCode, id, retrieve
             }
         }, [])
 
+        // TOOLTIP WITH INFO AND ARRIVALS
         function handleClick(e){
             if (e.eventObject.name != "00_NYC_full_trackmap"){
                 fetch(`http://127.0.0.1:5555/api/arrivals/${stationInfoObject.gtfs_stop_id}`)

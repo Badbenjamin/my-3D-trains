@@ -208,6 +208,7 @@ class FilteredTrains:
         
         self.trip_error_obj = None
         self.best_train = None
+        self.sorted_train_objects = None
         self.local_express_seq = None
         
         # if the trip involves a transfer from local to express trains or vice versa. 
@@ -230,6 +231,8 @@ class FilteredTrains:
             # if filter yields results (trip can be completed by one or more trains), we will turn the first train into a BestTrain object.
             if len(self.filtered_train_data) > 0:
                 train_obj_array = modules_classes.trains_to_objects(self.filtered_train_data)
+                self.sorted_train_objects = train_obj_array
+                print('sorted', self.sorted_train_objects)
                 self.best_train = BestTrain(train_obj_array, start_station_id, end_station_id, time)
             # if no trains are returned from the filter, we create a TripError object
             elif (self.filtered_train_data == []):
@@ -287,8 +290,8 @@ class BestTrain:
 
 class NextTrains:
 
-    def __init__(self, journey_obj, ):
-        self.journey_obj = journey_obj
+    def __init__(self):
+        pass
 
 
 # accepts trip_sequence, which is made up of TripSequenceElement objs or TripError objs, and converts to JSON style for front end. 
@@ -405,11 +408,11 @@ class Stop:
 # This class accepts a BestTrain obj, or info from the local_express_sequence of a LocalExpress object, and saves the info to itself. 
 class TripSequenceElement:
 
-    def __init__(self, trip_info):
+    def __init__(self, trip_info, start_gtfs=None, end_gtfs=None):
         self.train_id = None
         self.train = None
-        self.start_station_id = None
-        self.end_station_id = None
+        self.start_station_id = start_gtfs
+        self.end_station_id = end_gtfs
         self.start_station_arrival = None
         self.end_station_arrival = None
         self.error = None
@@ -423,6 +426,12 @@ class TripSequenceElement:
             self.start_station_arrival = trip_info.origin_departure_time
             self.end_station_arrival = trip_info.dest_arrival_time
         # TRIP HAS A LOCAL TO EXPRESS OR EXP TO LOC TRANSFER
+        elif(isinstance(trip_info, Train)):
+            print('tse train', trip_info)
+            self.train_id = trip_info.trip_id
+            self.train = trip_info
+            self.start_station_arrival = trip_info.arrival_time(start_gtfs)
+            self.end_station_arrival = trip_info.arrival_time(end_gtfs)
         else:
             self.train_id = trip_info['train_id']
             self.train = trip_info['train']
