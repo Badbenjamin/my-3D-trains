@@ -77,73 +77,53 @@ def handle_trip_with_transfer_btw_lines(train_data_obj, journey_obj):
     return find_fastest_trip_or_return_error(possible_trip_sequences)
 
 def build_sequence_with_transfer_btw_lines(train_data_obj, journey_obj):
-    # all possible trips for multiple transfer stations
-    print('tdo', journey_obj.start_station.gtfs_stop_id)
+
     start_station_id = journey_obj.start_station.gtfs_stop_id
     end_station_id = journey_obj.end_station.gtfs_stop_id
-    ts_pairs = []
+    all_possible_ts_pairs = []
+
     for transfer_obj in journey_obj.transfer_info_obj_array:
-        # sorted_trains_list = leg_one_filtered_trains.best_train.sorted_trains
         start_terminus_gtfs_id = transfer_obj['start_term'].gtfs_stop_id
         end_origin_gtfs_id = transfer_obj['end_origin'].gtfs_stop_id
-        # ts_pair= [] 
-        
        
-
         leg_one_filtered_trains = FilteredTrains(train_data_obj, train_data_obj.start_station_id, start_terminus_gtfs_id, current_time_int)
         leg_one_sorted_train_obj_list = leg_one_filtered_trains.best_train.sorted_trains
+        
         leg_two_filtered_trains = FilteredTrains(train_data_obj, end_origin_gtfs_id, train_data_obj.end_station_id, current_time_int)
         leg_two_sorted_train_obj_list = leg_two_filtered_trains.best_train.sorted_trains
-        # FIGURE OUT TRANSFER TIME
+        
         transfer_time = 180
-        # need to create a pair of TSEs for each train in sorted train list
-        # how do get the arrival time from train_obj to be passed to the next leg?
-        # lets just get an array of arrays with train pairs
-        result = []
-        print(len(leg_one_sorted_train_obj_list))
-        print(len(leg_two_sorted_train_obj_list))
+        buffer_for_start_time = 60
+        
+        ts_pairs_for_one_route = []
         if leg_one_sorted_train_obj_list and leg_two_sorted_train_obj_list:
-            # result = []
-            # ts_pair = []
-            for first_train_obj in leg_one_sorted_train_obj_list:
-                # print('fto', first_train_obj)
+            for leg_one_train_obj in leg_one_sorted_train_obj_list:
                 ts_pair = []
-                found = False
-                i = 0
-                while (i < len(leg_two_sorted_train_obj_list) and found == False):
-                        second_train_obj = leg_two_sorted_train_obj_list[i]
-                        if (second_train_obj['origin_departure_time']) > (first_train_obj['dest_arrival_time'] + transfer_time):
-                            # print(first_train_obj['dest_arrival_time'], second_train_obj['origin_departure_time'])
-                            # print('fto', first_train_obj['train'])
-                            # ts_pair = [TripSequenceElement(first_train_obj['train'], start_station_id, start_terminus_gtfs_id), TripSequenceElement(second_train_obj['train'], end_origin_gtfs_id, end_station_id]
-                            ts_pair.append(TripSequenceElement(first_train_obj['train'], start_station_id, start_terminus_gtfs_id))           
-                            ts_pair.append(TripSequenceElement(second_train_obj['train'], end_origin_gtfs_id, end_station_id))
-                            i += 1
+                if ((leg_one_train_obj['origin_departure_time']) >= (current_time_int + buffer_for_start_time)):
+                    ts_pair.append(TripSequenceElement(leg_one_train_obj['train'], start_station_id, start_terminus_gtfs_id))
+                    i = 0
+                    found = False
+                    while ((found == False) and i < (len(leg_two_sorted_train_obj_list))):
+                        leg_two_train_obj = leg_two_sorted_train_obj_list[i]
+                        if (leg_two_train_obj['origin_departure_time'] >= (ts_pair[0].end_station_arrival + transfer_time)):
+                            ts_pair.append(TripSequenceElement(leg_two_train_obj['train'], end_origin_gtfs_id, end_station_id))
+                            ts_pairs_for_one_route.append(ts_pair)
                             found = True
                         else:
                             i += 1
-                if ts_pair:
-                    result.append(ts_pair)      
-                      
-                        
-        
 
         elif (leg_one_filtered_trains.trip_error_obj):
-            result.append(leg_one_filtered_trains.trip_error_obj)
-            return
-            # RETURN?
-            # pre_trip_seq.append(leg_one_filtered_trains.trip_error_obj)
-        
-        ts_pairs = result
-    # print('pts', possible_trip_sequences)
-    # for train_pair in possible_trip_sequences:
-    #     print('tp',len(train_pair))
+            ts_pair.append(leg_one_filtered_trains.trip_error_obj)
+            all_possible_ts_pairs.append(ts_pair)
 
-    # print([train_pair[1] for train_pair in possible_trip_sequences])
-    sorted_ts_pairs = sorted(ts_pairs, key = lambda ts_pair : ts_pair[1].end_station_arrival)
-    # sorted_possible_trip_sequences = sorted(possible_trip_sequences, key= lambda trip_sequence : (trip_sequence[-1].end_station_arrival))
-    # print('spts',sorted_train_obj_pairs)
-    # sorted_ts_pairs = []
+        for pair in ts_pairs_for_one_route:
+            all_possible_ts_pairs.append(pair)
+
+      
+        
+    
+    sorted_ts_pairs = sorted(all_possible_ts_pairs, key = lambda ts_pair : ts_pair[1].end_station_arrival)
+   
     return sorted_ts_pairs[0]
 
 

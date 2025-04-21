@@ -427,7 +427,7 @@ class TripSequenceElement:
             self.end_station_arrival = trip_info.dest_arrival_time
         # TRIP HAS A LOCAL TO EXPRESS OR EXP TO LOC TRANSFER
         elif(isinstance(trip_info, Train)):
-            print('tse train', trip_info)
+            # print('tse train', trip_info)
             self.train_id = trip_info.trip_id
             self.train = trip_info
             self.start_station_arrival = trip_info.arrival_time(start_gtfs)
