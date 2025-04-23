@@ -232,8 +232,10 @@ class FilteredTrains:
             if len(self.filtered_train_data) > 0:
                 train_obj_array = modules_classes.trains_to_objects(self.filtered_train_data)
                 self.sorted_train_objects = train_obj_array
+                # self.best_train = self.sorted_train_objects[0]
                 # print('sorted', self.sorted_train_objects)
                 self.best_train = BestTrain(train_obj_array, start_station_id, end_station_id, time)
+                # print('bt', self.best_train)
             # if no trains are returned from the filter, we create a TripError object
             elif (self.filtered_train_data == []):
                 self.trip_error_obj = TripError(self.all_train_data, self.start_station_id, self.end_station_id)
