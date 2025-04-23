@@ -383,10 +383,14 @@ class Train:
         self.route_id = route_id
         self.schedule = schedule
 
+    # bug on terminus with no arrival time provided! Return departure if on the terminus. 
     def arrival_time(self, station_gtfs_id):
         for stop in self.schedule:
             if stop.stop_id[:-1] == station_gtfs_id:
-                return stop.arrival
+                if stop.arrival:
+                    return stop.arrival
+                else:
+                    return stop.departure
             
     def route(self):
         return self.route_id
@@ -433,6 +437,7 @@ class TripSequenceElement:
             self.train_id = trip_info.trip_id
             self.train = trip_info
             self.start_station_arrival = trip_info.arrival_time(start_gtfs)
+            print('ssa', self.start_station_arrival)
             self.end_station_arrival = trip_info.arrival_time(end_gtfs)
         else:
             self.train_id = trip_info['train_id']

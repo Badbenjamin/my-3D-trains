@@ -123,7 +123,9 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
         if leg_one_sorted_train_obj_list:
             for leg_one_train_obj in leg_one_sorted_train_obj_list:
                 ts_pair = []
+                # print('l1to', leg_one_train_obj, current_time_int)
                 if ((leg_one_train_obj['origin_departure_time']) >= (current_time_int + buffer_for_start_time)):
+                    print('l1to', leg_one_train_obj, current_time_int)
                     ts_pair.append(TripSequenceElement(leg_one_train_obj['train'], start_station_id, start_terminus_gtfs_id))
                     if leg_two_sorted_train_obj_list:
                         i = 0
