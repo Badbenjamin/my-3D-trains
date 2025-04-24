@@ -20,6 +20,7 @@ def plan_trip(start_station_id, end_station_id):
     new_train_data = TrainData(new_journey)
     # trip_sequence is an array that contains either a TripSequenceElement object or a TripError object.
     trip_sequence = modules_app.build_trip_sequence(new_journey, new_train_data)
+    print('trip seq', trip_sequence)
     # FormattedTrainData class takes our trip sequence (one or two trips), and converts the first arriving train to a dict, which is sent to client. 
     return FormattedTrainData(trip_sequence).trains_for_react, 200
 

@@ -137,7 +137,7 @@ class LocalExpress:
 
                     first_six_trains.append(train)
                     start_train_ids.append(train['start_train_id'])
-            print(len(first_six_trains))
+            # print(len(first_six_trains))
             self.two_trains = True
             self.transfer_station = self.first_train['transfer_station_start_train']
             self.start_station_arrival = self.first_train['start_station_arrival']
@@ -217,6 +217,7 @@ class FilteredTrains:
             best_trains_and_transfer = modules_classes.find_best_trains_and_transfer_local_express(train_data, start_station_id, end_station_id)
             
             if best_trains_and_transfer:
+                print('btato', len(best_trains_and_transfer))
                 local_express_obj = LocalExpress(
                     best_trains_and_transfer_obj = best_trains_and_transfer,
                     start_station_id = start_station_id,
@@ -231,11 +232,13 @@ class FilteredTrains:
             # if filter yields results (trip can be completed by one or more trains), we will turn the first train into a BestTrain object.
             if len(self.filtered_train_data) > 0:
                 train_obj_array = modules_classes.trains_to_objects(self.filtered_train_data)
-                self.sorted_train_objects = train_obj_array
+                self.sorted_train_objects =  modules_classes.sort_trains_by_arrival_at_destination(train_obj_array, start_station_id, end_station_id, time)
+                
                 # self.best_train = self.sorted_train_objects[0]
                 # print('sorted', self.sorted_train_objects)
-                self.best_train = BestTrain(train_obj_array, start_station_id, end_station_id, time)
-                # print('bt', self.best_train)
+                # MIGHT NOT NEED THIS
+                self.best_train = self.sorted_train_objects[0]
+                print('bt', self.best_train)
             # if no trains are returned from the filter, we create a TripError object
             elif (self.filtered_train_data == []):
                 self.trip_error_obj = TripError(self.all_train_data, self.start_station_id, self.end_station_id)
@@ -272,7 +275,7 @@ class BestTrain:
         self.start_station_id = start_station_id #
         self.end_station_id = end_station_id #
         self.sorted_trains  = modules_classes.sort_trains_by_arrival_at_destination(train_obj_array, start_station_id, end_station_id, time)
-       
+        # print('bt sorted trains', self.sorted_trains)
         self.first_train_and_schedule = self.sorted_trains[0]
         self.first_six_sorted_trains = []
 
@@ -347,11 +350,11 @@ class FormattedTrainData:
                     for train in trip.first_six_trains:
                         # print(train)
                         if 'start_station_arrival' in train:
-                            print('worked')
+                            # print('worked')
                             formatted_string = train['start_train_id'][-1] + " " + datetime.fromtimestamp(train['start_station_arrival']).strftime('%-I:%M')
                             first_six_trains_formatted.append(formatted_string)
                         elif 'origin_departure_time' in train:
-                            print('worked')
+                            # print('worked')
                             formatted_string = train['train'].route_id + " " + datetime.fromtimestamp(train['origin_departure_time']).strftime('%-I:%M')
                             first_six_trains_formatted.append(formatted_string)
 
@@ -433,11 +436,9 @@ class TripSequenceElement:
             self.end_station_arrival = trip_info.dest_arrival_time
         # TRIP HAS A LOCAL TO EXPRESS OR EXP TO LOC TRANSFER
         elif(isinstance(trip_info, Train)):
-            # print('tse train', trip_info)
             self.train_id = trip_info.trip_id
             self.train = trip_info
             self.start_station_arrival = trip_info.arrival_time(start_gtfs)
-            print('ssa', self.start_station_arrival)
             self.end_station_arrival = trip_info.arrival_time(end_gtfs)
         else:
             self.train_id = trip_info['train_id']
@@ -460,7 +461,7 @@ class ArrivalsForStation:
         self.north_direction_label = self.station.north_direction_label
         self.south_direction_label = self.station.south_direction_label
         self.station_endpoints = modules_classes.get_endpoints_for_station(self.station.station_endpoints)
-        print('ss', self.station_endpoints)
+        # print('ss', self.station_endpoints)
 
         gtfs_trains_for_station = []
         for endpoint in self.station_endpoints:

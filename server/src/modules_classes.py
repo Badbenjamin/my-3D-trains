@@ -530,7 +530,7 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
     #  best_train_pair = None
     #  if best_train_pairs_sorted:
     #       best_train_pair = best_train_pairs_sorted[0]
-     
+     print('btps', len(best_train_pairs_sorted))
      best_single_trains_sorted = sorted(trains_traveling_between_stations_array, key = lambda bst: bst['end_station_arrival'])
     #  best_single_train = None
     #  if best_single_trains_sorted:
