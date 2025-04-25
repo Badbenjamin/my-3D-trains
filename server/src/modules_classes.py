@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 import math
 
 from Classes import current_time
@@ -527,10 +527,20 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
      train_pairs_with_transfer_array = find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array)
     # sort for earliest arrival at end station, AND largest gap between transfer station arrival and departure. 
      best_train_pairs_sorted = sorted(train_pairs_with_transfer_array, key= lambda tp : (tp['end_station_arrival'], -tp['transfer_station_time_gap']))
+     print('btp1', len(best_train_pairs_sorted))
+     best_train_pairs_sorted_de_duplicated = []
+     train_pair_ids = []
+     if best_train_pairs_sorted:
+          for train_pair in best_train_pairs_sorted:
+               if train_pair['start_train_id'] not in train_pair_ids:
+                    train_pair_ids.append(train_pair['start_train_id'])
+                    best_train_pairs_sorted_de_duplicated.append(train_pair)
+     print('dedupe', len(best_train_pairs_sorted_de_duplicated))
     #  best_train_pair = None
     #  if best_train_pairs_sorted:
     #       best_train_pair = best_train_pairs_sorted[0]
      print('btps', len(best_train_pairs_sorted))
+     print([datetime.fromtimestamp(train_pair['start_station_arrival']).strftime('%-I:%M') for train_pair in best_train_pairs_sorted_de_duplicated])
      best_single_trains_sorted = sorted(trains_traveling_between_stations_array, key = lambda bst: bst['end_station_arrival'])
     #  best_single_train = None
     #  if best_single_trains_sorted:
@@ -543,7 +553,7 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
           else: 
                return best_single_trains_sorted
      elif best_train_pairs_sorted and not best_single_trains_sorted:
-          return best_train_pairs_sorted
+          return best_train_pairs_sorted_de_duplicated
      elif best_single_trains_sorted and not best_train_pairs_sorted:
           return best_single_trains_sorted
      else:
