@@ -19,10 +19,11 @@ def plan_trip(start_station_id, end_station_id):
     # it contains the JSON train data from the realtime gtfs feed. 
     new_train_data = TrainData(new_journey)
     # trip_sequence is an array that contains either a TripSequenceElement object or a TripError object.
-    trip_sequence = modules_app.build_trip_sequence(new_journey, new_train_data)
-    print('trip seq', trip_sequence)
+    trip_sequences = modules_app.build_trip_sequence(new_journey, new_train_data)
+    print('ts1')
+    pprint.pp(trip_sequences[0])
     # FormattedTrainData class takes our trip sequence (one or two trips), and converts the first arriving train to a dict, which is sent to client. 
-    return FormattedTrainData(trip_sequence).trains_for_react, 200
+    return FormattedTrainData(trip_sequences[0]).trains_for_react, 200
 
 # get names and routes (and gtfs id) for react-select search bar in journey planner
 @app.route('/api/stations')

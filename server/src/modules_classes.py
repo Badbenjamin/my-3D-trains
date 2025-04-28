@@ -54,6 +54,25 @@ def trains_to_objects(filtered_trains):
             train_object_list.append(new_train)
         return train_object_list
 
+def single_train_to_train_class(train):
+    new_schedule = []
+    for stop in train.trip_update.stop_time_update:
+        from Classes import Stop
+        new_stop = Stop(
+            arrival= stop.arrival.time,
+            departure= stop.departure.time,
+            stop_id= stop.stop_id
+        )
+        new_schedule.append(new_stop)
+    from Classes import Train
+    new_train = Train(
+                trip_id= train.trip_update.trip.trip_id,
+                start_time= train.trip_update.trip.start_time,
+                start_date= train.trip_update.trip.start_date,
+                route_id= train.trip_update.trip.route_id,
+                schedule= new_schedule
+            )
+    return new_train
 # could I combine this into filter trains for station direction current?
 def check_for_station_service_on_failed_trip(train_data, start_station_id, end_station_id):
     
@@ -527,7 +546,7 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
      train_pairs_with_transfer_array = find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array)
     # sort for earliest arrival at end station, AND largest gap between transfer station arrival and departure. 
      best_train_pairs_sorted = sorted(train_pairs_with_transfer_array, key= lambda tp : (tp['end_station_arrival'], -tp['transfer_station_time_gap']))
-     print('btp1', len(best_train_pairs_sorted))
+    #  print('btp1', len(best_train_pairs_sorted))
      best_train_pairs_sorted_de_duplicated = []
      train_pair_ids = []
      if best_train_pairs_sorted:
@@ -535,26 +554,26 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
                if train_pair['start_train_id'] not in train_pair_ids:
                     train_pair_ids.append(train_pair['start_train_id'])
                     best_train_pairs_sorted_de_duplicated.append(train_pair)
-     print('dedupe', len(best_train_pairs_sorted_de_duplicated))
+    #  print('dedupe', len(best_train_pairs_sorted_de_duplicated))
     #  best_train_pair = None
     #  if best_train_pairs_sorted:
     #       best_train_pair = best_train_pairs_sorted[0]
-     print('btps', len(best_train_pairs_sorted))
-     print([datetime.fromtimestamp(train_pair['start_station_arrival']).strftime('%-I:%M') for train_pair in best_train_pairs_sorted_de_duplicated])
+    #  print('cps', len(best_train_pairs_sorted))
+    #  print([datetime.fromtimestamp(train_pair['start_station_arrival']).strftime('%-I:%M') for train_pair in best_train_pairs_sorted_de_duplicated])
      best_single_trains_sorted = sorted(trains_traveling_between_stations_array, key = lambda bst: bst['end_station_arrival'])
     #  best_single_train = None
     #  if best_single_trains_sorted:
     #       best_single_train = best_single_trains_sorted[0]
 
-     
+    #  COULD POSSIBLE MERGE SINGE AND PAIRS?
      if best_train_pairs_sorted and best_single_trains_sorted:
-          if best_train_pairs_sorted[0]['end_station_arrival'] < best_single_trains_sorted[0]['end_station_arrival']:
-               return best_train_pairs_sorted
+          if best_train_pairs_sorted_de_duplicated[0]['end_station_arrival'] < best_single_trains_sorted[0]['end_station_arrival']:
+               return best_train_pairs_sorted_de_duplicated
           else: 
                return best_single_trains_sorted
-     elif best_train_pairs_sorted and not best_single_trains_sorted:
+     elif best_train_pairs_sorted_de_duplicated and not best_single_trains_sorted:
           return best_train_pairs_sorted_de_duplicated
-     elif best_single_trains_sorted and not best_train_pairs_sorted:
+     elif best_single_trains_sorted and not best_train_pairs_sorted_de_duplicated:
           return best_single_trains_sorted
      else:
           return False

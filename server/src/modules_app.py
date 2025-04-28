@@ -158,32 +158,38 @@ def build_trip_sequence(journey_obj, train_data_obj):
         for ts_pair in trip_sequence:
             trip_sequences.append(ts_pair)
     elif (journey_obj.local_express):
-        # ERROR HANDLING
+        # NEED TO DEDUPE SORTED TRAINS
         local_express_trip = FilteredTrains(train_data_obj, train_data_obj.start_station_id, train_data_obj.end_station_id, current_time_int)
-        trip_sequence = []
-        print(len(local_express_trip.local_express_seq))
-        # local express seq is just two trains. How do I append multiple, sorted ts pairs to this list?
-        for train in local_express_trip.local_express_seq:
-            # print('im in this func')
-            tse = TripSequenceElement(train)
-            trip_sequence.append(tse)
-        trip_sequences.append(trip_sequence)
+        # print('let')
+        # pprint.pp(local_express_trip.local_express_seq)
+        
+        # print(len(local_express_trip.local_express_seq))
+        # DO I NEED TO TURN THESE INTO <TRAIN> OBJS?
+        for pair in local_express_trip.local_express_seq_2:
+            # print('pair',pair)
+            trip_sequence = []
+            if len(pair) == 2:
+                trip_sequence.append(TripSequenceElement(pair[0]['train'], pair[0]['start_station_id'], pair[0]['end_station_id']))
+                trip_sequence.append(TripSequenceElement(pair[1]['train'], pair[1]['start_station_id'], pair[1]['end_station_id']))
+            elif len(pair) == 1:
+                trip_sequence.append(TripSequenceElement(pair[0]['train'], pair[0]['start_station_id'], pair[0]['end_station_id']))
+            trip_sequences.append(trip_sequence)
+        #     for train in pair:
+        #         tse = TripSequenceElement(train)
+        #         trip_sequence.append(tse)
+        # trip_sequences.append(trip_sequence)
     else:
         filtered_trains_one_leg = FilteredTrains(train_data_obj, train_data_obj.start_station_id, train_data_obj.end_station_id, current_time_int)
-        # print('leg')
         start_gtfs_id = train_data_obj.start_station_id
         end_gtfs_id = train_data_obj.end_station_id
-        # add multiple trains to trip sequence
         if filtered_trains_one_leg.trip_error_obj:
             trip_sequences.append([filtered_trains_one_leg.trip_error_obj])
         else:
             for train in filtered_trains_one_leg.sorted_train_objects:
-                # print(train)
                 trip_sequence = []
                 tse = TripSequenceElement(train['train'], start_gtfs_id, end_gtfs_id)
                 trip_sequence.append(tse)
-                # trip_sequence = filtered_trains_to_trip_sequence_element_or_trip_error(leg)
                 trip_sequences.append(trip_sequence)
-    print('ts',trip_sequences)
-    return trip_sequences[0]
+    # print('ts',trip_sequences)
+    return trip_sequences
 
