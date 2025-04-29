@@ -21,7 +21,7 @@ function App() {
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
   const [stationIdStartAndEnd, setStationIdStartAndEnd] = useState({"startId" : null, "endId" : null})
-  console.log('ti', tripInfo)
+  console.log('ti', tripInfo[0])
   // get station info for trip planner  for station search. 
   useEffect(() => {
     // remove local host for deployment
@@ -72,14 +72,15 @@ function App() {
   useEffect(()=>{
     // trip info contains trains, which contain schedules.
     // schedules are used to select meshes to be highlighted in our map.
-    if (tripInfo == []){
+    if (tripInfo[0] == []){
       return 
-    } else if (tripInfo[0]?.schedule) {
+      // added [0] to deal with list?
+    } else if (tripInfo[0][0]?.schedule) {
       let allIdsArray = []
       // Trigger some sort of animation change with errors?
       let allErrorsArray = []
 
-      for (let leg of tripInfo){
+      for (let leg of tripInfo[0]){
         if(leg.schedule){
           for (let id of getAllIds(leg,statusArray)){
             allIdsArray.push(id)
@@ -150,7 +151,7 @@ function App() {
         setStationArray : setStationArray,
         nodes : nodes,
         materials : materials,
-        tripInfo : tripInfo,
+        tripInfo : tripInfo[0],
         setTripInfo : setTripInfo,
         stationIdStartAndEnd : stationIdStartAndEnd
         // retrieveId : retrieveId

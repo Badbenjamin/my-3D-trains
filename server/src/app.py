@@ -23,7 +23,7 @@ def plan_trip(start_station_id, end_station_id):
     print('ts1')
     pprint.pp(trip_sequences[0])
     # FormattedTrainData class takes our trip sequence (one or two trips), and converts the first arriving train to a dict, which is sent to client. 
-    return FormattedTrainData(trip_sequences[0]).trains_for_react, 200
+    return FormattedTrainData(trip_sequences).trip_sequences_for_react, 200
 
 # get names and routes (and gtfs id) for react-select search bar in journey planner
 @app.route('/api/stations')

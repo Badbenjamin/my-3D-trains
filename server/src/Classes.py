@@ -329,83 +329,86 @@ class NextTrains:
 
 # accepts trip_sequence, which is made up of TripSequenceElement objs or TripError objs, and converts to JSON style for front end. 
 class FormattedTrainData:
-    def __init__(self, trip_sequence):
-        self.trip_sequence = trip_sequence
-        print('tsft', trip_sequence)
+    def __init__(self, trip_sequences):
+        self.trip_sequences = trip_sequences
+        print('tsft', trip_sequences)
         # trains for react is sent to the client and the information is displaid. 
-        self.trains_for_react = []
-        for trip in self.trip_sequence:
-            print('trip', trip)
-            if isinstance(trip, TripSequenceElement):
-                start_station = Station.query.filter(Station.gtfs_stop_id == trip.start_station_id).first()
-                end_station = Station.query.filter(Station.gtfs_stop_id == trip.end_station_id).first()
-                first_train = trip.train
-                # print('ft', first_train)
-                first_train_schedule = first_train.schedule
-                # create an array of stop objects, the schedule for the train. 
-                first_train_stop_schedule = []
-                for stop in first_train_schedule:
-                    stop_obj = {
-                        "stop_id" : stop.stop_id,
-                        "arrival" : stop.arrival,
-                        "departure" : stop.departure
-                    }
-                    first_train_stop_schedule.append(stop_obj)
-                stop_schedule_ids = []
-                for stop in first_train_stop_schedule:
-                    stop_schedule_ids.append(stop['stop_id'][:-1])
-                
-                train_for_react = {
-                    "train_id" : first_train.trip_id,
-                    "start_station" : start_station.stop_name,
-                    "start_station_gtfs" : trip.start_station_id,
-                    "start_station_departure" : datetime.fromtimestamp(trip.start_station_arrival).strftime('%-I:%M'),
-                    "end_station" : end_station.stop_name,
-                    "end_station_gtfs" : trip.end_station_id,
-                    "end_station_arrival" : datetime.fromtimestamp(trip.end_station_arrival).strftime('%-I:%M'),
-                    "transfer_station" : None,
-                    "route" : first_train.route(),
-                    "direction_label" : None,
-                    "schedule" : first_train_stop_schedule,
-                    "number_of_stops" : stop_schedule_ids.index(trip.end_station_id) - stop_schedule_ids.index(trip.start_station_id),
-                    "trip_time" : (trip.end_station_arrival - trip.start_station_arrival)//60,
-
+        self.trip_sequences_for_react = []
+        for possible_trip in trip_sequences:
+            trip_sequence = []
+            for trip_sequence_element in possible_trip:
+                print('trip', trip_sequence_element)
+                if isinstance(trip_sequence_element, TripSequenceElement):
+                    start_station = Station.query.filter(Station.gtfs_stop_id == trip_sequence_element.start_station_id).first()
+                    end_station = Station.query.filter(Station.gtfs_stop_id == trip_sequence_element.end_station_id).first()
+                    first_train = trip_sequence_element.train
+                    # print('ft', first_train)
+                    first_train_schedule = first_train.schedule
+                    # create an array of stop objects, the schedule for the train. 
+                    first_train_stop_schedule = []
+                    for stop in first_train_schedule:
+                        stop_obj = {
+                            "stop_id" : stop.stop_id,
+                            "arrival" : stop.arrival,
+                            "departure" : stop.departure
+                        }
+                        first_train_stop_schedule.append(stop_obj)
+                    stop_schedule_ids = []
+                    for stop in first_train_stop_schedule:
+                        stop_schedule_ids.append(stop['stop_id'][:-1])
                     
-                }
-                if first_train.direction() == "N":
-                    train_for_react['direction_label'] = start_station.north_direction_label
-                if first_train.direction() == "S":
-                    train_for_react['direction_label'] = start_station.south_direction_label
-                # if hasattr(trip,'first_six_trains'):
-                #     first_six_trains_formatted = []
-                #     for train in trip.first_six_trains:
-                #         # print(train['start_station_arrival'])
-                #         if 'start_station_arrival' in train:
-                #             # print('worked')
-                #             formatted_string = train['start_train_id'][-1] + " " + datetime.fromtimestamp(train['start_station_arrival']).strftime('%-I:%M')
-                #             first_six_trains_formatted.append(formatted_string)
-                #         elif 'origin_departure_time' in train:
-                #             # print('worked')
-                #             formatted_string = train['train'].route_id + " " + datetime.fromtimestamp(train['origin_departure_time']).strftime('%-I:%M')
-                #             first_six_trains_formatted.append(formatted_string)
+                    train_for_react = {
+                        "train_id" : first_train.trip_id,
+                        "start_station" : start_station.stop_name,
+                        "start_station_gtfs" : trip_sequence_element.start_station_id,
+                        "start_station_departure" : datetime.fromtimestamp(trip_sequence_element.start_station_arrival).strftime('%-I:%M'),
+                        "end_station" : end_station.stop_name,
+                        "end_station_gtfs" : trip_sequence_element.end_station_id,
+                        "end_station_arrival" : datetime.fromtimestamp(trip_sequence_element.end_station_arrival).strftime('%-I:%M'),
+                        "transfer_station" : None,
+                        "route" : first_train.route(),
+                        "direction_label" : None,
+                        "schedule" : first_train_stop_schedule,
+                        "number_of_stops" : stop_schedule_ids.index(trip_sequence_element.end_station_id) - stop_schedule_ids.index(trip_sequence_element.start_station_id),
+                        "trip_time" : (trip_sequence_element.end_station_arrival - trip_sequence_element.start_station_arrival)//60,
 
-                    # train_for_react["first_six_trains"] = first_six_trains_formatted
-                self.trains_for_react.append(train_for_react)
-            elif isinstance(trip, TripError):
-                start_station = Station.query.filter(Station.gtfs_stop_id == trip.start_station_id).first()
-                end_station = Station.query.filter(Station.gtfs_stop_id == trip.end_station_id).first()
-                error_for_react = {
-                    "start_station_name" : start_station.stop_name,
-                    "start_station_gtfs" : trip.start_station_id,
-                    "start_station_service" : trip.start_station_service,
-                    "end_station_name" : end_station.stop_name,
-                    "end_station_gtfs" : trip.end_station_id,
-                    "end_station_service" : trip.end_station_service,
-                    "station_to_station_service" : trip.between_station_service
-                }
-                self.trains_for_react.append(error_for_react)
-        print('tfr')
-        pprint.pp(train_for_react)
+                        
+                    }
+                    if first_train.direction() == "N":
+                        train_for_react['direction_label'] = start_station.north_direction_label
+                    if first_train.direction() == "S":
+                        train_for_react['direction_label'] = start_station.south_direction_label
+                    # if hasattr(trip,'first_six_trains'):
+                    #     first_six_trains_formatted = []
+                    #     for train in trip.first_six_trains:
+                    #         # print(train['start_station_arrival'])
+                    #         if 'start_station_arrival' in train:
+                    #             # print('worked')
+                    #             formatted_string = train['start_train_id'][-1] + " " + datetime.fromtimestamp(train['start_station_arrival']).strftime('%-I:%M')
+                    #             first_six_trains_formatted.append(formatted_string)
+                    #         elif 'origin_departure_time' in train:
+                    #             # print('worked')
+                    #             formatted_string = train['train'].route_id + " " + datetime.fromtimestamp(train['origin_departure_time']).strftime('%-I:%M')
+                    #             first_six_trains_formatted.append(formatted_string)
+
+                        # train_for_react["first_six_trains"] = first_six_trains_formatted
+                    trip_sequence.append(train_for_react)
+                elif isinstance(trip_sequence_element, TripError):
+                    start_station = Station.query.filter(Station.gtfs_stop_id == trip_sequence_element.start_station_id).first()
+                    end_station = Station.query.filter(Station.gtfs_stop_id == trip_sequence_element.end_station_id).first()
+                    error_for_react = {
+                        "start_station_name" : start_station.stop_name,
+                        "start_station_gtfs" : trip_sequence_element.start_station_id,
+                        "start_station_service" : trip_sequence_element.start_station_service,
+                        "end_station_name" : end_station.stop_name,
+                        "end_station_gtfs" : trip_sequence_element.end_station_id,
+                        "end_station_service" : trip_sequence_element.end_station_service,
+                        "station_to_station_service" : trip_sequence_element.between_station_service
+                    }
+                    trip_sequence.append(error_for_react)
+            self.trip_sequences_for_react.append(trip_sequence)
+        # print('tfr')
+        # pprint.pp(self.trip_sequences_for_react)
     def __repr__(self):
         return f'<FormattedTrainData >'
 
