@@ -159,7 +159,8 @@ function App() {
         setStationArray : setStationArray,
         nodes : nodes,
         materials : materials,
-        tripInfo : tripInfo[tripInfoIndex],
+        // trip info array passed down
+        tripInfo : tripInfo,
         setTripInfo : setTripInfo,
         stationIdStartAndEnd : stationIdStartAndEnd
         // retrieveId : retrieveId

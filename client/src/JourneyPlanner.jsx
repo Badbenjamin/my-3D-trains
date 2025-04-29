@@ -3,6 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import './Component.css'
 import StationSearch from "./StationSearch";
 import TripInfo from "./TripInfo";
+import NextTrains from "./NextTrains";
 
 
 
@@ -38,19 +39,32 @@ function JourneyPlanner() {
     }
 
     function handleNextTrainClick(){
-        setTripInfoIndex(tripInfoIndex + 1)
+        if (tripInfoIndex < tripInfo.length - 1){
+            setTripInfoIndex(tripInfoIndex + 1)
+        } 
+        
+    }
+
+    function handlePrevTrainClick(){
+        if (tripInfoIndex != 0){
+            setTripInfoIndex(tripInfoIndex - 1)
+        } 
+        
     }
 
     return (
         <div>
-            <button onClick={handleNextTrainClick}>NEXT TRAIN</button>
+            
             <div className='journey-planner'>
                 <StationSearch className='station_search' stations={stations} getStations={getStations} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
                 <StationSearch className='station_search' stations={stations} getStations={getStations} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
                 <br></br>
                 <button className="plan-trip-button" onClick={planTrip}>Plan Trip</button>
             </div>
-            {tripInfo != undefined ? <TripInfo className='trip-info' tripInfo={tripInfo}/> : ""}
+            {tripInfo[tripInfoIndex] != undefined ? <TripInfo className='trip-info' tripInfo={tripInfo} tripInfoIndex={tripInfoIndex}/> : ""}
+            
+            <NextTrains tripInfo={tripInfo} tripInfoIndex={tripInfoIndex} setTripInfoIndex={setTripInfoIndex}/>
+            
         </div>
 
     )

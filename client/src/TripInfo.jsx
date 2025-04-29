@@ -2,10 +2,10 @@ import './Component.css'
 import LegInfo from './LegInfo'
 import ErrorInfo from './ErrorInfo'
 
-function TripInfo({tripInfo}){
+function TripInfo({tripInfo, tripInfoIndex}){
 
-    console.log('ti', tripInfo)
-    const tripInformation = tripInfo.map((leg) =>{
+    console.log('ti', tripInfo[tripInfoIndex])
+    const tripInformation = tripInfo[tripInfoIndex].map((leg) =>{
         console.log('leg', leg)
         if ('schedule' in leg){
             return <LegInfo key={leg.start_station}  className='leg-info' leg={leg}/>
