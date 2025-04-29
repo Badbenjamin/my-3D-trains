@@ -331,9 +331,11 @@ class NextTrains:
 class FormattedTrainData:
     def __init__(self, trip_sequence):
         self.trip_sequence = trip_sequence
+        print('tsft', trip_sequence)
         # trains for react is sent to the client and the information is displaid. 
         self.trains_for_react = []
         for trip in self.trip_sequence:
+            print('trip', trip)
             if isinstance(trip, TripSequenceElement):
                 start_station = Station.query.filter(Station.gtfs_stop_id == trip.start_station_id).first()
                 end_station = Station.query.filter(Station.gtfs_stop_id == trip.end_station_id).first()
@@ -388,7 +390,7 @@ class FormattedTrainData:
                 #             first_six_trains_formatted.append(formatted_string)
 
                     # train_for_react["first_six_trains"] = first_six_trains_formatted
-                # self.trains_for_react.append(train_for_react)
+                self.trains_for_react.append(train_for_react)
             elif isinstance(trip, TripError):
                 start_station = Station.query.filter(Station.gtfs_stop_id == trip.start_station_id).first()
                 end_station = Station.query.filter(Station.gtfs_stop_id == trip.end_station_id).first()
@@ -402,7 +404,8 @@ class FormattedTrainData:
                     "station_to_station_service" : trip.between_station_service
                 }
                 self.trains_for_react.append(error_for_react)
-            
+        print('tfr')
+        pprint.pp(train_for_react)
     def __repr__(self):
         return f'<FormattedTrainData >'
 

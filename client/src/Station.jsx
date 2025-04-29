@@ -16,7 +16,7 @@ function Station( { status, materials, mesh, index, getStationCode, id, retrieve
         const [isClicked, setIsClicked] = useState(false)
         const [arrivalInfo, setArrivalInfo] = useState({})
         let stationRef = useRef()
-        console.log('ai', arrivalInfo)
+        // console.log('ai', arrivalInfo)
         // let stt = <StationToolTip stationInfoObject={stationInfoObject} mesh={mesh}/>
 
         const selectedMaterial = new THREE.MeshStandardMaterial()
