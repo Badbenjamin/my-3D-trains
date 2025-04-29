@@ -21,7 +21,9 @@ function App() {
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
   const [stationIdStartAndEnd, setStationIdStartAndEnd] = useState({"startId" : null, "endId" : null})
-  console.log('ti', tripInfo[0])
+  // console.log('ti', tripInfo[0])
+  console.log('sa', statusArray)
+
   // get station info for trip planner  for station search. 
   useEffect(() => {
     // remove local host for deployment
@@ -42,11 +44,12 @@ function App() {
     });
   }
   
-  console.log('start or end',stationIdStartAndEnd)
+  // console.log('start or end',stationIdStartAndEnd)
 
   // useEffect(()=>{
   //   setStationIdStartAndEnd(stationIdStartOrEnd['startId'])
   // }, [stationIdStartAndEnd])
+
   // build stationArray of 3D station components for LinesAndMap
   // this useEffect creates Station objects for each geometry in our model
   useEffect(()=>{
@@ -70,12 +73,14 @@ function App() {
   // selectStations takes an array of gtfs ids and uses it to change the status of the stations in stationArray.
 
   useEffect(()=>{
+    console.log('ti',tripInfo[0])
     // trip info contains trains, which contain schedules.
     // schedules are used to select meshes to be highlighted in our map.
-    if (tripInfo[0] == []){
+    if (tripInfo == []){
       return 
       // added [0] to deal with list?
-    } else if (tripInfo[0][0]?.schedule) {
+    } else if (tripInfo[0]) {
+      console.log('worked')
       let allIdsArray = []
       // Trigger some sort of animation change with errors?
       let allErrorsArray = []
