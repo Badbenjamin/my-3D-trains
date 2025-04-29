@@ -20,9 +20,10 @@ function App() {
   const [statusArray, setStatusArray] = useState([])
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
+  const [tripInfoIndex, setTripInfoIndex] = useState(0)
   const [stationIdStartAndEnd, setStationIdStartAndEnd] = useState({"startId" : null, "endId" : null})
-  // console.log('ti', tripInfo[0])
-  console.log('sa', statusArray)
+  console.log('tii', tripInfoIndex)
+  // console.log('sa', statusArray)
 
   // get station info for trip planner  for station search. 
   useEffect(() => {
@@ -73,19 +74,19 @@ function App() {
   // selectStations takes an array of gtfs ids and uses it to change the status of the stations in stationArray.
 
   useEffect(()=>{
-    console.log('ti',tripInfo[0])
+    console.log('ti',tripInfo[tripInfoIndex])
     // trip info contains trains, which contain schedules.
     // schedules are used to select meshes to be highlighted in our map.
     if (tripInfo == []){
       return 
       // added [0] to deal with list?
-    } else if (tripInfo[0]) {
+    } else if (tripInfo[tripInfoIndex]) {
       console.log('worked')
       let allIdsArray = []
       // Trigger some sort of animation change with errors?
       let allErrorsArray = []
 
-      for (let leg of tripInfo[0]){
+      for (let leg of tripInfo[tripInfoIndex]){
         if(leg.schedule){
           for (let id of getAllIds(leg,statusArray)){
             allIdsArray.push(id)
@@ -127,7 +128,7 @@ function App() {
       console.log('asa', alteredStationArray)
       setStationArray(alteredStationArray)
     }
-  }, [tripInfo])
+  }, [tripInfo, tripInfoIndex])
 
   // function retrieveId(id, startOrEnd){
   //    console.log(id, startOrEnd)
@@ -150,13 +151,15 @@ function App() {
         stations : stations, 
         version : version, 
         setVersion : setVersion, 
+        tripInfoIndex: tripInfoIndex,
+        setTripInfoIndex : setTripInfoIndex,
         statusArray : statusArray, 
         setStatusArray : setStatusArray, 
         stationArray : stationArray, 
         setStationArray : setStationArray,
         nodes : nodes,
         materials : materials,
-        tripInfo : tripInfo[0],
+        tripInfo : tripInfo[tripInfoIndex],
         setTripInfo : setTripInfo,
         stationIdStartAndEnd : stationIdStartAndEnd
         // retrieveId : retrieveId

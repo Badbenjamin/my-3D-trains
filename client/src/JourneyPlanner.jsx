@@ -8,7 +8,7 @@ import TripInfo from "./TripInfo";
 
 function JourneyPlanner() {
 
-    const {tripInfo, stations, setTripInfo, stationIdStartAndEnd} = useOutletContext()
+    const {tripInfo, stations, setTripInfo, stationIdStartAndEnd, tripInfoIndex, setTripInfoIndex} = useOutletContext()
     
     const [journeyStations, setJourneyStations] = useState([null, null])
     console.log('js', journeyStations)
@@ -37,9 +37,13 @@ function JourneyPlanner() {
         }
     }
 
+    function handleNextTrainClick(){
+        setTripInfoIndex(tripInfoIndex + 1)
+    }
 
     return (
         <div>
+            <button onClick={handleNextTrainClick}>NEXT TRAIN</button>
             <div className='journey-planner'>
                 <StationSearch className='station_search' stations={stations} getStations={getStations} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
                 <StationSearch className='station_search' stations={stations} getStations={getStations} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
