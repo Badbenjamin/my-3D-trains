@@ -95,3 +95,17 @@ a:visited{
 .canvas_text{
   color:black;
 }
+
+.next-trains-bar{
+  display: flex;
+  /* align-items: center; */
+  justify-content: center;
+}
+
+.next-train-button{
+  background-color: grey;
+}
+
+.next-train-button-selected{
+  background-color: rgb(255, 225, 58);
+}

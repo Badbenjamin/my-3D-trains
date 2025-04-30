@@ -128,7 +128,63 @@ function App() {
       console.log('asa', alteredStationArray)
       setStationArray(alteredStationArray)
     }
-  }, [tripInfo, tripInfoIndex])
+  }, [tripInfoIndex])
+
+  useEffect(()=>{
+    if (tripInfo == []){
+      return 
+      // added [0] to deal with list?
+    } else if (tripInfo[tripInfoIndex]) {
+      console.log('worked')
+      let allIdsArray = []
+      // Trigger some sort of animation change with errors?
+      let allErrorsArray = []
+
+      for (let leg of tripInfo[tripInfoIndex]){
+        if(leg.schedule){
+          for (let id of getAllIds(leg,statusArray)){
+            allIdsArray.push(id)
+          }
+        } else {
+          console.log('error')
+          // allErrorsArray.push(leg.error)
+        }
+      }
+      
+      // version must update to change key and trigger re render
+      // does version need to be saved in state?
+      setVersion(version + 1)
+      
+      const newStatusArray = [...statusArray]
+      // reset statuses to false 
+      for (const status of newStatusArray){
+        status['status'] = false
+      }
+        
+      // set statusArray state to updated version
+      setStatusArray(updateStatusArray(allIdsArray, newStatusArray))
+    
+      // alteredStationArray will contain stations with updated status.
+      const alteredStationArray = stationArray.map((station) => {
+        const newStation = {...station}
+        const newStationName = newStation['props']['name']
+        let newStationStatus = newStation['props']['status']['status']
+          
+        // IMPORTANT TO UPDATE KEY TO TRIGGER RE RENDER
+        // look for match between station gtfs id and gtfs id's in statusArray
+        for (const status of newStatusArray){
+            newStationStatus = status['status']
+            newStation['key'] =  String(newStationName + version)
+            // newStation['id'] = String(newStationName + version)
+          }
+        return newStation
+      })
+      console.log('asa', alteredStationArray)
+      setStationArray(alteredStationArray)
+    }
+
+    setTripInfoIndex(0)
+  }, [tripInfo])
 
   // function retrieveId(id, startOrEnd){
   //    console.log(id, startOrEnd)

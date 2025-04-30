@@ -270,7 +270,7 @@ class FilteredTrains:
             # if no trains are returned from the filter, we create a TripError object
             elif (self.filtered_train_data == []):
                 self.trip_error_obj = TripError(self.all_train_data, self.start_station_id, self.end_station_id)
-
+        print('sto', self.sorted_train_objects)
     def __repr__(self):
         if (self.best_train):
             return f'<FilteredTrains #Trains {len(self.filtered_train_data)} between {self.start_station_id} and {self.end_station_id} >'

@@ -93,6 +93,7 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
         # START HERE TOMORROW. ERROR LOGIC COULD OCCUR HERE RATHER THAN IN LOOP
         # THIS LIST DOESNT EXIST IF FILTER PRODUCES TRIP ERROR
         # GET RID OF BEST TRAIN OR KEEP?
+        print('l1ft', leg_one_filtered_trains)
         if (leg_one_filtered_trains.trip_error_obj != None):
             all_possible_ts_pairs.append([leg_one_filtered_trains.trip_error_obj])
             return all_possible_ts_pairs
