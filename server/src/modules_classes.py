@@ -212,25 +212,38 @@ def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_st
 
 # is quick sort efficient for a sorted array?
 # it should be sorted correctly unless an express train arrives at the destination. 
-def quick_sort_trains_by_arrival_time(train_obj_array):
+def quick_sort_trains_by_arrival_time(train_obj_array, sort_by_origin_departure_or_dest_arrival):
+    print('doa', sort_by_origin_departure_or_dest_arrival)
+    sort_by = ''
+    if sort_by_origin_departure_or_dest_arrival == 'destination_arrival':
+         sort_by = 'dest_arrival_time'
+    elif sort_by_origin_departure_or_dest_arrival == 'origin_departure':
+         sort_by = 'origin_departure_time'
     new_train_obj_array = [*train_obj_array]
     if len(new_train_obj_array) < 2:
          return new_train_obj_array
     else:
          pivot = new_train_obj_array[0]
-         less = [nto for nto in new_train_obj_array[1:] if nto['dest_arrival_time'] <= pivot['dest_arrival_time']]
-         greater = [nto for nto in new_train_obj_array[1:] if nto['dest_arrival_time'] > pivot['dest_arrival_time']]
-         return quick_sort_trains_by_arrival_time(less) + [pivot] + quick_sort_trains_by_arrival_time(greater)
+         less = [nto for nto in new_train_obj_array[1:] if nto[sort_by] <= pivot[sort_by]]
+         greater = [nto for nto in new_train_obj_array[1:] if nto[sort_by] > pivot[sort_by]]
+         return quick_sort_trains_by_arrival_time(less, sort_by_origin_departure_or_dest_arrival) + [pivot] + quick_sort_trains_by_arrival_time(greater, sort_by_origin_departure_or_dest_arrival)
 
 
 # takes list of JSON trains (from filter_trains_for_stations_direction_future_arrival()) and returns list of trains sorted by arrival time at destination.
-def sort_trains_by_arrival_at_destination(filtered_train_data_object, start_station_id, dest_station_id, time):
-    
+def sort_trains_by_arrival_at_destination_or_origin_departure(filtered_train_data_object, start_station_id, dest_station_id, time, sort_by_departure_or_arrival):
+        print('sbdoa', sort_by_departure_or_arrival)
+        departure_or_arrival = ''
+        if sort_by_departure_or_arrival == 'destination_arrival':
+            #  print('worked')
+             departure_or_arrival = 'destination_arrival'
+        elif sort_by_departure_or_arrival == 'origin_departure':
+             departure_or_arrival = 'origin_departure'
+        print('dporar',departure_or_arrival)
         # take JSON train array (filtered) and build objects with {train, dest arrival, origin arrival} key value pairs
         trains_with_arrival_objs_array = create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id)
-
+        print('twaoa', trains_with_arrival_objs_array)
         # use quicksort to sort array of objects by arrival at destination.
-        sorted_trains = [train for train in quick_sort_trains_by_arrival_time(trains_with_arrival_objs_array) if train['origin_departure_time'] >= time]
+        sorted_trains = [train for train in quick_sort_trains_by_arrival_time(trains_with_arrival_objs_array, departure_or_arrival) if train['origin_departure_time'] >= time]
         return sorted_trains
 
 # returns True if a route from the start station routes is present in the end station routes

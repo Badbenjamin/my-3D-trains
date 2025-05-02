@@ -209,9 +209,12 @@ class FilteredTrains:
         
         self.trip_error_obj = None
         self.best_train = None
-        self.sorted_train_objects = None
+        self.train_objects_sorted_by_dest_arrival = None
+        self.train_objects_sorted_by_origin_departure = None
         self.local_express_seq = None
         self.local_express_seq_2 = []
+
+        # print('ss', train_data.journey_object.shared_stations)
         # if the trip involves a transfer from local to express trains or vice versa. 
         if train_data.local_express:
             # finds either a pair of trains with a transfer station, a single train (local faster), or no trains. No trains produces TripError object.
@@ -260,17 +263,19 @@ class FilteredTrains:
             # if filter yields results (trip can be completed by one or more trains), we will turn the first train into a BestTrain object.
             if len(self.filtered_train_data) > 0:
                 train_obj_array = modules_classes.trains_to_objects(self.filtered_train_data)
-                self.sorted_train_objects =  modules_classes.sort_trains_by_arrival_at_destination(train_obj_array, start_station_id, end_station_id, time)
-                
+                self.train_objects_sorted_by_dest_arrival =  modules_classes.sort_trains_by_arrival_at_destination_or_origin_departure(train_obj_array, start_station_id, end_station_id, time, 'destination_arrival')
+                if train_data.journey_object.shared_stations:
+                    print('ss')
+                    self.train_objects_sorted_by_origin_departure = modules_classes.sort_trains_by_arrival_at_destination_or_origin_departure(train_obj_array, start_station_id, end_station_id, time, 'origin_departure')
                 # self.best_train = self.sorted_train_objects[0]
                 # print('sorted', self.sorted_train_objects)
                 # MIGHT NOT NEED THIS
-                self.best_train = self.sorted_train_objects[0]
+                self.best_train = self.train_objects_sorted_by_dest_arrival[0]
                 # print('bt', self.best_train)
             # if no trains are returned from the filter, we create a TripError object
             elif (self.filtered_train_data == []):
                 self.trip_error_obj = TripError(self.all_train_data, self.start_station_id, self.end_station_id)
-        print('sto', self.sorted_train_objects)
+        # print('sto', self.sorted_train_objects)
     def __repr__(self):
         if (self.best_train):
             return f'<FilteredTrains #Trains {len(self.filtered_train_data)} between {self.start_station_id} and {self.end_station_id} >'
@@ -331,13 +336,13 @@ class NextTrains:
 class FormattedTrainData:
     def __init__(self, trip_sequences):
         self.trip_sequences = trip_sequences
-        print('tsft', trip_sequences)
+        # print('tsft', trip_sequences)
         # trains for react is sent to the client and the information is displaid. 
         self.trip_sequences_for_react = []
         for possible_trip in trip_sequences:
             trip_sequence = []
             for trip_sequence_element in possible_trip:
-                print('trip', trip_sequence_element)
+                # print('trip', trip_sequence_element)
                 if isinstance(trip_sequence_element, TripSequenceElement):
                     start_station = Station.query.filter(Station.gtfs_stop_id == trip_sequence_element.start_station_id).first()
                     end_station = Station.query.filter(Station.gtfs_stop_id == trip_sequence_element.end_station_id).first()
