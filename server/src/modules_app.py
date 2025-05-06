@@ -120,31 +120,26 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
         buffer_for_start_time = 30
         print('lens', len(leg_one_sorted_train_obj_list), len(leg_one_sorted_train_obj_list))
         ts_pairs_for_one_route = []
-        first_train_ids = []
         count = 0
+        # STILL NEED TO FIGURE OUT WHY LIST IS SHORT FOR CERTAIN TRIPS
         if leg_one_sorted_train_obj_list:
             for leg_one_train_obj in leg_one_sorted_train_obj_list:
-                print('l1t0', leg_one_train_obj['train'].trip_id)
                 ts_pair = []
-                
-                # print('l1to', leg_one_train_obj, current_time_int)
+  
                 if ((leg_one_train_obj['origin_departure_time']) >= (current_time_int + buffer_for_start_time)):
-                    # print('l1to', leg_one_train_obj, current_time_int)
+                    ts_pair.append(TripSequenceElement(leg_one_train_obj['train'], start_station_id, start_terminus_gtfs_id))
                     
-                    if leg_one_train_obj['train'].trip_id not in first_train_ids:
-                        ts_pair.append(TripSequenceElement(leg_one_train_obj['train'], start_station_id, start_terminus_gtfs_id))
-                        # first_train_ids.append(leg_one_train_obj['train'].trip_id)
                     if leg_two_sorted_train_obj_list:
                         i = 0
                         found = False
                         while ((found == False) and i < (len(leg_two_sorted_train_obj_list))):
                             
                             leg_two_train_obj = leg_two_sorted_train_obj_list[i]
-                            # print('l2t0', leg_two_train_obj)
-                            if (leg_two_train_obj['origin_departure_time'] >= (leg_one_train_obj['dest_arrival_time'] + transfer_time)):
+                            
+                            if ((leg_one_train_obj['dest_arrival_time'] + transfer_time) <= (leg_two_train_obj['origin_departure_time'])):
                                 ts_pair.append(TripSequenceElement(leg_two_train_obj['train'], end_origin_gtfs_id, end_station_id))
                                 count += 1
-                                # print('tsp', ts_pair)
+                      
                                 ts_pairs_for_one_route.append(ts_pair)
                                 found = True
                             else:
@@ -152,10 +147,9 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
 
     for pair in ts_pairs_for_one_route:
         all_possible_ts_pairs.append(pair)
-
     
     sorted_ts_pairs = sorted(all_possible_ts_pairs, key = lambda ts_pair : ts_pair[1].end_station_arrival)
-    # print('stsp', sorted_ts_pairs)
+    print(count)
     return sorted_ts_pairs
 
 
@@ -195,7 +189,7 @@ def build_trip_sequence(journey_obj, train_data_obj):
         if filtered_trains_one_leg.trip_error_obj:
             trip_sequences.append([filtered_trains_one_leg.trip_error_obj])
         else:
-            for train in filtered_trains_one_leg.sorted_train_objects:
+            for train in filtered_trains_one_leg.train_objects_sorted_by_dest_arrival:
                 trip_sequence = []
                 tse = TripSequenceElement(train['train'], start_gtfs_id, end_gtfs_id)
                 trip_sequence.append(tse)
