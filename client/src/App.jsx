@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { useState, useEffect} from 'react'
 import { useGLTF } from '@react-three/drei'
+import { useFrame } from '@react-three/fiber'
 
 
 import './App.css'
@@ -13,7 +14,7 @@ function App() {
   // load station and track model. destructure to nodes and materials to create Station component
   // nodes correspond to each geometry in the model
   // each node contains a mesh, which has the properties for that geometry 
-  const { nodes, materials } = useGLTF('./subway_map_v5.glb')
+  const { nodes, materials } = useGLTF('./subway_map_stations_tracks_1.glb')
   
   const [stations, setStations] = useState([])
   const [stationArray, setStationArray] = useState([])
@@ -22,7 +23,8 @@ function App() {
   const [tripInfo, setTripInfo] = useState([])
   const [tripInfoIndex, setTripInfoIndex] = useState(0)
   const [stationIdStartAndEnd, setStationIdStartAndEnd] = useState({"startId" : null, "endId" : null})
-  console.log('tii', tripInfoIndex)
+  const [vectorPosition, setVectorPositon] = useState({})
+  console.log('vp', vectorPosition)
   // console.log('sa', statusArray)
 
   // get station info for trip planner  for station search. 
@@ -186,6 +188,11 @@ function App() {
     setTripInfoIndex(0)
   }, [tripInfo])
 
+          // console.log('vp', vectorPosition)
+          
+      
+
+
   // function retrieveId(id, startOrEnd){
   //    console.log(id, startOrEnd)
   //   }
@@ -218,8 +225,10 @@ function App() {
         // trip info array passed down
         tripInfo : tripInfo,
         setTripInfo : setTripInfo,
-        stationIdStartAndEnd : stationIdStartAndEnd
+        stationIdStartAndEnd : stationIdStartAndEnd,
         // retrieveId : retrieveId
+        vectorPosition : vectorPosition,
+        setVectorPositon : setVectorPositon
         }}/>
     </>
   )
