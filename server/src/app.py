@@ -60,3 +60,7 @@ def get_arrivals(gtfs_id):
 @app.route('/api/trainlocations')
 def get_train_locations():
     pass
+
+# @app.route('/api/allstationsinfo')
+# def get_all_stations_info():
+#     stations = 

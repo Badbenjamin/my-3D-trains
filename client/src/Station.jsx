@@ -128,7 +128,7 @@ function Station( { status, materials, mesh, index, getStationCode, id, retrieve
                   scale={newScale}
                   
             />
-                {<Html  wrapperClass="station_label" distanceFactor={5} center={true} position={newPosition}>{stationInfoObject.name+ " " + stationInfoObject.daytime_routes}</Html>}
+                {/* {<Html  wrapperClass="station_label" distanceFactor={5} center={true} position={newPosition}>{stationInfoObject.name+ " " + stationInfoObject.daytime_routes}</Html>} */}
                 {!isClicked ? <></> : stationHTML}
         </group>
     )
