@@ -12,6 +12,8 @@ import Map from "./Map"
 import { getByteLength } from 'three/src/extras/TextureUtils.js'
 import { useRef, useEffect, useState } from 'react'
 
+
+// MAYBE CALL THIS ENVIRONMENT OR SOMETHING
 function LinesAndMap(){
     const ref = useRef()
     const {vectorPosition, setVectorPositon} = useOutletContext()
@@ -56,16 +58,12 @@ function LinesAndMap(){
     // },[])
 
     // let pos = {}
+    // MAP CONTROLLS IN THIS COMPONENT, SO CAMERA POSITION DETERMINED HERE AND PASSED DOWN
     useFrame((state, delta) => {
         let newVectorPosition = {...vectorPosition}
         if (ref.current){
             newVectorPosition = ref.current.object.position
-            // pos = newVectorPosition
-            // let newVectorPosition = {ref.current.object.position}
-            // console.log(ref.current.object.position)
             setVectorPositon(newVectorPosition)
-            // console.log(vectorPosition)
-            // console.log('vp', vectorPosition)
         }
     })
     // console.log('p', vectorPosition)

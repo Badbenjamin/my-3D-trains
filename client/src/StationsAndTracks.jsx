@@ -54,13 +54,34 @@ useEffect(()=>{
 },[stationInfoObjectArray])
 
 
+let origin= {"x": 0, "y": 0, "z": 0}
+
+function findDistance(point1, point2){
+  let x1 = point1["x"]
+  let y1 = point1['y']
+  let z1 = point1['z']
+
+  let x2 = point2['x']
+  let y2 = point2['y']
+  let z2 = point2['z']
+
+  let result = Math.sqrt(((x2-x1)**2) + ((y2-y1)**2) + ((z2-z1)**2))
+  return result
+}
+
+let p1 = {"x": 1, "y": 1, "z": 1}
+
+// console.log('dist',findDistance(origin, p1))
 
 // POSITION OF CAMERA
     useFrame((state, delta) => {
       // console.log('vecpos', vectorPosition)
+      console.log('dist',findDistance(origin, vectorPosition))
+
+
   })
 
-console.log('ht', stationHtml)
+// console.log('ht', stationHtml)
   
 
   if (stationArray == []){
