@@ -9,17 +9,19 @@ import { useState } from 'react'
 export default function StationsAndTracks({vectorPosition}) {
     // console.log('v3',vector3)
     const {stationArray} = useOutletContext()
-    const [meshPosition, setMeshPostion] = useState([])
+    // const [meshPosition, setMeshPostion] = useState([])
     const [stationInfoObjectArray, setStationInfoObjectArray] = useState([])
-    const [stationHtml, setStationHtml] = useState([])
+    const [stationHtmlArray, setStationHtmlArray] = useState([])
+    const [cameraDistance, setCameraDistance] = useState(0)
 
 useEffect(()=>{
       fetch(`http://127.0.0.1:5555/api/stations`)
       .then(response => response.json())
       .then(stationInfoObjectArray => {setStationInfoObjectArray(stationInfoObjectArray)})
 },[])
-  console.log('sioa',stationInfoObjectArray)
+  // console.log('sioa',stationInfoObjectArray)
 
+  // COMBINE station info from DB with location info from map model
 useEffect(()=>{
   
   if (stationInfoObjectArray && stationArray){
@@ -35,7 +37,7 @@ useEffect(()=>{
     for (let i = 0 ; i < stationInfoObjectArray.length; i++){
       stationInfoObject = {...stationInfoObject, [stationInfoObjectArray[i].gtfs_stop_id] : stationInfoObjectArray[i]}
     }
-    console.log('sio2', stationInfoObject)
+    // console.log('sio2', stationInfoObject)
 
     let newHtmlArray = []
     for (let j = 0 ; j < stationArray.length; j++){
@@ -44,16 +46,16 @@ useEffect(()=>{
         if( stationArray[j].props.name in stationInfoObject){
           let newPosition = stationArray[j].props.mesh.position
           let newInfoObject = stationInfoObject[stationArray[j].props.name]
-          let newHtml = <Html  wrapperClass="station_label" distanceFactor={5} center={true} position={newPosition}>{newInfoObject.name+ " " + newInfoObject.daytime_routes}</Html>
+          let newHtml = <Html key={stationArray[j].props.name}  wrapperClass="station_label" distanceFactor={5} center={true} position={newPosition}>{newInfoObject.name+ " " + newInfoObject.daytime_routes}</Html>
           newHtmlArray.push(newHtml)
         }
       }
     }
-    setStationHtml(newHtmlArray)
+    setStationHtmlArray(newHtmlArray)
   }
 },[stationInfoObjectArray])
 
-
+console.log('shtml', stationHtmlArray)
 let origin= {"x": 0, "y": 0, "z": 0}
 
 function findDistance(point1, point2){
@@ -76,11 +78,14 @@ let p1 = {"x": 1, "y": 1, "z": 1}
 // POSITION OF CAMERA
     useFrame((state, delta) => {
       // console.log('vecpos', vectorPosition)
-      console.log('dist',findDistance(origin, vectorPosition))
+      // console.log('dist',findDistance(origin, vectorPosition))
+      let newCameraDistance = Math.round(findDistance(origin, vectorPosition) * 100) / 100
+      setCameraDistance(newCameraDistance)
+      
 
 
   })
-
+console.log('cd',cameraDistance)
 // console.log('ht', stationHtml)
   
 
@@ -88,17 +93,17 @@ let p1 = {"x": 1, "y": 1, "z": 1}
     return(
         <>loading</>
     )
-  } else if (stationArray && !stationHtml){
+  } else if (stationArray && !stationHtmlArray){
     return (
       <group  dispose={null}>
           {stationArray}
       </group>
     )
-  }else if (stationArray && stationHtml){
+  }else if (stationArray && stationHtmlArray){
     return (
       <group  dispose={null}>
           {stationArray}
-          {stationHtml}
+          {stationHtmlArray}
       </group>
     )
   }

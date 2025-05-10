@@ -79,7 +79,7 @@ function LinesAndMap(){
             <directionalLight position={[1,2,3]} intenstity={1.5}/>
             <Sky/>
             <Map/>
-            <StationsAndTracks vectorPosition={vectorPosition}/>
+            <StationsAndTracks  vectorPosition={vectorPosition}/>
         </>
     )
 }
