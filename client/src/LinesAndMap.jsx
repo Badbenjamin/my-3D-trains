@@ -62,11 +62,12 @@ function LinesAndMap(){
     useFrame((state, delta) => {
         let newVectorPosition = {...vectorPosition}
         if (ref.current){
+            
             newVectorPosition = ref.current.object.position
             setVectorPositon(newVectorPosition)
         }
     })
-    // console.log('p', vectorPosition)
+    console.log('t', ref.current.object)
 
     
     return(
