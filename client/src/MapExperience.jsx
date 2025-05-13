@@ -14,9 +14,9 @@ function MapExpierience(){
 
     return(
         <>  
-            <TimeDate/>
+            {/* <TimeDate/> */}
             <JourneyPlanner/>
-            <Canvas camera={{ fov: 90, position: [5, -200, 0] }}>
+            <Canvas camera={{ fov: 90, position: [1, -120, .2] }}>
                 <SubwayMap />
             </Canvas>
         </>

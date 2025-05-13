@@ -76,7 +76,7 @@ useEffect(()=>{
           let newInfoObject = stationInfoObject[stationArray[j].props.name]
           // let newHtml = <Html key={stationArray[j].props.name}  wrapperClass="station_label" distanceFactor={5} center={true} position={newPosition}>{newInfoObject.name+ " " + newInfoObject.daytime_routes}</Html>
           // VERSION???
-          let newStationText = <StationText wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name}  distanceFactor={5} center={true} position={newPosition} text={newInfoObject.name+ " " + newInfoObject.daytime_routes} />
+          let newStationText = <StationText wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} text={newInfoObject.name+ " " + newInfoObject.daytime_routes} />
           newHtmlArray.push(newStationText)
           // newPositionArray.push(newPosition)
         }
@@ -153,11 +153,11 @@ useEffect(()=>{
       if (findDistance(stationText.props.position, cameraPosition) < 17){
         // return <StationText status={true} />
         let status = true
-        let newStationText = <StationText wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={5} center={true} position={stationText.props.position} text={stationText.props.text} />
+        let newStationText = <StationText wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} text={stationText.props.text} />
         return newStationText
       } else {
         let status = false
-        let newStationText = <StationText wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={5} center={true} position={stationText.props.position} text={stationText.props.text} />
+        let newStationText = <StationText wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} text={stationText.props.text} />
         return newStationText
       }
     })
