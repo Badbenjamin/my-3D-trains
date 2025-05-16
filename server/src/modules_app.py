@@ -118,6 +118,7 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
         
         transfer_time = 180
         buffer_for_start_time = 30
+        # USEFULL PRINT STATEMENT
         print('lens', len(leg_one_sorted_train_obj_list), len(leg_one_sorted_train_obj_list))
         ts_pairs_for_one_route = []
         count = 0
@@ -149,7 +150,7 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
         all_possible_ts_pairs.append(pair)
     
     sorted_ts_pairs = sorted(all_possible_ts_pairs, key = lambda ts_pair : ts_pair[1].end_station_arrival)
-    print(count)
+    # print(count)
     return sorted_ts_pairs
 
 

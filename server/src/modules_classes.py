@@ -213,7 +213,7 @@ def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_st
 # is quick sort efficient for a sorted array?
 # it should be sorted correctly unless an express train arrives at the destination. 
 def quick_sort_trains_by_arrival_time(train_obj_array, sort_by_origin_departure_or_dest_arrival):
-    print('doa', sort_by_origin_departure_or_dest_arrival)
+    # print('doa', sort_by_origin_departure_or_dest_arrival)
     sort_by = ''
     if sort_by_origin_departure_or_dest_arrival == 'destination_arrival':
          sort_by = 'dest_arrival_time'

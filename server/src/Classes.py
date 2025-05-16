@@ -265,7 +265,7 @@ class FilteredTrains:
                 train_obj_array = modules_classes.trains_to_objects(self.filtered_train_data)
                 self.train_objects_sorted_by_dest_arrival =  modules_classes.sort_trains_by_arrival_at_destination_or_origin_departure(train_obj_array, start_station_id, end_station_id, time, 'destination_arrival')
                 if train_data.journey_object.shared_stations:
-                    print('ss')
+                    # print('ss')
                     self.train_objects_sorted_by_origin_departure = modules_classes.sort_trains_by_arrival_at_destination_or_origin_departure(train_obj_array, start_station_id, end_station_id, time, 'origin_departure')
                 # self.best_train = self.sorted_train_objects[0]
                 # print('sorted', self.sorted_train_objects)

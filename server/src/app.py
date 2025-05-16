@@ -18,6 +18,7 @@ def plan_trip(start_station_id, end_station_id):
     # new_train_data takes the info from new_journey and uses it to make requests from the relevant MTA API route endpoints.
     # it contains the JSON train data from the realtime gtfs feed. 
     new_train_data = TrainData(new_journey)
+    print('ntd', new_train_data.all_train_data)
     # trip_sequence is an array that contains either a TripSequenceElement object or a TripError object.
     trip_sequences = modules_app.build_trip_sequence(new_journey, new_train_data)
     # print('ts1')
@@ -44,14 +45,14 @@ def get_all_stations():
         complex_ids.append(station.complex_id)
         station_list.append(station_obj)
     complex_list = [complex_id for complex_id in complex_ids if complex_ids.count(complex_id)>1]
-    print(complex_list)
+    # print(complex_list)
     final_station_list = []
     for station in station_list:
         if station['complex_id'] in complex_list:
             # print(station['id']
             station['complex'] = True
         final_station_list.append(station)
-    pprint.pp(final_station_list)
+    # pprint.pp(final_station_list)
     return station_list, 200
 
 # get station names for HTML text on map

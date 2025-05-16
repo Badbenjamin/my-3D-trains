@@ -2,28 +2,22 @@
 import { useEffect } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import { useFrame } from '@react-three/fiber'
-// import { Html } from "@react-three/drei"
 import { useState } from 'react'
 
 
 import StationText from './StationText'
+import ComplexText from './ComplexText'
 
 
 export default function StationsAndTracks({vectorPosition}) {
-    // console.log('v3',vector3)
     const {stationArray} = useOutletContext()
-    // const [meshPosition, setMeshPostion] = useState([])
     const [stationInfoObjectArray, setStationInfoObjectArray] = useState([])
     const [stationHtmlArray, setStationHtmlArray] = useState([])
-    // const [positionArray, setPositionArray] = useState([])
-    // const [cameraPosition, setCameraPosition] = useState({})
-    // const [cameraDistance, setCameraDistance] = useState(0)
+    const [complexHtmlArray, setComplexHtmlArray] = useState([])
     const [cameraPosition, setCameraPosition] = useState({"x": 0, "y" : 0, "z" : 0})
 
-let now = new Date()
-let halfSec = Math.round(now.getTime()/1000)
-// console.log(Math.floor(now.getTime()/10))
-// console.log(halfSec)
+
+
 
 function findDistance(point1, point2){
     let x1 = point1["x"]
@@ -45,113 +39,122 @@ useEffect(()=>{
 },[])
   // console.log('sioa',stationInfoObjectArray)
 
-  // COMBINE station info from DB with location info from map model
+  // COMBINE station info from DB with location info from map model to display HTML text on map
 useEffect(()=>{
   
   if (stationInfoObjectArray && stationArray){
-    // console.log('i work')
-    // for (let i = 0; i < stationArray.length ; i++){
-    //   let meshName = stationArray[i].props.mesh.name
-    //   for (let j = 0; j < stationInfoObjectArray.length; j++){
-    //     let stationName = stationInfoObjectArray[j].gtfs_stop_id
-    //     console.log(stationName)
-    //   }
-    // }
+
+    // This is the station information returned from the call to the backend
+    // an object is created with gtfs Id as the key, and info from the DB as the value
     let stationInfoObject = {}
     for (let i = 0 ; i < stationInfoObjectArray.length; i++){
       stationInfoObject = {...stationInfoObject, [stationInfoObjectArray[i].gtfs_stop_id] : stationInfoObjectArray[i]}
     }
-    // console.log('sio2', stationInfoObject)
-
-    let newHtmlArray = []
-    let newPositionArray =[]
+    // console.log('sio', stationInfoObject)
+    // stationArray is the array of meshes from the blender model, containing position
+    // stationHtmlArray will contain <StationText/> elements that will display info above each station
+    // we are combining the position of the mesh from the blender model with the information for the station from the backend
+    let newStationHtmlArray = []
+    // this might not be needed
+    let newComplexHtmlArray = []
+    let complexObject = {}
+    let count = 0
+    // loop through meshes 
+    // maybe this is the issue?
     for (let j = 0 ; j < stationArray.length; j++){
-      
+      // console.log('co', complexObject)
+      // console.log('info obj', stationInfoObject[stationArray[j].props.name])
       if (stationArray[j].props.name.length < 5){
-        if( stationArray[j].props.name in stationInfoObject){
+        // if name is in stationInfoObject as key, and is not a complex, create <StationText> and push to stationHtmlArray
+        if( stationArray[j].props.name in stationInfoObject && !stationInfoObject[stationArray[j].props.name].complex){
           let status = false
           let newPosition = stationArray[j].props.mesh.position
-          // console.log(newPosition)
-          // let distance = findDistance(newPosition, cameraPosition)
+
           let newInfoObject = stationInfoObject[stationArray[j].props.name]
-          // let newHtml = <Html key={stationArray[j].props.name}  wrapperClass="station_label" distanceFactor={5} center={true} position={newPosition}>{newInfoObject.name+ " " + newInfoObject.daytime_routes}</Html>
+          // console.log('nio', newInfoObject.complex)
           // VERSION???
           let newStationText = <StationText wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} text={newInfoObject.name+ " " + newInfoObject.daytime_routes} />
-          newHtmlArray.push(newStationText)
-          // newPositionArray.push(newPosition)
+          newStationHtmlArray.push(newStationText)
+
+          // if complex = True, create key in complexObject from complex_id and add values to key
+          // I WANT TO CREATE NEW KEY VALUE PAIRS WHEN NOT IN DICT, BUT ADD TO VALUES WHEN KEY IS IN DICT
+        } else if ( stationArray[j].props.name in stationInfoObject && stationInfoObject[stationArray[j].props.name].complex){
+          // console.log('worked 1', complexObject, complexObject == {})
+          // let status = true
+          let newPosition = stationArray[j].props.mesh.position
+
+          let newInfoObject = stationInfoObject[stationArray[j].props.name]
+          // console.log(newInfoObject.complex_id)
+          if (Object.keys(complexObject).length === 0 || !(complexObject.hasOwnProperty(newInfoObject.complex_id))){
+            // console.log('worked 2', complexObject)
+            
+            complexObject[newInfoObject.complex_id] = {
+                "complex_id" : newInfoObject.complex_id,
+                "daytime_routes" : newInfoObject.daytime_routes.split(" "),
+                "gtfs_stop_ids" : [newInfoObject.gtfs_stop_id],
+                "positions" : [newPosition],
+                "stop_names" : [newInfoObject.name],
+                // "count" : count
+            } 
+          } else {
+            // console.log(complexObject[newInfoObject.complex_id]['daytime_routes'])
+            // console.log([newInfoObject.daytime_routes.split(" ")])
+            let routes = complexObject[newInfoObject.complex_id]['daytime_routes']
+            let newRoutes = newInfoObject.daytime_routes.split(" ")
+            let concatRoutes = routes.concat(newRoutes)
+            complexObject[newInfoObject.complex_id]['daytime_routes'] = concatRoutes
+
+            let stopIds = complexObject[newInfoObject.complex_id]['gtfs_stop_ids']
+            let newStopId = newInfoObject.gtfs_stop_id
+            stopIds.push(newStopId)
+
+            let positions = complexObject[newInfoObject.complex_id]['positions']
+            let nextNewPosition = newPosition
+            positions.push(nextNewPosition)
+           
+            let stopNames = complexObject[newInfoObject.complex_id]['stop_names']
+            let newStopName = newInfoObject.name
+            stopNames.push(newStopName)
+          }
+          
+      
         }
       }
     }
-    setStationHtmlArray(newHtmlArray)
-    // setPositionArray(newPositionArray)
+    console.log(complexObject)
+    let i = 0
+    for (let complex in complexObject){
+      let status = true
+      i += 1
+      // console.log(complexObject[complex])
+      let newComplexText = <ComplexText wrapperClass="station_label"  index={i} status={status} key={complexObject[complex].complex_id}  distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} positions={complexObject[complex].positions} names={complexObject[complex].stop_names} />
+      newComplexHtmlArray.push(newComplexText)
+    }
+    setStationHtmlArray(newStationHtmlArray)
+    setComplexHtmlArray(newComplexHtmlArray)
   }
 },[stationInfoObjectArray])
 
 
-// console.log('shtml', stationHtmlArray)
-// let origin= {"x": 0, "y": 0, "z": 0}
-
-
-
-// let p1 = {"x": 1, "y": 1, "z": 1}
-
-
-
 // POSITION OF CAMERA
     useFrame((state, delta) => {
-      // console.log('vecpos', vectorPosition)
-      // console.log('dist',findDistance(origin, vectorPosition))
-      // USE ROUNDING TO ONLY CHANGE AT CERTAIN INTERVALS?
-      // console.log('vp',vectorPosition)
-      // let newCameraPosition = {...cameraPosition}
-      // newCameraPosition = vectorPosition
-      // setCameraPosition(newCameraPosition)
-      // console.log('cploop',cameraPosition)
 
-      // let newCameraDistance = Math.round(findDistance(p1, vectorPosition) * 100) / 100
-      // setCameraDistance(newCameraDistance)
-      
-      // console.log('vp', vectorPosition.x)
-      // console.log('delt', delta)
-      // console.log(Date.now)
-      // console.log(halfSec)
       let newCameraPosition = {...cameraPosition}
       newCameraPosition.x = Math.round(vectorPosition.x) 
       newCameraPosition.y = Math.round(vectorPosition.y) 
       newCameraPosition.z = Math.round(vectorPosition.z)  
 
-      // only update with a real change in position!
-      // console.log(cameraPosition, newCameraPosition)
-      // console.log(cameraPosition !== newCameraPosition)
       if (newCameraPosition.x !== cameraPosition.x || newCameraPosition.y !== cameraPosition.y || newCameraPosition.z !== cameraPosition.z){
         setCameraPosition(newCameraPosition)
       }
-      // setCameraPosition(
-      //   cameraPosition["x"] = vectorPosition["x"],
-      //   cameraPosition["y"]= vectorPosition["y"],
-      //   cameraPosition["z"] = vectorPosition["z"]
-      // )
-
-
   })
-console.log('cp',cameraPosition)
-
-// console.log(halfSec)
-// necessary?
 
 useEffect(()=>{
-  // let count = 0
-  // console.log('change')
-  // let newStationHtml = stationHtmlArray.map((station)=>{
-  //   console.log(station)
-  // })
-  console.log(halfSec)
+
   if (true){
-    // console.log('change')
     let newStationHtml = [...stationHtmlArray]
     newStationHtml = stationHtmlArray.map((stationText)=>{
-      if (findDistance(stationText.props.position, cameraPosition) < 17){
-        // return <StationText status={true} />
+      if (findDistance(stationText.props.position, cameraPosition) < 16){
         let status = true
         let newStationText = <StationText wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} text={stationText.props.text} />
         return newStationText
@@ -163,24 +166,6 @@ useEffect(()=>{
     })
     setStationHtmlArray(newStationHtml)
   }
-  // console.log('change')
-  // console.log(vectorPosition)
-  // HOW DO I UPDATE THE ITEMS IN THE ARRAY TO SEND CAMERA DISTANCE TO THEM?
-  // let newStationHtmlArray = []
-  // for (let i = 0; i < stationHtmlArray.length; i++){
-  //   let newStationText = <StationText cameraPosition={cameraPosition}  />
-  //   newStationHtmlArray.push(newStationText)
-  // }
-  // setStationHtmlArray(newStationHtmlArray)
-
-  // let newPositionArray = positionArray.map((position)=>{
-  //   return
-  // })
-  // console.log('pa', positionArray)
-  // let newStationHtmlArray = stationHtmlArray.map((station)=>{
-  //   console.log(station.props.distance)
-  // })
-
 
 }, [cameraPosition])
   
@@ -195,11 +180,12 @@ useEffect(()=>{
           {stationArray}
       </group>
     )
-  }else if (stationArray && stationHtmlArray){
+  }else if (stationArray && stationHtmlArray && complexHtmlArray){
     return (
       <group  dispose={null}>
           {stationArray}
           {stationHtmlArray}
+          {complexHtmlArray}
       </group>
     )
   }
