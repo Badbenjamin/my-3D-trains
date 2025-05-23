@@ -40,3 +40,16 @@ html{
   align-items: center;
 }
 
+.x-button{
+  font-size: 12px;
+  font-weight: bold;
+  margin-top: 1px;
+  margin-right: 2px;
+  position:absolute;
+  top:0;
+  right:0;
+  border-style: solid;
+  border-color: black;
+  border-radius: 3px;
+}
+
