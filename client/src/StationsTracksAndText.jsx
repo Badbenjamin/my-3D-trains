@@ -9,11 +9,12 @@ import StationText from './StationText'
 import ComplexText from './ComplexText'
 
 
-export default function StationsAndTracks({vectorPosition}) {
+export default function StationsTracksAndText({vectorPosition}) {
     const {stationArray} = useOutletContext()
     const [stationInfoObjectArray, setStationInfoObjectArray] = useState([])
     const [stationHtmlArray, setStationHtmlArray] = useState([])
     const [complexHtmlArray, setComplexHtmlArray] = useState([])
+    const [toolTipArray, setToolTipArray] = useState([])
     const [cameraPosition, setCameraPosition] = useState({"x": 0, "y" : 0, "z" : 0})
 
 
@@ -39,6 +40,14 @@ useEffect(()=>{
 },[])
   // console.log('sioa',stationInfoObjectArray)
 
+function handleStationClick(text){
+  console.log(text)
+}
+
+function handleComplexClick(){
+  console.log('c click')
+}
+
   // COMBINE station info from DB with location info from map model to display HTML text on map
 useEffect(()=>{
   
@@ -57,6 +66,7 @@ useEffect(()=>{
     let newStationHtmlArray = []
     // this might not be needed
     let newComplexHtmlArray = []
+    let newTooltipArray = []
     let complexObject = {}
     let count = 0
     // loop through meshes 
@@ -73,7 +83,7 @@ useEffect(()=>{
           let newInfoObject = stationInfoObject[stationArray[j].props.name]
           // console.log('nio', newInfoObject.complex)
           // VERSION???
-          let newStationText = <StationText wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} text={newInfoObject.name+ " " + newInfoObject.daytime_routes} />
+          let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id}/>
           newStationHtmlArray.push(newStationText)
 
           // if complex = True, create key in complexObject from complex_id and add values to key
@@ -127,7 +137,7 @@ useEffect(()=>{
       let status = true
       i += 1
       // console.log(complexObject[complex])
-      let newComplexText = <ComplexText wrapperClass="station_label"  index={i} status={status} key={complexObject[complex].complex_id}  distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} positions={complexObject[complex].positions} names={complexObject[complex].stop_names} />
+      let newComplexText = <ComplexText onClick={handleComplexClick} wrapperClass="station_label"  index={i} status={status} key={complexObject[complex].complex_id}  distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} positions={complexObject[complex].positions} names={complexObject[complex].stop_names}  />
       newComplexHtmlArray.push(newComplexText)
     }
     setStationHtmlArray(newStationHtmlArray)
@@ -149,18 +159,20 @@ useEffect(()=>{
       }
   })
 
+// check camera distance to turn on/off station html text
 useEffect(()=>{
 
+  // clean this up!!!
   if (true){
     let newStationHtml = [...stationHtmlArray]
     newStationHtml = stationHtmlArray.map((stationText)=>{
       if (findDistance(stationText.props.position, cameraPosition) < 16){
         let status = true
-        let newStationText = <StationText wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} text={stationText.props.text} />
+        let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} name={stationText.props.name} daytime_routes={stationText.props.daytime_routes} gtfs_stop_id={stationText.props.gtfs_stop_id}/>
         return newStationText
       } else {
         let status = false
-        let newStationText = <StationText wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} text={stationText.props.text} />
+        let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} name={stationText.props.name} daytime_routes={stationText.props.daytime_routes} gtfs_stop_id={stationText.props.gtfs_stop_id}/>
         return newStationText
       }
     })

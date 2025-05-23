@@ -23,7 +23,7 @@ export default function ComplexText({positions, names, routes,status}){
         return new THREE.Vector3(xAv, yAv, zAv)
     }
     let averagePosition = avereragePosition(positions)
-    console.log(positions[0], averagePosition)
+    // console.log(positions[0], averagePosition)
     // useFrame((state, delta)=>{
     // })
     return(

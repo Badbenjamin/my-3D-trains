@@ -1,14 +1,19 @@
 import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 
-export default function StationText({position, text, status}){
+import './App.css'
 
+export default function StationText({handleStationClick, position, daytime_routes, name, status, gtfs_stop_id}){
+
+    function handleClick(e){
+        handleStationClick(gtfs_stop_id)
+    }
 
     useFrame((state, delta)=>{
     })
     return(
         <>
-            {status ? <Html  wrapperClass="station_label" distanceFactor={5} center={true} position={position}>{text}</Html> : <></>}
+            {status ? <Html wrapperClass="station_label" distanceFactor={5} center={true} position={position}>{<button className="station-html-button-text" onClick={handleClick}>{name + " " + daytime_routes}</button>}</Html> : <></>}
         </>
     )
 }

@@ -7,7 +7,7 @@ import { useOutletContext } from 'react-router-dom'
 
 // import { mapControls } from 'three/addons/controls/OrbitControls.js';
 
-import StationsAndTracks from "./StationsAndTracks"
+import StationsTracksAndText from "./StationsTracksAndText"
 import Map from "./Map"
 import { getByteLength } from 'three/src/extras/TextureUtils.js'
 import { useRef, useEffect, useState } from 'react'
@@ -80,7 +80,7 @@ function LinesAndMap(){
             <directionalLight position={[1,2,3]} intenstity={1.5}/>
             <Sky/>
             <Map/>
-            <StationsAndTracks  vectorPosition={vectorPosition}/>
+            <StationsTracksAndText  vectorPosition={vectorPosition}/>
         </>
     )
 }
