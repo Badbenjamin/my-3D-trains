@@ -165,13 +165,13 @@ useEffect(()=>{
 
   let newStationHtml = [...stationHtmlArray]
   newStationHtml = stationHtmlArray.map((stationText)=>{
-    if (findDistance(stationText.props.position, cameraPosition) <= 15){
+    if (findDistance(stationText.props.position, cameraPosition) <= 20){
       let distance = findDistance(stationText.props.position, cameraPosition)
       // let opacityPercentage = Math.round((distance / 15) * 100)
       // console.log(opacityPercentage)
       let alphaLevel = 0
-      if (distance <= 15 && distance >= 10){
-        alphaLevel = Math.abs((distance - 15) / (15 - 10))
+      if (distance <= 20 && distance >= 15){
+        alphaLevel = Math.abs((distance - 20) / (20 - 15))
         // alphaLevel = 0
         console.log(alphaLevel)
       } else {
