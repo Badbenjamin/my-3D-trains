@@ -7,6 +7,7 @@ import { useState } from 'react'
 
 import StationText from './StationText'
 import ComplexText from './ComplexText'
+import StationToolTip from './StationTooltip'
 
 
 export default function StationsTracksAndText({vectorPosition}) {
@@ -83,7 +84,7 @@ useEffect(()=>{
           let newInfoObject = stationInfoObject[stationArray[j].props.name]
           // console.log('nio', newInfoObject.complex)
           // VERSION???
-          let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id}/>
+          let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
           newStationHtmlArray.push(newStationText)
 
           // if complex = True, create key in complexObject from complex_id and add values to key
@@ -162,22 +163,51 @@ useEffect(()=>{
 // check camera distance to turn on/off station html text
 useEffect(()=>{
 
-  // clean this up!!!
-  if (true){
-    let newStationHtml = [...stationHtmlArray]
-    newStationHtml = stationHtmlArray.map((stationText)=>{
-      if (findDistance(stationText.props.position, cameraPosition) < 16){
-        let status = true
-        let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} name={stationText.props.name} daytime_routes={stationText.props.daytime_routes} gtfs_stop_id={stationText.props.gtfs_stop_id}/>
-        return newStationText
+  let newStationHtml = [...stationHtmlArray]
+  newStationHtml = stationHtmlArray.map((stationText)=>{
+    if (findDistance(stationText.props.position, cameraPosition) <= 15){
+      let distance = findDistance(stationText.props.position, cameraPosition)
+      // let opacityPercentage = Math.round((distance / 15) * 100)
+      // console.log(opacityPercentage)
+      let alphaLevel = 0
+      if (distance <= 15 && distance >= 10){
+        alphaLevel = Math.abs((distance - 15) / (15 - 10))
+        // alphaLevel = 0
+        console.log(alphaLevel)
       } else {
-        let status = false
-        let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} name={stationText.props.name} daytime_routes={stationText.props.daytime_routes} gtfs_stop_id={stationText.props.gtfs_stop_id}/>
-        return newStationText
+        alphaLevel = 1
       }
-    })
+     
+      let status = true
+      let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} name={stationText.props.name} daytime_routes={stationText.props.daytime_routes} gtfs_stop_id={stationText.props.gtfs_stop_id} alphaLevel={alphaLevel} />
+      return newStationText
+    } else {
+      let distance = null
+      let status = false
+      let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} name={stationText.props.name} daytime_routes={stationText.props.daytime_routes} gtfs_stop_id={stationText.props.gtfs_stop_id} alphaLevel={1} />
+      return newStationText
+    }
+  })
     setStationHtmlArray(newStationHtml)
-  }
+
+  // clean this up!!!
+  // CAMERA DISTANCE SETS INLINE CSS OPACITY?!?!
+  // if (true){
+  //   let newStationHtml = [...stationHtmlArray]
+  //   newStationHtml = stationHtmlArray.map((stationText)=>{
+  //     if (findDistance(stationText.props.position, cameraPosition) < 16){
+
+  //       let status = true
+  //       let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} name={stationText.props.name} daytime_routes={stationText.props.daytime_routes} gtfs_stop_id={stationText.props.gtfs_stop_id}/>
+  //       return newStationText
+  //     } else {
+  //       let status = false
+  //       let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} name={stationText.props.name} daytime_routes={stationText.props.daytime_routes} gtfs_stop_id={stationText.props.gtfs_stop_id}/>
+  //       return newStationText
+  //     }
+  //   })
+  //   setStationHtmlArray(newStationHtml)
+  // }
 
 }, [cameraPosition])
   

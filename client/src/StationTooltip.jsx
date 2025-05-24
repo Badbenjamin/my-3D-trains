@@ -1,6 +1,7 @@
 import { Html } from "@react-three/drei"
 
-export default function StationToolTip(mesh, stationInfoObject){
+// add props?
+export default function StationToolTip(){
     // console.log('mp', mesh)
     // console.log('sio stt',stationInfoObject)
     const props = "station name"
@@ -13,16 +14,22 @@ export default function StationToolTip(mesh, stationInfoObject){
             key={mesh.uuid}
             as="div"
             wrapperClass="station-tooltip"
+            position={tooltipPosition}
+            distanceFactor={5}
             center={true}
-            // className="station_tooltip"
-            position={newPosition}
-
-        >
-            <div>
-                <h2></h2>
-                <button>set as start</button>
-                <button>set as end</button>
+            // occlude={true}
+            
+            >
+            <div  className="station-html">
+                <button className="x-button" onClick={handleHtmlClick}>X</button>
+                <h2 className="station-html-text">{stationInfoObject.name + " " + stationInfoObject.daytime_routes}</h2>
+                <div className="arrivals-html">
+                    <div>{arrivalInfo.north_direction_label + ": " + arrivalInfo.n_bound_arrivals}</div>
+                    <div>{arrivalInfo.south_direction_label + ": " + arrivalInfo.s_bound_arrivals}</div>
+                </div>
+                <button onClick={()=>handleSetStationClick(stationInfoObject.id, "start")}>ORIGIN</button>
+                <button onClick={()=>handleSetStationClick(stationInfoObject.id, "end")}>DESTINATION</button>
             </div>
-        </Html>
+    </Html>
     )
 }
