@@ -66,3 +66,7 @@ html{
   background-color: rgba(0,0,0,0);
 }
 
+.route_icon{
+  width: 30px;
+  height: 30px;
+}
