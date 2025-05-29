@@ -26,9 +26,21 @@ export default function ComplexText({positions, names, routes,status}){
     // console.log(positions[0], averagePosition)
     // useFrame((state, delta)=>{
     // })
+
+    let iconImageArray = []
+    let routesArray = routes.map((route)=>{
+        iconImageArray.push(<img className="route_icon" src={`../public/ICONS/${route}.png`}/>)
+    })
+
+    function handleClick(){
+        console.log('clickeeed')
+    }
     return(
         <>
-            {status ? <Html  wrapperClass="complex_label" distanceFactor={5} center={true} position={averagePosition}>{names[0] + " " + routes}</Html> : <></>}
+            {status ? <Html  wrapperClass="complex_label" distanceFactor={6} center={true} position={averagePosition}>
+                <button onClick={handleClick} className="complex-html-button-text">{names[0]}{iconImageArray}</button>
+                {/* {iconImageArray} */}
+                </Html> : <></>}
         </>
     )
 }
