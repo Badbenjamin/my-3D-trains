@@ -6,7 +6,7 @@ import { useFrame } from "@react-three/fiber";
 import './App.css'
 
 export default function StationText({handleStationClick, position, daytime_routes, name, status, gtfs_stop_id, alphaLevel}){
-    // console.log('dist sta', daytime_routes)
+    console.log('alpha station', alphaLevel)
 
     let iconImageArray = []
     let routesArray = daytime_routes.split(" ").map((route)=>{
@@ -23,16 +23,9 @@ export default function StationText({handleStationClick, position, daytime_route
     })
     return(
         <>
-            {/* {iconImage} */}
-            {status ? <Html style={{opacity : alphaLevel}} wrapperClass="station_label" distanceFactor={5} center={true} position={position}>{<button className="station-html-button-text" onClick={handleClick}>
-                {name}{iconImageArray}</button>}
-                {/* <img className="route_icon" src={A}/> */}
-                
-                </Html> : <></>}
-            {/* {<Html position={position}> */}
-                {/* <img className="route_icon" src={A}/> */}
-                {/* {array} */}
-            {/* </Html>} */}
+            {status ? <Html style={{opacity : alphaLevel}} wrapperClass="station_label" distanceFactor={5} center={true} position={position}>
+                {<button className="station-html-button-text" onClick={handleClick}>{name}{iconImageArray}</button>}
+            </Html> : <></>}
         </>
     )
 }

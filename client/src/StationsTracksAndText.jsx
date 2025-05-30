@@ -3,11 +3,13 @@ import { useEffect } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import { useFrame } from '@react-three/fiber'
 import { useState } from 'react'
+import * as THREE from "three"
 
 
 import StationText from './StationText'
 import ComplexText from './ComplexText'
 import StationToolTip from './StationTooltip'
+
 
 
 export default function StationsTracksAndText({vectorPosition}) {
@@ -137,8 +139,28 @@ useEffect(()=>{
     for (let complex in complexObject){
       let status = true
       i += 1
-      // console.log(complexObject[complex])
-      let newComplexText = <ComplexText onClick={handleComplexClick} wrapperClass="station_label"  index={i} status={status} key={complexObject[complex].complex_id}  distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} positions={complexObject[complex].positions} names={complexObject[complex].stop_names}  />
+      
+      let complexPositionsArray = complexObject[complex].positions
+      // console.log('co', complexPositionsArray)
+      function avereragePosition(positionsArray){
+        let xTotal = 0
+        let yTotal= 0
+        let zTotal = 0
+        for (let pos of positionsArray){
+            xTotal += pos.x
+            yTotal += pos.y
+            zTotal += pos.z
+        }
+        // console.log(xArray,yArray,zArray)
+        let xAv = xTotal/positionsArray.length
+        let yAv = yTotal/positionsArray.length
+        let zAv = zTotal/positionsArray.length
+        // console.log(xAv)
+        return new THREE.Vector3(xAv, yAv, zAv)
+      }
+      let averagePosition = avereragePosition(complexObject[complex].positions)
+      // console.log('ap', averagePosition)
+      let newComplexText = <ComplexText onClick={handleComplexClick} wrapperClass="station_label"  index={i} status={status} key={complexObject[complex].complex_id}  distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={1} />
       newComplexHtmlArray.push(newComplexText)
     }
     setStationHtmlArray(newStationHtmlArray)
@@ -163,17 +185,14 @@ useEffect(()=>{
 // check camera distance to turn on/off station html text
 useEffect(()=>{
 
-  let newStationHtml = [...stationHtmlArray]
-  newStationHtml = stationHtmlArray.map((stationText)=>{
+  let newStationHtmlArray = [...stationHtmlArray]
+  let updatedStationHtml = newStationHtmlArray.map((stationText)=>{
     if (findDistance(stationText.props.position, cameraPosition) <= 20){
       let distance = findDistance(stationText.props.position, cameraPosition)
-      // let opacityPercentage = Math.round((distance / 15) * 100)
-      // console.log(opacityPercentage)
+      
       let alphaLevel = 0
       if (distance <= 20 && distance >= 15){
         alphaLevel = Math.abs((distance - 20) / (20 - 15))
-        // alphaLevel = 0
-        console.log(alphaLevel)
       } else {
         alphaLevel = 1
       }
@@ -182,32 +201,35 @@ useEffect(()=>{
       let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} name={stationText.props.name} daytime_routes={stationText.props.daytime_routes} gtfs_stop_id={stationText.props.gtfs_stop_id} alphaLevel={alphaLevel} />
       return newStationText
     } else {
-      let distance = null
       let status = false
       let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} name={stationText.props.name} daytime_routes={stationText.props.daytime_routes} gtfs_stop_id={stationText.props.gtfs_stop_id} alphaLevel={1} />
       return newStationText
     }
   })
-    setStationHtmlArray(newStationHtml)
-
-  // clean this up!!!
-  // CAMERA DISTANCE SETS INLINE CSS OPACITY?!?!
-  // if (true){
-  //   let newStationHtml = [...stationHtmlArray]
-  //   newStationHtml = stationHtmlArray.map((stationText)=>{
-  //     if (findDistance(stationText.props.position, cameraPosition) < 16){
-
-  //       let status = true
-  //       let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} name={stationText.props.name} daytime_routes={stationText.props.daytime_routes} gtfs_stop_id={stationText.props.gtfs_stop_id}/>
-  //       return newStationText
-  //     } else {
-  //       let status = false
-  //       let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} name={stationText.props.name} daytime_routes={stationText.props.daytime_routes} gtfs_stop_id={stationText.props.gtfs_stop_id}/>
-  //       return newStationText
-  //     }
-  //   })
-  //   setStationHtmlArray(newStationHtml)
-  // }
+  setStationHtmlArray(updatedStationHtml)
+  // TYPE ERROR OCCURING IN COMPLEXTTEXT?
+  let newComplexHtmlArray = [...complexHtmlArray]
+  let updatedComplexHtmlArray = newComplexHtmlArray.map((complexText, i)=>{
+    console.log('names',complexText.props.names)
+    if (findDistance(complexText.props.averagePosition, cameraPosition) <= 40){
+      let distance = findDistance(complexText.props.averagePosition, cameraPosition)
+      let alphaLevel = 0
+      if (distance <= 40 && distance >= 30){
+        // alphaLevel = Math.abs((distance - 40) / (40 - 30))
+        alphaLevel = 0.5
+      } else {
+        alphaLevel = 1
+      }
+      let status = true
+      let newComplexText = <ComplexText onClick={handleComplexClick} wrapperClass="station_label"  index={i} status={status} key={complexText.props.complex_id}  distanceFactor={8} center={true} routes={complexText.props.routes} averagePosition={complexText.props.averagePosition} names={complexText.props.names} alphaLevel={alphaLevel} />
+      return newComplexText
+    } else {
+      let status = false
+      let newComplexText = <ComplexText onClick={handleComplexClick} wrapperClass="station_label"  index={i} status={status} key={complexText.props.complex_id}  distanceFactor={8} center={true} routes={complexText.props.routes} averagePosition={complexText.props.averagePosition} names={complexText.props.names} alphaLevel={1} />
+      return newComplexText
+    }
+  })
+  setComplexHtmlArray(updatedComplexHtmlArray)
 
 }, [cameraPosition])
   

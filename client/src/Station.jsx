@@ -53,7 +53,7 @@ function Station( { status, materials, mesh, index, getStationCode, id, retrieve
         // const line = new THREE.Line( lineGeometry, lineMaterial )
         // Scene.add(line)
 
-        console.log('nptp', newPosition, tooltipPosition)
+        // console.log('nptp', newPosition, tooltipPosition)
 
         // tooltipPosition.z = tooltipPosition.y + 1
         // console.log('ttp', tooltipPosition.y )
@@ -75,27 +75,27 @@ function Station( { status, materials, mesh, index, getStationCode, id, retrieve
             setIsClicked(!isClicked)
         }
 
-        // let stationHTML =   <Html
-        //                         key={mesh.uuid}
-        //                         as="div"
-        //                         wrapperClass="station-tooltip"
-        //                         position={tooltipPosition}
-        //                         distanceFactor={5}
-        //                         center={true}
-        //                         // occlude={true}
+        let stationHTML =   <Html
+                                key={mesh.uuid}
+                                as="div"
+                                wrapperClass="station-tooltip"
+                                position={tooltipPosition}
+                                distanceFactor={5}
+                                center={true}
+                                // occlude={true}
                                 
-        //                     >
-        //                         <div  className="station-html">
-        //                             <button className="x-button" onClick={handleHtmlClick}>X</button>
-        //                             <h2 className="station-html-text">{stationInfoObject.name + " " + stationInfoObject.daytime_routes}</h2>
-        //                             <div className="arrivals-html">
-        //                                 <div>{arrivalInfo.north_direction_label + ": " + arrivalInfo.n_bound_arrivals}</div>
-        //                                 <div>{arrivalInfo.south_direction_label + ": " + arrivalInfo.s_bound_arrivals}</div>
-        //                             </div>
-        //                             <button onClick={()=>handleSetStationClick(stationInfoObject.id, "start")}>ORIGIN</button>
-        //                             <button onClick={()=>handleSetStationClick(stationInfoObject.id, "end")}>DESTINATION</button>
-        //                         </div>
-        //                     </Html>
+                            >
+                                <div  className="station-html">
+                                    <button className="x-button" onClick={handleHtmlClick}>X</button>
+                                    <h2 className="station-html-text">{stationInfoObject.name + " " + stationInfoObject.daytime_routes}</h2>
+                                    <div className="arrivals-html">
+                                        <div>{arrivalInfo.north_direction_label + ": " + arrivalInfo.n_bound_arrivals}</div>
+                                        <div>{arrivalInfo.south_direction_label + ": " + arrivalInfo.s_bound_arrivals}</div>
+                                    </div>
+                                    <button onClick={()=>handleSetStationClick(stationInfoObject.id, "start")}>ORIGIN</button>
+                                    <button onClick={()=>handleSetStationClick(stationInfoObject.id, "end")}>DESTINATION</button>
+                                </div>
+                            </Html>
         
         useFrame(({clock})=>{
             // setIsWhite(true)
