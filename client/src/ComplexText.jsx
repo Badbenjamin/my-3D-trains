@@ -2,39 +2,16 @@ import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three"
 
-export default function ComplexText({averagePosition, names, routes, status, alphaLevel}){
-    // console.log(names)
-    console.log('alpha complex', alphaLevel)
-    // alphaLevel = 1.0
-    // function avereragePosition(positionsArray){
-    //     let xTotal = 0
-    //     let yTotal= 0
-    //     let zTotal = 0
-    //     for (let pos of positionsArray){
-    //         xTotal += pos.x
-    //         yTotal += pos.y
-    //         zTotal += pos.z
-    //     }
-    //     // console.log(xArray,yArray,zArray)
-    //     let xAv = xTotal/positionsArray.length
-    //     let yAv = yTotal/positionsArray.length
-    //     let zAv = zTotal/positionsArray.length
-    //     // console.log(xAv)
-    //     return new THREE.Vector3(xAv, yAv, zAv)
-    // }
-    // let averagePosition = avereragePosition(positions)
-    // console.log(positions[0], averagePosition)
-
-    // useFrame((state, delta)=>{
-    // })
+export default function ComplexText({handleComplexClick, averagePosition, names, routes, status, alphaLevel, complexId}){
+    
 
     let iconImageArray = []
-    let routesArray = routes.map((route)=>{
+    routes.map((route)=>{
         iconImageArray.push(<img className="route_icon" src={`../public/ICONS/${route}.png`}/>)
     })
 
     function handleClick(){
-        console.log('clickeeed')
+        handleComplexClick(complexId)
     }
     return(
         <>

@@ -43,12 +43,13 @@ useEffect(()=>{
 },[])
   // console.log('sioa',stationInfoObjectArray)
 
+// THIS SHOULD BRING UP TOOLTIP
 function handleStationClick(text){
   console.log(text)
 }
 
-function handleComplexClick(){
-  console.log('c click')
+function handleComplexClick(complexId){
+  console.log(complexId)
 }
 
   // COMBINE station info from DB with location info from map model to display HTML text on map
@@ -62,7 +63,7 @@ useEffect(()=>{
     for (let i = 0 ; i < stationInfoObjectArray.length; i++){
       stationInfoObject = {...stationInfoObject, [stationInfoObjectArray[i].gtfs_stop_id] : stationInfoObjectArray[i]}
     }
-    // console.log('sio', stationInfoObject)
+   
     // stationArray is the array of meshes from the blender model, containing position
     // stationHtmlArray will contain <StationText/> elements that will display info above each station
     // we are combining the position of the mesh from the blender model with the information for the station from the backend
@@ -75,8 +76,7 @@ useEffect(()=>{
     // loop through meshes 
     // maybe this is the issue?
     for (let j = 0 ; j < stationArray.length; j++){
-      // console.log('co', complexObject)
-      // console.log('info obj', stationInfoObject[stationArray[j].props.name])
+   
       if (stationArray[j].props.name.length < 5){
         // if name is in stationInfoObject as key, and is not a complex, create <StationText> and push to stationHtmlArray
         if( stationArray[j].props.name in stationInfoObject && !stationInfoObject[stationArray[j].props.name].complex){
@@ -84,7 +84,7 @@ useEffect(()=>{
           let newPosition = stationArray[j].props.mesh.position
 
           let newInfoObject = stationInfoObject[stationArray[j].props.name]
-          // console.log('nio', newInfoObject.complex)
+        
           // VERSION???
           let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
           newStationHtmlArray.push(newStationText)
@@ -92,14 +92,13 @@ useEffect(()=>{
           // if complex = True, create key in complexObject from complex_id and add values to key
           // I WANT TO CREATE NEW KEY VALUE PAIRS WHEN NOT IN DICT, BUT ADD TO VALUES WHEN KEY IS IN DICT
         } else if ( stationArray[j].props.name in stationInfoObject && stationInfoObject[stationArray[j].props.name].complex){
-          // console.log('worked 1', complexObject, complexObject == {})
-          // let status = true
+    
           let newPosition = stationArray[j].props.mesh.position
 
           let newInfoObject = stationInfoObject[stationArray[j].props.name]
-          // console.log(newInfoObject.complex_id)
+     
           if (Object.keys(complexObject).length === 0 || !(complexObject.hasOwnProperty(newInfoObject.complex_id))){
-            // console.log('worked 2', complexObject)
+ 
             
             complexObject[newInfoObject.complex_id] = {
                 "complex_id" : newInfoObject.complex_id,
@@ -110,8 +109,7 @@ useEffect(()=>{
                 // "count" : count
             } 
           } else {
-            // console.log(complexObject[newInfoObject.complex_id]['daytime_routes'])
-            // console.log([newInfoObject.daytime_routes.split(" ")])
+
             let routes = complexObject[newInfoObject.complex_id]['daytime_routes']
             let newRoutes = newInfoObject.daytime_routes.split(" ")
             let concatRoutes = routes.concat(newRoutes)
@@ -134,14 +132,14 @@ useEffect(()=>{
         }
       }
     }
-    console.log(complexObject)
+    // console.log(complexObject)
     let i = 0
     for (let complex in complexObject){
       let status = true
       i += 1
       
-      let complexPositionsArray = complexObject[complex].positions
-      // console.log('co', complexPositionsArray)
+      // let complexPositionsArray = complexObject[complex].positions
+
       function avereragePosition(positionsArray){
         let xTotal = 0
         let yTotal= 0
@@ -159,8 +157,8 @@ useEffect(()=>{
         return new THREE.Vector3(xAv, yAv, zAv)
       }
       let averagePosition = avereragePosition(complexObject[complex].positions)
-      // console.log('ap', averagePosition)
-      let newComplexText = <ComplexText onClick={handleComplexClick} wrapperClass="station_label"  index={i} status={status} key={complexObject[complex].complex_id}  distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={1} />
+      // console.log('cid', complexObject[complex].complex_id)
+      let newComplexText = <ComplexText handleComplexClick={handleComplexClick} complexId={complexObject[complex].complex_id} wrapperClass="station_label"  index={i} status={status} key={complexObject[complex].complex_id}  distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={1} />
       newComplexHtmlArray.push(newComplexText)
     }
     setStationHtmlArray(newStationHtmlArray)
@@ -182,7 +180,7 @@ useEffect(()=>{
       }
   })
 
-// check camera distance to turn on/off station html text
+// check camera distance to fade in/out station html text
 useEffect(()=>{
 
   let newStationHtmlArray = [...stationHtmlArray]
@@ -207,25 +205,25 @@ useEffect(()=>{
     }
   })
   setStationHtmlArray(updatedStationHtml)
-  // TYPE ERROR OCCURING IN COMPLEXTTEXT?
+  
   let newComplexHtmlArray = [...complexHtmlArray]
   let updatedComplexHtmlArray = newComplexHtmlArray.map((complexText, i)=>{
-    console.log('names',complexText.props.names)
+  //  console.log(complexText.props)
     if (findDistance(complexText.props.averagePosition, cameraPosition) <= 40){
       let distance = findDistance(complexText.props.averagePosition, cameraPosition)
       let alphaLevel = 0
       if (distance <= 40 && distance >= 30){
-        // alphaLevel = Math.abs((distance - 40) / (40 - 30))
-        alphaLevel = 0.5
+        
+        alphaLevel = Math.abs((distance - 40) / (40-30))
       } else {
         alphaLevel = 1
       }
       let status = true
-      let newComplexText = <ComplexText onClick={handleComplexClick} wrapperClass="station_label"  index={i} status={status} key={complexText.props.complex_id}  distanceFactor={8} center={true} routes={complexText.props.routes} averagePosition={complexText.props.averagePosition} names={complexText.props.names} alphaLevel={alphaLevel} />
+      let newComplexText = <ComplexText handleComplexClick={handleComplexClick} wrapperClass="station_label" complexId={complexText.props.complexId.toString()} index={i} status={status} key={complexText.props.complex_id}  distanceFactor={8} center={true} routes={complexText.props.routes} averagePosition={complexText.props.averagePosition} names={complexText.props.names} alphaLevel={alphaLevel} />
       return newComplexText
     } else {
       let status = false
-      let newComplexText = <ComplexText onClick={handleComplexClick} wrapperClass="station_label"  index={i} status={status} key={complexText.props.complex_id}  distanceFactor={8} center={true} routes={complexText.props.routes} averagePosition={complexText.props.averagePosition} names={complexText.props.names} alphaLevel={1} />
+      let newComplexText = <ComplexText handleComplexClick={handleComplexClick} wrapperClass="station_label" complexId={complexText.props.complexId.toString()} index={i} status={status} key={complexText.props.complex_id}  distanceFactor={8} center={true} routes={complexText.props.routes} averagePosition={complexText.props.averagePosition} names={complexText.props.names} alphaLevel={1} />
       return newComplexText
     }
   })
@@ -250,6 +248,7 @@ useEffect(()=>{
           {stationArray}
           {stationHtmlArray}
           {complexHtmlArray}
+          {toolTipArray}
       </group>
     )
   }

@@ -6,10 +6,10 @@ import { useFrame } from "@react-three/fiber";
 import './App.css'
 
 export default function StationText({handleStationClick, position, daytime_routes, name, status, gtfs_stop_id, alphaLevel}){
-    console.log('alpha station', alphaLevel)
+
 
     let iconImageArray = []
-    let routesArray = daytime_routes.split(" ").map((route)=>{
+    daytime_routes.split(" ").map((route)=>{
         iconImageArray.push(<img className="route_icon" src={`../public/ICONS/${route}.png`}/>)
     })
 
