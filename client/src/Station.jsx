@@ -50,16 +50,7 @@ function Station( { status, materials, mesh, index, getStationCode, id, retrieve
         const tooltipLine = <line geometry={lineGeometry} material={lineMaterial} linewidth={10.0}>
                          <lineBasicMaterial />
                      </line>
-        // const line = new THREE.Line( lineGeometry, lineMaterial )
-        // Scene.add(line)
 
-        // console.log('nptp', newPosition, tooltipPosition)
-
-        // tooltipPosition.z = tooltipPosition.y + 1
-        // console.log('ttp', tooltipPosition.y )
-
-        // console.log('np', newPosition)
-        // do i need this state or can I just have a variable?
         const [isWhite, setIsWhite] = useState(false)
         let color = !isWhite ? newMaterial : selectedMaterial
 
@@ -112,29 +103,29 @@ function Station( { status, materials, mesh, index, getStationCode, id, retrieve
         })
      
         // Get Station Names for HTML text
-        useEffect(()=>{
-            if (newName.length < 5 ){
-                // console.log('nn', newName)
-                fetch(`http://127.0.0.1:5555/api/stationname/${newName}`)
-                .then(response => response.json())
-                .then(stationInfoObject => {setStationInfoObject(stationInfoObject)})
-                // .then(stationInfoObject => console.log(stationInfoObject))
-                .catch((error)=>{console.log(error, newName)})
-            }
-            // setReadableName(stationInfoObject.name)
-        }, [])
+        // useEffect(()=>{
+        //     if (newName.length < 5 ){
+        //         // console.log('nn', newName)
+        //         fetch(`http://127.0.0.1:5555/api/stationname/${newName}`)
+        //         .then(response => response.json())
+        //         .then(stationInfoObject => {setStationInfoObject(stationInfoObject)})
+        //         // .then(stationInfoObject => console.log(stationInfoObject))
+        //         .catch((error)=>{console.log(error, newName)})
+        //     }
+        //     // setReadableName(stationInfoObject.name)
+        // }, [])
         // console.log('rn', readableName)
         // TOOLTIP WITH INFO AND ARRIVALS
-        function handleClick(e){
-            if (e.eventObject.name != "00_NYC_full_trackmap"){
-                fetch(`http://127.0.0.1:5555/api/arrivals/${stationInfoObject.gtfs_stop_id}`)
-                .then(response => response.json())
-                .then(arrivals => {setArrivalInfo(arrivals)})
-                .catch((error)=>{console.log(error, arrivals)})
-                setIsClicked(!isClicked)
+        // function handleClick(e){
+        //     if (e.eventObject.name != "00_NYC_full_trackmap"){
+        //         fetch(`http://127.0.0.1:5555/api/arrivals/${stationInfoObject.gtfs_stop_id}`)
+        //         .then(response => response.json())
+        //         .then(arrivals => {setArrivalInfo(arrivals)})
+        //         .catch((error)=>{console.log(error, arrivals)})
+        //         setIsClicked(!isClicked)
 
-            }
-        }
+        //     }
+        // }
 
         // console.log('sio',stationInfoObject)
         // console.log(readableName)
@@ -153,8 +144,8 @@ function Station( { status, materials, mesh, index, getStationCode, id, retrieve
                   scale={newScale}
                   
             />
-                {!isClicked ? <></> : stationHTML}
-                {!isClicked ? <></> : tooltipLine}
+                {/* {!isClicked ? <></> : stationHTML}
+                {!isClicked ? <></> : tooltipLine} */}
         </group>
     )
 }

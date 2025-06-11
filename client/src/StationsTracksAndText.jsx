@@ -4,6 +4,9 @@ import { useOutletContext } from 'react-router-dom'
 import { useFrame } from '@react-three/fiber'
 import { useState } from 'react'
 import * as THREE from "three"
+// import { Html } from "@react-three/drei"
+// import { Line } from "@react-three/drei"
+// import { Line } from '@react-three/drei'
 
 
 import StationText from './StationText'
@@ -18,6 +21,7 @@ export default function StationsTracksAndText({vectorPosition}) {
     const [stationHtmlArray, setStationHtmlArray] = useState([])
     const [complexHtmlArray, setComplexHtmlArray] = useState([])
     const [toolTipArray, setToolTipArray] = useState([])
+    // const [lineArray, setLineArray] = useState([])
     const [cameraPosition, setCameraPosition] = useState({"x": 0, "y" : 0, "z" : 0})
 
 
@@ -36,6 +40,7 @@ function findDistance(point1, point2){
     return result
   }
 
+// 
 useEffect(()=>{
       fetch(`http://127.0.0.1:5555/api/stations`)
       .then(response => response.json())
@@ -44,8 +49,57 @@ useEffect(()=>{
   // console.log('sioa',stationInfoObjectArray)
 
 // THIS SHOULD BRING UP TOOLTIP
-function handleStationClick(text){
-  console.log(text)
+function handleStationClick(stopId, name, iconImageArray, position){
+  
+  // fetch(`http://127.0.0.1:5555/api/arrivals/${stopId}`)
+  //               .then(response => response.json())
+  //               .then(newArrivals => {arrivals = newArrivals})
+  // console.log('ar',arrivals)
+  
+  // const lineMaterial = new THREE.LineBasicMaterial( { color: new THREE.Color('white') } );
+  // lineMaterial.linewidth = 50
+
+  // const tooltipPosition = new THREE.Vector3(position.x, position.y + 2, position.z)
+  // const points = []
+  // points.push(position)
+  // points.push(tooltipPosition)
+  // const lineGeometry = new THREE.BufferGeometry().setFromPoints( points );
+
+  // const tooltipLine = <line geometry={lineGeometry} material={lineMaterial} linewidth={10.0}>
+  //                         <lineBasicMaterial linewidth={100}/>
+  //                     </line>
+
+  // DRAW LINE, PUSH TO ARRAY
+  // let stationHTML =   <Html
+  //                         key={stopId}
+  //                         as="div"
+  //                         wrapperClass="station-tooltip"
+  //                         position={tooltipPosition}
+  //                         distanceFactor={5}
+  //                         center={true}
+  //                       >
+  //                         <div  className="station-html">
+  //                             <button className="x-button" onClick={console.log('xclick')}>X</button>
+  //                             <h2 className="station-html-text">{name + " " + iconImageArray}</h2>
+  //                             <div className="arrivals-html">
+  //                                 <div>{arrivals.north_direction_label + ": " + arrivals.n_bound_arrivals}</div>
+  //                                 <div>{arrivals.south_direction_label + ": " + arrivals.s_bound_arrivals}</div>
+  //                             </div>
+  //                             {/* <button onClick={()=>handleSetStationClick(stationInfoObject.id, "start")}>ORIGIN</button> */}
+  //                             {/* <button onClick={()=>handleSetStationClick(stationInfoObject.id, "end")}>DESTINATION</button> */}
+  //                         </div>
+  //                     </Html>
+
+  let newTooltip = <StationToolTip key={name} stopId={stopId} position={position} name={name}/>
+
+  let newTooltipArray = [...toolTipArray]
+  newTooltipArray.push(newTooltip)
+  setToolTipArray(newTooltipArray)
+
+  // let newLineArray = [...lineArray]
+  // newLineArray.push(tooltipLine)
+  // setLineArray(newLineArray)
+
 }
 
 function handleComplexClick(complexId){
@@ -158,7 +212,7 @@ useEffect(()=>{
       }
       let averagePosition = avereragePosition(complexObject[complex].positions)
       // console.log('cid', complexObject[complex].complex_id)
-      let newComplexText = <ComplexText handleComplexClick={handleComplexClick} complexId={complexObject[complex].complex_id} wrapperClass="station_label"  index={i} status={status} key={complexObject[complex].complex_id}  distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={1} />
+      let newComplexText = <ComplexText handleComplexClick={handleComplexClick} complexId={complexObject[complex].complex_id} wrapperClass="station_label"  index={i} status={status} key={complexObject[complex].complex_id}  distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={0} />
       newComplexHtmlArray.push(newComplexText)
     }
     setStationHtmlArray(newStationHtmlArray)
@@ -249,6 +303,7 @@ useEffect(()=>{
           {stationHtmlArray}
           {complexHtmlArray}
           {toolTipArray}
+          {/* {lineArray} */}
       </group>
     )
   }

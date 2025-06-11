@@ -16,7 +16,7 @@ export default function StationText({handleStationClick, position, daytime_route
 
 
     function handleClick(e){
-        handleStationClick(gtfs_stop_id)
+        handleStationClick(gtfs_stop_id, name, iconImageArray, position)
     }
 
     useFrame((state, delta)=>{
