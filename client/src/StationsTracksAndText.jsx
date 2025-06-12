@@ -20,7 +20,7 @@ export default function StationsTracksAndText({vectorPosition}) {
     const [stationInfoObjectArray, setStationInfoObjectArray] = useState([])
     const [stationHtmlArray, setStationHtmlArray] = useState([])
     const [complexHtmlArray, setComplexHtmlArray] = useState([])
-    const [toolTipArray, setToolTipArray] = useState([])
+    const [toolTipArray, setToolTipArray] = useState([].slice(0,2))
     // const [lineArray, setLineArray] = useState([])
     const [cameraPosition, setCameraPosition] = useState({"x": 0, "y" : 0, "z" : 0})
 
@@ -49,59 +49,19 @@ useEffect(()=>{
   // console.log('sioa',stationInfoObjectArray)
 
 // THIS SHOULD BRING UP TOOLTIP
-function handleStationClick(stopId, name, iconImageArray, position){
+function handleStationClick(stopId, name, position, daytime_routes){
+  // console.log(iconImageArray)
+  let newTooltip = <StationToolTip key={name} stopId={stopId} position={position} name={name} daytime_routes={daytime_routes}/>
+
   
-  // fetch(`http://127.0.0.1:5555/api/arrivals/${stopId}`)
-  //               .then(response => response.json())
-  //               .then(newArrivals => {arrivals = newArrivals})
-  // console.log('ar',arrivals)
-  
-  // const lineMaterial = new THREE.LineBasicMaterial( { color: new THREE.Color('white') } );
-  // lineMaterial.linewidth = 50
+  setToolTipArray(prev => {
+    const updated = [newTooltip, ...prev]
+    return updated.slice(0,2)
+  })
 
-  // const tooltipPosition = new THREE.Vector3(position.x, position.y + 2, position.z)
-  // const points = []
-  // points.push(position)
-  // points.push(tooltipPosition)
-  // const lineGeometry = new THREE.BufferGeometry().setFromPoints( points );
-
-  // const tooltipLine = <line geometry={lineGeometry} material={lineMaterial} linewidth={10.0}>
-  //                         <lineBasicMaterial linewidth={100}/>
-  //                     </line>
-
-  // DRAW LINE, PUSH TO ARRAY
-  // let stationHTML =   <Html
-  //                         key={stopId}
-  //                         as="div"
-  //                         wrapperClass="station-tooltip"
-  //                         position={tooltipPosition}
-  //                         distanceFactor={5}
-  //                         center={true}
-  //                       >
-  //                         <div  className="station-html">
-  //                             <button className="x-button" onClick={console.log('xclick')}>X</button>
-  //                             <h2 className="station-html-text">{name + " " + iconImageArray}</h2>
-  //                             <div className="arrivals-html">
-  //                                 <div>{arrivals.north_direction_label + ": " + arrivals.n_bound_arrivals}</div>
-  //                                 <div>{arrivals.south_direction_label + ": " + arrivals.s_bound_arrivals}</div>
-  //                             </div>
-  //                             {/* <button onClick={()=>handleSetStationClick(stationInfoObject.id, "start")}>ORIGIN</button> */}
-  //                             {/* <button onClick={()=>handleSetStationClick(stationInfoObject.id, "end")}>DESTINATION</button> */}
-  //                         </div>
-  //                     </Html>
-
-  let newTooltip = <StationToolTip key={name} stopId={stopId} position={position} name={name}/>
-
-  let newTooltipArray = [...toolTipArray]
-  newTooltipArray.push(newTooltip)
-  setToolTipArray(newTooltipArray)
-
-  // let newLineArray = [...lineArray]
-  // newLineArray.push(tooltipLine)
-  // setLineArray(newLineArray)
 
 }
-
+// console.log('tta', toolTipArray)
 function handleComplexClick(complexId){
   console.log(complexId)
 }

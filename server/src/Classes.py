@@ -519,14 +519,14 @@ class ArrivalsForStation:
         self.trains_for_station = modules_classes.get_station_arrival_times(gtfs_trains_for_station, gtfs_stop_id)
         self.n_bound_arrivals = self.trains_for_station['n_bound_arrivals']
         self.s_bound_arrivals = self.trains_for_station['s_bound_arrivals']
-
+        # maybe make this a countdown in the future
         self.arrivals_for_react = {
             "north_direction_label" : self.north_direction_label,
             "south_direction_label" : self.south_direction_label,
-            "n_bound_arrivals" : [n_bound_arrival['route'] + " " + datetime.fromtimestamp(n_bound_arrival['arrival_time']).strftime('%-I:%M') for n_bound_arrival in self.n_bound_arrivals][0:3],
-            "s_bound_arrivals" : [s_bound_arrival['route'] + " " + datetime.fromtimestamp(s_bound_arrival['arrival_time']).strftime('%-I:%M') for s_bound_arrival in self.s_bound_arrivals][0:3]
+            "n_bound_arrivals" : [{"route" : n_bound_arrival['route'], "time" : datetime.fromtimestamp(n_bound_arrival['arrival_time']).strftime('%-I:%M')} for n_bound_arrival in self.n_bound_arrivals][0:3],
+            "s_bound_arrivals" : [{"route" : s_bound_arrival['route'], "time" : datetime.fromtimestamp(s_bound_arrival['arrival_time']).strftime('%-I:%M')} for s_bound_arrival in self.s_bound_arrivals][0:3]
         }
-        
+        print(self.arrivals_for_react)
     def __repr__(self):
         return f'<ArrivalsForStation>'
 

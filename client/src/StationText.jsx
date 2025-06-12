@@ -13,14 +13,16 @@ export default function StationText({handleStationClick, position, daytime_route
         iconImageArray.push(<img className="route_icon" src={`../public/ICONS/${route}.png`}/>)
     })
 
-
+    // console.log(iconImageArray)
 
     function handleClick(e){
-        handleStationClick(gtfs_stop_id, name, iconImageArray, position)
+        handleStationClick(gtfs_stop_id, name, position, daytime_routes)
     }
 
     useFrame((state, delta)=>{
     })
+
+    // console.log(iconImageArray)
     return(
         <>
             {status ? <Html style={{opacity : alphaLevel}} wrapperClass="station_label" distanceFactor={5} center={true} position={position}>

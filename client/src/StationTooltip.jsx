@@ -1,11 +1,17 @@
 import { Html, Line } from "@react-three/drei"
+import { use } from "react"
 import { useState, useEffect } from "react"
 import * as THREE from "three"
 // import { Line } from "@react-three/drei"
 
+
+import './App.css'
+
 // add props?
-export default function StationToolTip({stopId, position, name}){
+export default function StationToolTip({stopId, position, name, daytime_routes}){
     let [arrivalInfo, setArrivalInfo] = useState({})
+    let [northArrivals, setNorthArrivals] = useState([])
+    let [southArrivals, setSouthArrivals] = useState([])
 
     useEffect(()=>{
         fetch(`http://127.0.0.1:5555/api/arrivals/${stopId}`)
@@ -14,19 +20,59 @@ export default function StationToolTip({stopId, position, name}){
 
     }, [])
 
-    console.log('ai',arrivalInfo)
+    console.log('ai', arrivalInfo)
+
+    let iconImageArray = []
+    // daytime_routes.split(" ").map((route)=>{
+    //     iconImageArray.push(<img className="route_icon" src={`../public/ICONS/${route}.png`}/>)
+    // })
+    function buildArrivals(arrivalObjectArray){
+        // console.log(arrivalObjectArray)
+        let imgTimePairs =[]
+        if (arrivalObjectArray) {
+            for (const arrivalObject of arrivalObjectArray){
+                console.log(arrivalObject['route'])
+                // let imgTimePair = <img className="route_icon" src={`../public/ICONS/${arrivalObject["route"]}.png`} />
+                let imgTimePair = <div className="icon-time-pair">
+                                     <img className="tooltip_route_icon" src={`../public/ICONS/${arrivalObject["route"]}.png`} />
+                                     <h2>{arrivalObject['time']}</h2>
+                                  </div>
+                                   
+                // let imgTimePair = 'boob'
+                imgTimePairs.push(imgTimePair)
+            }
+        }
+        
+        return imgTimePairs
+    }
+    
+    // let northArrivals = []
+    // let southArrivals = []
+    // let testArrivals = ['ho', 'ho', 'ho']
+
+    useEffect(()=>{
+       northArrivals = buildArrivals(arrivalInfo.n_bound_arrivals)
+       console.log(northArrivals)
+       setNorthArrivals(northArrivals)
+       southArrivals = buildArrivals(arrivalInfo.s_bound_arrivals)
+       setSouthArrivals(southArrivals)
+    //    setNorthArrivals(newNorthArrivals)
+    }, [arrivalInfo])
+    
+    
+
   
   
     const lineMaterial = new THREE.LineBasicMaterial( { color: new THREE.Color('white') } );
     lineMaterial.linewidth = 500
 
     const tooltipPosition = new THREE.Vector3(position.x, position.y + 2, position.z)
-    const points = []
-    points.push(position)
-    points.push(tooltipPosition)
-    const lineGeometry = new THREE.BufferGeometry().setFromPoints( points );
+    // const points = []
+    // points.push(position)
+    // points.push(tooltipPosition)
+    // const lineGeometry = new THREE.BufferGeometry().setFromPoints( points );
 
-    console.log(lineGeometry)
+    // console.log(lineGeometry)
 
     // const tooltipLine = <Line points={[position, tooltipPosition]}/>
 
@@ -38,7 +84,7 @@ export default function StationToolTip({stopId, position, name}){
                 </div>
             </Html>
         )
-    } else if (arrivalInfo){
+    } else if (arrivalInfo && northArrivals && southArrivals){
         return (
         <>
              <Html
@@ -51,11 +97,14 @@ export default function StationToolTip({stopId, position, name}){
             >
                 <div  className="station-html">
                     <button className="x-button" onClick={console.log('xclick')}>X</button>
-                    <h2 className="station-html-text">{name + " " + "icons"}</h2>
+                    <h2 className="station-html-text">{name + " " + iconImageArray}</h2>
                     <div className="arrivals-html">
-                        <div>{arrivalInfo.north_direction_label + ": " + arrivalInfo.n_bound_arrivals}</div>
-                        <div>{arrivalInfo.south_direction_label + ": " + arrivalInfo.s_bound_arrivals}</div>
+                        {arrivalInfo.north_direction_label}
+                        {northArrivals}
+                        {arrivalInfo.south_direction_label}
+                        {southArrivals}
                     </div>
+                    
                     <button onClick={()=>handleSetStationClick(stationInfoObject.id, "start")}>ORIGIN</button>
                     <button onClick={()=>handleSetStationClick(stationInfoObject.id, "end")}>DESTINATION</button>
                     {/* {tooltipLine} */}
@@ -66,7 +115,8 @@ export default function StationToolTip({stopId, position, name}){
                 </line> */}
                 
             </Html>
-            <Line points={[position, tooltipPosition]}/>
+            <Line points={[position, tooltipPosition]} lineWidth={2}/>
+            {/* {northArrivals} */}
         </>
            
          

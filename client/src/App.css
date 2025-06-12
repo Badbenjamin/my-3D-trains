@@ -80,3 +80,23 @@ html{
   padding: 3px;
   pointer-events: none;
 }
+
+.tooltip_route_icon{
+  width: 27px;
+  height: 27px;
+  padding: 3px;
+  pointer-events: none;
+}
+
+.arrivals-html{
+  display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+
+.icon-time-pair{
+  display: flex;
+    flex-direction: row;
+}
