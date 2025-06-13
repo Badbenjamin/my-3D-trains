@@ -35,7 +35,7 @@ export default function StationToolTip({stopId, position, name, daytime_routes})
                 // let imgTimePair = <img className="route_icon" src={`../public/ICONS/${arrivalObject["route"]}.png`} />
                 let imgTimePair = <div className="icon-time-pair">
                                      <img className="tooltip_route_icon" src={`../public/ICONS/${arrivalObject["route"]}.png`} />
-                                     <h2>{arrivalObject['time']}</h2>
+                                     <div>{arrivalObject['time']}</div>
                                   </div>
                                    
                 // let imgTimePair = 'boob'
