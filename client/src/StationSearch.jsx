@@ -4,12 +4,12 @@ import Select from 'react-select'
 import './Component.css'
 
 function StationSearch({getStations, position, stations, stationId}) {
-    console.log('sid ',stations)
+    // console.log('sid ',stations)
     const [selectedOption, setSelectedOption] = useState(null)
     // console.log('selectedOption', selectedOption)
 
     
-
+    // STYLING FOR SEARCH
     const customStyles = {
         control : (provided) => ({
             ...provided,
@@ -24,6 +24,7 @@ function StationSearch({getStations, position, stations, stationId}) {
         }),
     }
 
+    // when station is selected from search dropdown, selecedOption is set, and then getStations callback functio (from JourneyPlanner) is invoked with gtfs id and start or end
     const handleChange = (option) => {
         console.log('op', option)
         setSelectedOption(option);
@@ -40,7 +41,9 @@ function StationSearch({getStations, position, stations, stationId}) {
     }
     // console.log(optionsArray)
 
-    // wgat does this do?
+    // stationId from stationIdStartorEnd in JourneyPlanner, passed down from app.jsx
+    // when stationID changes, which occurs with a tooltip origin or dest click, this sets the search componen to that station. 
+    // loop through optionsArray to find the option that has the gtfs stop id 
     useEffect(()=>{
         let buttonSelectedStationObj = selectedOption
         for (const optionStation of optionsArray){

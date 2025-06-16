@@ -1,14 +1,9 @@
 import { Html, Line } from "@react-three/drei"
-import { use } from "react"
 import { useState, useEffect } from "react"
 import * as THREE from "three"
 
-// import { Line } from "@react-three/drei"
-
-
 import './App.css'
 
-// add props?
 export default function StationToolTip({stopId, position, name, daytime_routes, retrieveStationId}){
     let [arrivalInfo, setArrivalInfo] = useState({})
     let [northArrivals, setNorthArrivals] = useState([])
@@ -21,35 +16,23 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
 
     }, [])
 
-    // console.log('rsid', retrieveStationId)
-
     let iconImageArray = []
-    // daytime_routes.split(" ").map((route)=>{
-    //     iconImageArray.push(<img className="route_icon" src={`../public/ICONS/${route}.png`}/>)
-    // })
+  
     function buildArrivals(arrivalObjectArray){
-        // console.log(arrivalObjectArray)
         let imgTimePairs =[]
         if (arrivalObjectArray) {
             for (const arrivalObject of arrivalObjectArray){
                 console.log(arrivalObject['route'])
-                // let imgTimePair = <img className="route_icon" src={`../public/ICONS/${arrivalObject["route"]}.png`} />
                 let imgTimePair = <div className="icon-time-pair">
                                      <img className="tooltip_route_icon" src={`../public/ICONS/${arrivalObject["route"]}.png`} />
                                      <div>{arrivalObject['time']}</div>
                                   </div>
-                                   
-                // let imgTimePair = 'boob'
                 imgTimePairs.push(imgTimePair)
             }
         }
-        
         return imgTimePairs
     }
     
-    // let northArrivals = []
-    // let southArrivals = []
-    // let testArrivals = ['ho', 'ho', 'ho']
 
     useEffect(()=>{
        northArrivals = buildArrivals(arrivalInfo.n_bound_arrivals)
@@ -57,31 +40,19 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
        setNorthArrivals(northArrivals)
        southArrivals = buildArrivals(arrivalInfo.s_bound_arrivals)
        setSouthArrivals(southArrivals)
-    //    setNorthArrivals(newNorthArrivals)
     }, [arrivalInfo])
     
-    
-
-  
-  
+    // line for tooltip. make variable according to cam position in future. 
     const lineMaterial = new THREE.LineBasicMaterial( { color: new THREE.Color('white') } );
     lineMaterial.linewidth = 500
 
     const tooltipPosition = new THREE.Vector3(position.x, position.y + 2, position.z)
-    // const points = []
-    // points.push(position)
-    // points.push(tooltipPosition)
-    // const lineGeometry = new THREE.BufferGeometry().setFromPoints( points );
-
-    // console.log(lineGeometry)
-
-    // const tooltipLine = <Line points={[position, tooltipPosition]}/>
-
+ 
+    // origin or destination click invokes callback func retrieveStationId from app.jsx
+    // this is passed down to search elements to display the station
+    // passed down from app.jsx to journeyplanner, sets journey stations for fetch request 
     function handleSetStationClick(id, startOrEnd){
-        console.log('tt set station',id, startOrEnd)
         retrieveStationId(id, startOrEnd)
-        // setIsClicked(!isClicked)
-        
     }
 
     if (!arrivalInfo){
@@ -115,16 +86,9 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
                     
                     <button onClick={()=>handleSetStationClick(stopId, "start")}>ORIGIN</button>
                     <button onClick={()=>handleSetStationClick(stopId, "end")}>DESTINATION</button>
-                    {/* {tooltipLine} */}
                 </div>
-                
-                {/* <line geometry={lineGeometry} material={lineMaterial} linewidth={10.0}>
-                            <lineBasicMaterial />
-                </line> */}
-                
             </Html>
             <Line points={[position, tooltipPosition]} lineWidth={2}/>
-            {/* {northArrivals} */}
         </>
            
          

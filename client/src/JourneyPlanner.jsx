@@ -19,7 +19,7 @@ function JourneyPlanner() {
     function getStations(stationValue, position){
         console.log('get stations', stationValue, position)
 
-        // logic to hanlde staton or id maybe just always make it id? 
+        
         const journey = [...journeyStations]
         if (position === 'start'){
             journey[0] = stationValue;
@@ -30,7 +30,8 @@ function JourneyPlanner() {
     setJourneyStations(journey)
     }
 
-    // there is another value id instead of a GTFS id
+    // stationIdStartAndEnd passed down from app.jsx
+    // sets journeyStations, which are used in fetch to plan trip
     useEffect(()=>{
         let newJourney = [...journeyStations]
         newJourney[0] = stationIdStartAndEnd['startId']
