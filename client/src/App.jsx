@@ -4,6 +4,8 @@ import { useGLTF } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 
 
+
+
 import './App.css'
 import Station from './Station'
 import { getAllIds, createStatusObjectArray, createStationComponentsObj, updateStatusArray, getStationCode} from './ModularFunctions'
@@ -24,7 +26,7 @@ function App() {
   const [tripInfoIndex, setTripInfoIndex] = useState(0)
   const [stationIdStartAndEnd, setStationIdStartAndEnd] = useState({"startId" : null, "endId" : null})
   const [vectorPosition, setVectorPositon] = useState({})
-  console.log('vp', vectorPosition)
+  console.log('sid start and end', stationIdStartAndEnd)
   // console.log('sa', statusArray)
 
   // get station info for trip planner  for station search. 
@@ -35,7 +37,10 @@ function App() {
       .then(stationsData => setStations(stationsData))
   }, [])
 
+    // look into how this is used 
+    // This is triggered when ToolTip origin or dest button is clicked
   function retrieveStationId(id, startOrEnd) {
+    console.log('rsid func', id, startOrEnd)
     setStationIdStartAndEnd(prevState => {
       const newStationIdStartOrEnd = { ...prevState };
       if (startOrEnd === "start") {
@@ -228,7 +233,8 @@ function App() {
         stationIdStartAndEnd : stationIdStartAndEnd,
         // retrieveId : retrieveId
         vectorPosition : vectorPosition,
-        setVectorPositon : setVectorPositon
+        setVectorPositon : setVectorPositon,
+        retrieveStationId : retrieveStationId
         }}/>
     </>
   )

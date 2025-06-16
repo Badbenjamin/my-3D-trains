@@ -4,6 +4,7 @@ import { useOutletContext } from 'react-router-dom'
 import { useFrame } from '@react-three/fiber'
 import { useState } from 'react'
 import * as THREE from "three"
+// import { useOutletContext } from "react-router-dom";
 // import { Html } from "@react-three/drei"
 // import { Line } from "@react-three/drei"
 // import { Line } from '@react-three/drei'
@@ -25,8 +26,8 @@ export default function StationsTracksAndText({vectorPosition}) {
     const [cameraPosition, setCameraPosition] = useState({"x": 0, "y" : 0, "z" : 0})
 
 
-
-
+    const {retrieveStationId} = useOutletContext()
+    // console.log('rsid stat', retrieveStationId)
 function findDistance(point1, point2){
     let x1 = point1["x"]
     let y1 = point1['y']
@@ -51,7 +52,7 @@ useEffect(()=>{
 // THIS SHOULD BRING UP TOOLTIP
 function handleStationClick(stopId, name, position, daytime_routes){
   // console.log(iconImageArray)
-  let newTooltip = <StationToolTip key={name} stopId={stopId} position={position} name={name} daytime_routes={daytime_routes}/>
+  let newTooltip = <StationToolTip key={name} retrieveStationId={retrieveStationId} stopId={stopId} position={position} name={name} daytime_routes={daytime_routes}/>
 
   
   setToolTipArray(prev => {

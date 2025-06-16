@@ -76,6 +76,7 @@ export function createStationComponentsObj(nodes, materials, newStatusArray, ret
                       mesh={nodes[mesh]} 
                       materials={materials}
                       getStationCode={getStationCode}
+                      // maybe remove if this is in text component now
                       retrieveStationId = {retrieveStationId}
                       />
         } 

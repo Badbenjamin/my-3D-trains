@@ -2,13 +2,14 @@ import { Html, Line } from "@react-three/drei"
 import { use } from "react"
 import { useState, useEffect } from "react"
 import * as THREE from "three"
+
 // import { Line } from "@react-three/drei"
 
 
 import './App.css'
 
 // add props?
-export default function StationToolTip({stopId, position, name, daytime_routes}){
+export default function StationToolTip({stopId, position, name, daytime_routes, retrieveStationId}){
     let [arrivalInfo, setArrivalInfo] = useState({})
     let [northArrivals, setNorthArrivals] = useState([])
     let [southArrivals, setSouthArrivals] = useState([])
@@ -20,7 +21,7 @@ export default function StationToolTip({stopId, position, name, daytime_routes})
 
     }, [])
 
-    console.log('ai', arrivalInfo)
+    // console.log('rsid', retrieveStationId)
 
     let iconImageArray = []
     // daytime_routes.split(" ").map((route)=>{
@@ -76,6 +77,13 @@ export default function StationToolTip({stopId, position, name, daytime_routes})
 
     // const tooltipLine = <Line points={[position, tooltipPosition]}/>
 
+    function handleSetStationClick(id, startOrEnd){
+        console.log('tt set station',id, startOrEnd)
+        retrieveStationId(id, startOrEnd)
+        // setIsClicked(!isClicked)
+        
+    }
+
     if (!arrivalInfo){
         return(
             <Html position={position}>
@@ -96,7 +104,7 @@ export default function StationToolTip({stopId, position, name, daytime_routes})
                 center={true}
             >
                 <div  className="station-html">
-                    <button className="x-button" onClick={console.log('xclick')}>X</button>
+                    <button className="x-button" >X</button>
                     <h2 className="station-html-text">{name + " " + iconImageArray}</h2>
                     <div className="arrivals-html">
                         {arrivalInfo.north_direction_label}
@@ -105,8 +113,8 @@ export default function StationToolTip({stopId, position, name, daytime_routes})
                         {southArrivals}
                     </div>
                     
-                    <button onClick={()=>handleSetStationClick(stationInfoObject.id, "start")}>ORIGIN</button>
-                    <button onClick={()=>handleSetStationClick(stationInfoObject.id, "end")}>DESTINATION</button>
+                    <button onClick={()=>handleSetStationClick(stopId, "start")}>ORIGIN</button>
+                    <button onClick={()=>handleSetStationClick(stopId, "end")}>DESTINATION</button>
                     {/* {tooltipLine} */}
                 </div>
                 

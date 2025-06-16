@@ -5,7 +5,7 @@ export default function NextTrains({tripInfoIndex, tripInfo, setTripInfoIndex}){
 
 
 
-    console.log('ntti',tripInfo)
+    // console.log('ntti',tripInfo)
     // let arrivalsButtons = []
 
     let arrivalsButtons = tripInfo.map((trip, index)=>{

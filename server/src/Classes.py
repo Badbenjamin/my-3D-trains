@@ -20,9 +20,10 @@ class Journey:
 
     def __init__(self, start_station_id, end_station_id, time=None):
 
-        self.start_station = Station.query.filter(Station.id == start_station_id).first()
-        self.end_station = Station.query.filter(Station.id == end_station_id).first()
-        
+        # CHANGE TO GTFS STOP ID from ID
+        self.start_station = Station.query.filter(Station.gtfs_stop_id == start_station_id).first()
+        self.end_station = Station.query.filter(Station.gtfs_stop_id == end_station_id).first()
+        print(self.start_station, self.end_station)
         # accounting for stations in complexes, these are the stations that are shared between two lines on a two part trip.
         self.shared_stations = []
 

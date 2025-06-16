@@ -10,21 +10,33 @@ import NextTrains from "./NextTrains";
 function JourneyPlanner() {
 
     const {tripInfo, stations, setTripInfo, stationIdStartAndEnd, tripInfoIndex, setTripInfoIndex} = useOutletContext()
-    
+    //
+    console.log('jp sid',stationIdStartAndEnd)
+    // look if this is an "option" number and not a gtfs id
     const [journeyStations, setJourneyStations] = useState([null, null])
     console.log('js', journeyStations)
     
-    function getStations(station, position){
-        // console.log(station.pos.position)
+    function getStations(stationValue, position){
+        console.log('get stations', stationValue, position)
+
+        // logic to hanlde staton or id maybe just always make it id? 
         const journey = [...journeyStations]
-        if (station.pos.position === 'start'){
-            journey[0] = station.value;
-        } else if (station.pos.position == 'end'){
-            journey[1] = station.value;
+        if (position === 'start'){
+            journey[0] = stationValue;
+        } else if (position == 'end'){
+            journey[1] = stationValue;
         }
-        
+        console.log('journey', journey)
     setJourneyStations(journey)
     }
+
+    // there is another value id instead of a GTFS id
+    useEffect(()=>{
+        let newJourney = [...journeyStations]
+        newJourney[0] = stationIdStartAndEnd['startId']
+        newJourney[1] = stationIdStartAndEnd['endId']
+        setJourneyStations(newJourney)
+    }, [stationIdStartAndEnd])
 
     function planTrip(e){
         console.log(journeyStations)
@@ -38,19 +50,19 @@ function JourneyPlanner() {
         }
     }
 
-    function handleNextTrainClick(){
-        if (tripInfoIndex < tripInfo.length - 1){
-            setTripInfoIndex(tripInfoIndex + 1)
-        } 
+    // function handleNextTrainClick(){
+    //     if (tripInfoIndex < tripInfo.length - 1){
+    //         setTripInfoIndex(tripInfoIndex + 1)
+    //     } 
         
-    }
+    // }
 
-    function handlePrevTrainClick(){
-        if (tripInfoIndex != 0){
-            setTripInfoIndex(tripInfoIndex - 1)
-        } 
+    // function handlePrevTrainClick(){
+    //     if (tripInfoIndex != 0){
+    //         setTripInfoIndex(tripInfoIndex - 1)
+    //     } 
         
-    }
+    // }
 
     return (
         <div>
