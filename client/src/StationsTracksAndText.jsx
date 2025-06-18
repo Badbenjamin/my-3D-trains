@@ -49,7 +49,7 @@ useEffect(()=>{
 },[])
   // console.log('sioa',stationInfoObjectArray)
 
-// THIS SHOULD BRING UP TOOLTIP
+// THIS SHOULD BRING UP STATION TOOLTIP
 function handleStationClick(stopId, name, position, daytime_routes){
   // console.log(iconImageArray)
   let newTooltip = <StationToolTip key={name} retrieveStationId={retrieveStationId} stopId={stopId} position={position} name={name} daytime_routes={daytime_routes}/>
@@ -62,12 +62,13 @@ function handleStationClick(stopId, name, position, daytime_routes){
 
 
 }
-// console.log('tta', toolTipArray)
-function handleComplexClick(complexId){
-  console.log(complexId)
+
+function handleComplexClick(complexId, routes){
+  console.log(complexId, routes)
 }
 
   // COMBINE station info from DB with location info from map model to display HTML text on map
+  // THINK ABOUT HOW TO GET SMALL TEXT WHEN STATIONS ARE CLOSE!!!
 useEffect(()=>{
   
   if (stationInfoObjectArray && stationArray){
@@ -85,13 +86,13 @@ useEffect(()=>{
     let newStationHtmlArray = []
     // this might not be needed
     let newComplexHtmlArray = []
-    let newTooltipArray = []
+    // let newTooltipArray = []
     let complexObject = {}
-    let count = 0
+    // let count = 0
     // loop through meshes 
     // maybe this is the issue?
     for (let j = 0 ; j < stationArray.length; j++){
-   
+      // filter out track names for now
       if (stationArray[j].props.name.length < 5){
         // if name is in stationInfoObject as key, and is not a complex, create <StationText> and push to stationHtmlArray
         if( stationArray[j].props.name in stationInfoObject && !stationInfoObject[stationArray[j].props.name].complex){
@@ -105,7 +106,7 @@ useEffect(()=>{
           newStationHtmlArray.push(newStationText)
 
           // if complex = True, create key in complexObject from complex_id and add values to key
-          // I WANT TO CREATE NEW KEY VALUE PAIRS WHEN NOT IN DICT, BUT ADD TO VALUES WHEN KEY IS IN DICT
+          // need to make array of daytime routes, to send to tooltip when clicked
         } else if ( stationArray[j].props.name in stationInfoObject && stationInfoObject[stationArray[j].props.name].complex){
     
           let newPosition = stationArray[j].props.mesh.position
@@ -117,18 +118,20 @@ useEffect(()=>{
             
             complexObject[newInfoObject.complex_id] = {
                 "complex_id" : newInfoObject.complex_id,
-                "daytime_routes" : newInfoObject.daytime_routes.split(" "),
+                // "daytime_routes" : newInfoObject.daytime_routes.split(" "),
+                "daytime_routes" : [[newInfoObject.daytime_routes]],
                 "gtfs_stop_ids" : [newInfoObject.gtfs_stop_id],
                 "positions" : [newPosition],
                 "stop_names" : [newInfoObject.name],
                 // "count" : count
             } 
           } else {
-
-            let routes = complexObject[newInfoObject.complex_id]['daytime_routes']
-            let newRoutes = newInfoObject.daytime_routes.split(" ")
-            let concatRoutes = routes.concat(newRoutes)
-            complexObject[newInfoObject.complex_id]['daytime_routes'] = concatRoutes
+            // maybe just concat routes in ComplexText component?
+            // let routes = complexObject[newInfoObject.complex_id]['daytime_routes']
+            // let newRoutes = newInfoObject.daytime_routes.split(" ")
+            // let concatRoutes = routes.concat(newRoutes)
+            // complexObject[newInfoObject.complex_id]['daytime_routes'] = concatRoutes
+            complexObject[newInfoObject.complex_id]['daytime_routes'].push([newInfoObject.daytime_routes])
 
             let stopIds = complexObject[newInfoObject.complex_id]['gtfs_stop_ids']
             let newStopId = newInfoObject.gtfs_stop_id
@@ -147,7 +150,7 @@ useEffect(()=>{
         }
       }
     }
-    // console.log(complexObject)
+    // console.log('comp obj',complexObject)
     let i = 0
     for (let complex in complexObject){
       let status = true
