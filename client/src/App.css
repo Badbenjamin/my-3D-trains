@@ -79,6 +79,13 @@ html{
   pointer-events: none;
 }
 
+.route_icon_complex{
+  width: 20px;
+  height: 20pxx;
+  padding: 3px;
+  pointer-events: none;
+}
+
 .tooltip_route_icon{
   width: 27px;
   height: 27px;
@@ -97,4 +104,9 @@ html{
 .icon-time-pair{
   display: flex;
     flex-direction: row;
+}
+
+.station-routes-button{
+  white-space: nowrap;
+  overflow: hidden;
 }

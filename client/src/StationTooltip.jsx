@@ -16,7 +16,10 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
 
     }, [])
 
-    let iconImageArray = []
+    let iconImageArray = [];
+    daytime_routes.split(" ").map((route)=>{
+            iconImageArray.push(<img className="route_icon_complex" src={`../public/ICONS/${route}.png`}/>)
+    })
   
     function buildArrivals(arrivalObjectArray){
         let imgTimePairs =[]
@@ -76,7 +79,7 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
             >
                 <div  className="station-html">
                     <button className="x-button" >X</button>
-                    <h2 className="station-html-text">{name + " " + iconImageArray}</h2>
+                    <h2 className="station-html-text">{name}{iconImageArray} </h2>
                     <div className="arrivals-html">
                         {arrivalInfo.north_direction_label}
                         {northArrivals}

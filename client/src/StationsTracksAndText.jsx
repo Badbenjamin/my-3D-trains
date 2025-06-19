@@ -13,7 +13,7 @@ import * as THREE from "three"
 import StationText from './StationText'
 import ComplexText from './ComplexText'
 import StationToolTip from './StationTooltip'
-
+import ComplexTooltip from './ComplexTooltip'
 
 
 export default function StationsTracksAndText({vectorPosition}) {
@@ -24,6 +24,7 @@ export default function StationsTracksAndText({vectorPosition}) {
     const [toolTipArray, setToolTipArray] = useState([].slice(0,2))
     // const [lineArray, setLineArray] = useState([])
     const [cameraPosition, setCameraPosition] = useState({"x": 0, "y" : 0, "z" : 0})
+    
 
 
     const {retrieveStationId} = useOutletContext()
@@ -52,19 +53,25 @@ useEffect(()=>{
 // THIS SHOULD BRING UP STATION TOOLTIP
 function handleStationClick(stopId, name, position, daytime_routes){
   // console.log(iconImageArray)
-  let newTooltip = <StationToolTip key={name} retrieveStationId={retrieveStationId} stopId={stopId} position={position} name={name} daytime_routes={daytime_routes}/>
+  // FIX KEY ISSUE
+  let newStationTooltip = <StationToolTip key={name} retrieveStationId={retrieveStationId} stopId={stopId} position={position} name={name} daytime_routes={daytime_routes}/>
 
   
   setToolTipArray(prev => {
-    const updated = [newTooltip, ...prev]
+    const updated = [newStationTooltip, ...prev]
     return updated.slice(0,2)
   })
 
 
 }
 
-function handleComplexClick(complexId, routes){
-  console.log(complexId, routes)
+function handleComplexClick(complexStationRouteIdObjs, averagePosition){
+  console.log(complexStationRouteIdObjs, averagePosition)
+  let newComplexTooltip = <ComplexTooltip complexStationRouteIdObjs={complexStationRouteIdObjs} averagePosition={averagePosition}/>
+  setToolTipArray(prev => {
+    const updated = [newComplexTooltip, ...prev]
+    return updated.slice(0,2)
+  })
 }
 
   // COMBINE station info from DB with location info from map model to display HTML text on map
@@ -123,6 +130,11 @@ useEffect(()=>{
                 "gtfs_stop_ids" : [newInfoObject.gtfs_stop_id],
                 "positions" : [newPosition],
                 "stop_names" : [newInfoObject.name],
+                "name_route_combo_obj_array" : [{
+                  "name" : newInfoObject.name,
+                  "routes" : newInfoObject.daytime_routes,
+                  "gtfs_stop_id" :newInfoObject.gtfs_stop_id
+                }]
                 // "count" : count
             } 
           } else {
@@ -132,6 +144,13 @@ useEffect(()=>{
             // let concatRoutes = routes.concat(newRoutes)
             // complexObject[newInfoObject.complex_id]['daytime_routes'] = concatRoutes
             complexObject[newInfoObject.complex_id]['daytime_routes'].push([newInfoObject.daytime_routes])
+
+            // name route combos, might only need this after all
+            complexObject[newInfoObject.complex_id]['name_route_combo_obj_array'].push({
+                  "name" : newInfoObject.name,
+                  "routes" : newInfoObject.daytime_routes,
+                  "gtfs_stop_id" :newInfoObject.gtfs_stop_id
+            })
 
             let stopIds = complexObject[newInfoObject.complex_id]['gtfs_stop_ids']
             let newStopId = newInfoObject.gtfs_stop_id
@@ -176,7 +195,7 @@ useEffect(()=>{
       }
       let averagePosition = avereragePosition(complexObject[complex].positions)
       // console.log('cid', complexObject[complex].complex_id)
-      let newComplexText = <ComplexText handleComplexClick={handleComplexClick} complexId={complexObject[complex].complex_id} wrapperClass="station_label"  index={i} status={status} key={complexObject[complex].complex_id}  distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={0} />
+      let newComplexText = <ComplexText handleComplexClick={handleComplexClick} complexStationRouteIdObjs={complexObject[complex].name_route_combo_obj_array} complexId={complexObject[complex].complex_id} wrapperClass="station_label"  index={i} status={status} key={complexObject[complex].complex_id}  distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={0} />
       newComplexHtmlArray.push(newComplexText)
     }
     setStationHtmlArray(newStationHtmlArray)
@@ -236,12 +255,13 @@ useEffect(()=>{
       } else {
         alphaLevel = 1
       }
+      // issue with complex station routes and ids array
       let status = true
-      let newComplexText = <ComplexText handleComplexClick={handleComplexClick} wrapperClass="station_label" complexId={complexText.props.complexId.toString()} index={i} status={status} key={complexText.props.complex_id}  distanceFactor={8} center={true} routes={complexText.props.routes} averagePosition={complexText.props.averagePosition} names={complexText.props.names} alphaLevel={alphaLevel} />
+      let newComplexText = <ComplexText handleComplexClick={handleComplexClick} wrapperClass="station_label" complexStationRouteIdObjs={complexText.props.complexStationRouteIdObjs} complexId={complexText.props.complexId.toString()} index={i} status={status} key={complexText.props.complex_id}  distanceFactor={8} center={true} routes={complexText.props.routes} averagePosition={complexText.props.averagePosition} names={complexText.props.names} alphaLevel={alphaLevel} />
       return newComplexText
     } else {
       let status = false
-      let newComplexText = <ComplexText handleComplexClick={handleComplexClick} wrapperClass="station_label" complexId={complexText.props.complexId.toString()} index={i} status={status} key={complexText.props.complex_id}  distanceFactor={8} center={true} routes={complexText.props.routes} averagePosition={complexText.props.averagePosition} names={complexText.props.names} alphaLevel={1} />
+      let newComplexText = <ComplexText handleComplexClick={handleComplexClick} wrapperClass="station_label" complexStationRouteIdObjs={complexText.props.complexStationRouteIdObjs} complexId={complexText.props.complexId.toString()} index={i} status={status} key={complexText.props.complex_id}  distanceFactor={8} center={true} routes={complexText.props.routes} averagePosition={complexText.props.averagePosition} names={complexText.props.names} alphaLevel={1} />
       return newComplexText
     }
   })
