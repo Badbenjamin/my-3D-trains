@@ -24,7 +24,7 @@ export default function StationsTracksAndText({vectorPosition}) {
     const [toolTipArray, setToolTipArray] = useState([].slice(0,2))
     // const [lineArray, setLineArray] = useState([])
     const [cameraPosition, setCameraPosition] = useState({"x": 0, "y" : 0, "z" : 0})
-    
+    // console.log('ttarr', toolTipArray)
 
 
     const {retrieveStationId} = useOutletContext()
@@ -54,7 +54,7 @@ useEffect(()=>{
 function handleStationClick(stopId, name, position, daytime_routes){
   // console.log(iconImageArray)
   // FIX KEY ISSUE
-  let newStationTooltip = <StationToolTip key={name} retrieveStationId={retrieveStationId} stopId={stopId} position={position} name={name} daytime_routes={daytime_routes}/>
+  let newStationTooltip = <StationToolTip key={name} clearTooltip={clearTooltip} retrieveStationId={retrieveStationId} stopId={stopId} position={position} name={name} daytime_routes={daytime_routes}/>
 
   
   setToolTipArray(prev => {
@@ -71,6 +71,16 @@ function handleComplexClick(complexStationRouteIdObjs, averagePosition){
   setToolTipArray(prev => {
     const updated = [newComplexTooltip, ...prev]
     return updated.slice(0,2)
+  })
+}
+ // filter and only return id's that are not from the tooltip that had it's x clicked
+function clearTooltip(id){
+  setToolTipArray(prevArray => {
+    return prevArray.filter((tooltip)=>{
+      if (tooltip.props.stopId != id){
+        return tooltip
+      }
+    })
   })
 }
 
@@ -109,7 +119,7 @@ useEffect(()=>{
           let newInfoObject = stationInfoObject[stationArray[j].props.name]
         
           // VERSION???
-          let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
+          let newStationText = <StationText handleStationClick={handleStationClick}  wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
           newStationHtmlArray.push(newStationText)
 
           // if complex = True, create key in complexObject from complex_id and add values to key
@@ -195,7 +205,7 @@ useEffect(()=>{
       }
       let averagePosition = avereragePosition(complexObject[complex].positions)
       // console.log('cid', complexObject[complex].complex_id)
-      let newComplexText = <ComplexText handleComplexClick={handleComplexClick} complexStationRouteIdObjs={complexObject[complex].name_route_combo_obj_array} complexId={complexObject[complex].complex_id} wrapperClass="station_label"  index={i} status={status} key={complexObject[complex].complex_id}  distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={0} />
+      let newComplexText = <ComplexText handleComplexClick={handleComplexClick}  complexStationRouteIdObjs={complexObject[complex].name_route_combo_obj_array} complexId={complexObject[complex].complex_id} wrapperClass="station_label"  index={i} status={status} key={complexObject[complex].complex_id}  distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={0} />
       newComplexHtmlArray.push(newComplexText)
     }
     setStationHtmlArray(newStationHtmlArray)
@@ -257,11 +267,11 @@ useEffect(()=>{
       }
       // issue with complex station routes and ids array
       let status = true
-      let newComplexText = <ComplexText handleComplexClick={handleComplexClick} wrapperClass="station_label" complexStationRouteIdObjs={complexText.props.complexStationRouteIdObjs} complexId={complexText.props.complexId.toString()} index={i} status={status} key={complexText.props.complex_id}  distanceFactor={8} center={true} routes={complexText.props.routes} averagePosition={complexText.props.averagePosition} names={complexText.props.names} alphaLevel={alphaLevel} />
+      let newComplexText = <ComplexText handleComplexClick={handleComplexClick}  wrapperClass="station_label" complexStationRouteIdObjs={complexText.props.complexStationRouteIdObjs} complexId={complexText.props.complexId.toString()} index={i} status={status} key={complexText.props.complex_id}  distanceFactor={8} center={true} routes={complexText.props.routes} averagePosition={complexText.props.averagePosition} names={complexText.props.names} alphaLevel={alphaLevel} />
       return newComplexText
     } else {
       let status = false
-      let newComplexText = <ComplexText handleComplexClick={handleComplexClick} wrapperClass="station_label" complexStationRouteIdObjs={complexText.props.complexStationRouteIdObjs} complexId={complexText.props.complexId.toString()} index={i} status={status} key={complexText.props.complex_id}  distanceFactor={8} center={true} routes={complexText.props.routes} averagePosition={complexText.props.averagePosition} names={complexText.props.names} alphaLevel={1} />
+      let newComplexText = <ComplexText handleComplexClick={handleComplexClick}  wrapperClass="station_label" complexStationRouteIdObjs={complexText.props.complexStationRouteIdObjs} complexId={complexText.props.complexId.toString()} index={i} status={status} key={complexText.props.complex_id}  distanceFactor={8} center={true} routes={complexText.props.routes} averagePosition={complexText.props.averagePosition} names={complexText.props.names} alphaLevel={1} />
       return newComplexText
     }
   })

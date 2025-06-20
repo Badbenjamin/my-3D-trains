@@ -4,11 +4,11 @@ import * as THREE from "three"
 
 import './App.css'
 
-export default function StationToolTip({stopId, position, name, daytime_routes, retrieveStationId}){
+export default function StationToolTip({stopId, position, name, daytime_routes, retrieveStationId, clearTooltip}){
     let [arrivalInfo, setArrivalInfo] = useState({})
     let [northArrivals, setNorthArrivals] = useState([])
     let [southArrivals, setSouthArrivals] = useState([])
-
+    console.log('cleaertt', clearTooltip)
     useEffect(()=>{
         fetch(`http://127.0.0.1:5555/api/arrivals/${stopId}`)
                 .then(response => response.json())
@@ -21,6 +21,11 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
             iconImageArray.push(<img className="route_icon_complex" src={`../public/ICONS/${route}.png`}/>)
     })
   
+    function handleXClick(stopId){
+        clearTooltip(stopId)
+        // console.log(stopId)
+    }
+
     function buildArrivals(arrivalObjectArray){
         let imgTimePairs =[]
         if (arrivalObjectArray) {
@@ -78,7 +83,7 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
                 center={true}
             >
                 <div  className="station-html">
-                    <button className="x-button" >X</button>
+                    <button className="x-button" onClick={()=>{(handleXClick(stopId))}} >X</button>
                     <h2 className="station-html-text">{name}{iconImageArray} </h2>
                     <div className="arrivals-html">
                         {arrivalInfo.north_direction_label}

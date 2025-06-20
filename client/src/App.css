@@ -93,13 +93,13 @@ html{
   pointer-events: none;
 }
 
-.arrivals-html{
+/* .arrivals-html{
   display: flex;
-    flex-direction: row;
+  flex-direction: row;
     flex-wrap: wrap;
     gap: 15px;
     align-items: center;
-}
+} */
 
 .icon-time-pair{
   display: flex;
