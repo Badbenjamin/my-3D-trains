@@ -17,17 +17,20 @@ import ComplexTooltip from './ComplexTooltip'
 
 
 export default function StationsTracksAndText({vectorPosition}) {
-    const {stationArray} = useOutletContext()
+    const {stationArray, retrieveStationId} = useOutletContext()
     const [stationInfoObjectArray, setStationInfoObjectArray] = useState([])
     const [stationHtmlArray, setStationHtmlArray] = useState([])
     const [complexHtmlArray, setComplexHtmlArray] = useState([])
     const [toolTipArray, setToolTipArray] = useState([].slice(0,2))
+    const [versionForKey, setVersionForKey] = useState(0)
     // const [lineArray, setLineArray] = useState([])
     const [cameraPosition, setCameraPosition] = useState({"x": 0, "y" : 0, "z" : 0})
+    console.log('vfk', versionForKey)
+    // DO I NEED TO KEEP CREATING TOOLTIPARRAY?
     // console.log('ttarr', toolTipArray)
 
 
-    const {retrieveStationId} = useOutletContext()
+    // const {retrieveStationId} = useOutletContext()
     // console.log('rsid stat', retrieveStationId)
 function findDistance(point1, point2){
     let x1 = point1["x"]
@@ -54,8 +57,9 @@ useEffect(()=>{
 function handleStationClick(stopId, name, position, daytime_routes){
   // console.log(iconImageArray)
   // FIX KEY ISSUE
-  let newStationTooltip = <StationToolTip key={name} clearTooltip={clearTooltip} retrieveStationId={retrieveStationId} stopId={stopId} position={position} name={name} daytime_routes={daytime_routes}/>
-
+  // if (toolTipArray.includes())
+  let newStationTooltip = <StationToolTip key={name + versionForKey} clearTooltip={clearTooltip} retrieveStationId={retrieveStationId} stopId={stopId} position={position} name={name} daytime_routes={daytime_routes}/>
+  setVersionForKey(versionForKey + 1)
   
   setToolTipArray(prev => {
     const updated = [newStationTooltip, ...prev]
@@ -65,25 +69,47 @@ function handleStationClick(stopId, name, position, daytime_routes){
 
 }
 
-function handleComplexClick(complexStationRouteIdObjs, averagePosition){
-  console.log(complexStationRouteIdObjs, averagePosition)
-  let newComplexTooltip = <ComplexTooltip complexStationRouteIdObjs={complexStationRouteIdObjs} averagePosition={averagePosition}/>
+function handleComplexClick(complexStationRouteIdObjs, averagePosition, complexId){
+  // console.log(complexStationRouteIdObjs, averagePosition, complexId)
+
+  let newComplexTooltip = <ComplexTooltip key={complexId + versionForKey} clearTooltip={clearTooltip} retrieveStationId={retrieveStationId} complexId={complexId} complexStationRouteIdObjs={complexStationRouteIdObjs} averagePosition={averagePosition}/>
+  setVersionForKey(versionForKey + 1)
+
   setToolTipArray(prev => {
+    
     const updated = [newComplexTooltip, ...prev]
     return updated.slice(0,2)
   })
 }
  // filter and only return id's that are not from the tooltip that had it's x clicked
-function clearTooltip(id){
-  setToolTipArray(prevArray => {
-    return prevArray.filter((tooltip)=>{
-      if (tooltip.props.stopId != id){
-        return tooltip
-      }
+function clearTooltip(id, type){
+  // check if complex id and stopId are interchangable in this situatioin
+  console.log('id', id)
+  console.log('type',type)
+  // console.log('tta',toolTipArray)
+  if (type === "stopId"){
+    setToolTipArray(prevArray => {
+      console.log('id2', id)
+      return prevArray.filter((tooltip)=>{
+        if (tooltip.props.stopId != id){
+          return tooltip
+        }
+      })
     })
-  })
+  } else if (type === "complexId"){
+    console.log('complexid')
+    setToolTipArray(prevArray => {
+      console.log('id2', id)
+      return prevArray.filter((tooltip)=>{
+        if (tooltip.props.complexId != id){
+          return tooltip
+        }
+      })
+    })
+  }
+  
 }
-
+// console.log('tta',toolTipArray)
   // COMBINE station info from DB with location info from map model to display HTML text on map
   // THINK ABOUT HOW TO GET SMALL TEXT WHEN STATIONS ARE CLOSE!!!
 useEffect(()=>{

@@ -20,7 +20,7 @@ export default function ComplexText({handleComplexClick, averagePosition, names,
     })
 
     function handleClick(){
-        handleComplexClick(complexStationRouteIdObjs, averagePosition);
+        handleComplexClick(complexStationRouteIdObjs, averagePosition, complexId);
     }
     return(
         <>

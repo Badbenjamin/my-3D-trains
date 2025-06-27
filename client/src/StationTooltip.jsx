@@ -22,10 +22,11 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
     })
   
     function handleXClick(stopId){
-        clearTooltip(stopId)
+        clearTooltip(stopId, "stopId")
         // console.log(stopId)
     }
 
+    // DUPLICATE FUNCTION IN COMPLEX TOOLTIP!!!
     function buildArrivals(arrivalObjectArray){
         let imgTimePairs =[]
         if (arrivalObjectArray) {

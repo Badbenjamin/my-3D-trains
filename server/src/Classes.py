@@ -23,7 +23,7 @@ class Journey:
         # CHANGED TO GTFS STOP ID from ID (6/16)
         self.start_station = Station.query.filter(Station.gtfs_stop_id == start_station_id).first()
         self.end_station = Station.query.filter(Station.gtfs_stop_id == end_station_id).first()
-        print(self.start_station, self.end_station)
+        # print(self.start_station, self.end_station)
         # accounting for stations in complexes, these are the stations that are shared between two lines on a two part trip.
         self.shared_stations = []
 
@@ -505,6 +505,10 @@ class ArrivalsForStation:
         # get endpoint for route that station is on
         self.station = Station.query.filter(Station.gtfs_stop_id == gtfs_stop_id).first()
         # self.routes = self.station.daytime_routes.split()
+        self.gtfs_stop_id = self.station.gtfs_stop_id
+        print('gtfsid', self.gtfs_stop_id)
+        self.station_name = self.station.stop_name
+        print('station', self.station)
         self.north_direction_label = self.station.north_direction_label
         self.south_direction_label = self.station.south_direction_label
         self.station_endpoints = modules_classes.get_endpoints_for_station(self.station.station_endpoints)
@@ -522,12 +526,14 @@ class ArrivalsForStation:
         self.s_bound_arrivals = self.trains_for_station['s_bound_arrivals']
         # maybe make this a countdown in the future
         self.arrivals_for_react = {
+            "gtfs_stop_id" : self.gtfs_stop_id,
+            "stop_name" : self.station_name,
             "north_direction_label" : self.north_direction_label,
             "south_direction_label" : self.south_direction_label,
             "n_bound_arrivals" : [{"route" : n_bound_arrival['route'], "time" : datetime.fromtimestamp(n_bound_arrival['arrival_time']).strftime('%-I:%M')} for n_bound_arrival in self.n_bound_arrivals][0:3],
             "s_bound_arrivals" : [{"route" : s_bound_arrival['route'], "time" : datetime.fromtimestamp(s_bound_arrival['arrival_time']).strftime('%-I:%M')} for s_bound_arrival in self.s_bound_arrivals][0:3]
         }
-        print(self.arrivals_for_react)
+        # print(self.arrivals_for_react)
     def __repr__(self):
         return f'<ArrivalsForStation>'
 
