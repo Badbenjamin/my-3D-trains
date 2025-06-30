@@ -8,7 +8,7 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
     let [arrivalInfo, setArrivalInfo] = useState({})
     let [northArrivals, setNorthArrivals] = useState([])
     let [southArrivals, setSouthArrivals] = useState([])
-    console.log('cleaertt', clearTooltip)
+    // console.log('cleaertt', clearTooltip)
     useEffect(()=>{
         fetch(`http://127.0.0.1:5555/api/arrivals/${stopId}`)
                 .then(response => response.json())
@@ -31,7 +31,7 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
         let imgTimePairs =[]
         if (arrivalObjectArray) {
             for (const arrivalObject of arrivalObjectArray){
-                console.log(arrivalObject['route'])
+                // console.log(arrivalObject['route'])
                 let imgTimePair = <div className="icon-time-pair">
                                      <img className="tooltip_route_icon" src={`../public/ICONS/${arrivalObject["route"]}.png`} />
                                      <div>{arrivalObject['time']}</div>

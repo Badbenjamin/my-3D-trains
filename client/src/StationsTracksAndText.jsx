@@ -25,7 +25,7 @@ export default function StationsTracksAndText({vectorPosition}) {
     const [versionForKey, setVersionForKey] = useState(0)
     // const [lineArray, setLineArray] = useState([])
     const [cameraPosition, setCameraPosition] = useState({"x": 0, "y" : 0, "z" : 0})
-    console.log('vfk', versionForKey)
+    // console.log('vfk', versionForKey)
     // DO I NEED TO KEEP CREATING TOOLTIPARRAY?
     // console.log('ttarr', toolTipArray)
 
@@ -53,20 +53,28 @@ useEffect(()=>{
 },[])
   // console.log('sioa',stationInfoObjectArray)
 
-// THIS SHOULD BRING UP STATION TOOLTIP
+// CREATE STATION TOOLTIP IF IT DOESN'T ALREADY EXIST
 function handleStationClick(stopId, name, position, daytime_routes){
-  // console.log(iconImageArray)
-  // FIX KEY ISSUE
-  // if (toolTipArray.includes())
-  let newStationTooltip = <StationToolTip key={name + versionForKey} clearTooltip={clearTooltip} retrieveStationId={retrieveStationId} stopId={stopId} position={position} name={name} daytime_routes={daytime_routes}/>
-  setVersionForKey(versionForKey + 1)
+
+  let newStationTooltip = <StationToolTip key={name + versionForKey} clearTooltip={clearTooltip} retrieveStationId={retrieveStationId} stopId={stopId} position={position} name={name} daytime_routes={daytime_routes}/>;
+  setVersionForKey(versionForKey + 1);
+
+  setToolTipArray(prevTooltipArray => {
   
-  setToolTipArray(prev => {
-    const updated = [newStationTooltip, ...prev]
-    return updated.slice(0,2)
-  })
+    let alreadyInArray = false
+    prevTooltipArray.map((tooltip)=>{
+        if (tooltip.props.stopId == stopId){
+          alreadyInArray = true
+        } 
+      })
 
-
+    if (alreadyInArray) {
+      return [...prevTooltipArray]
+    } else {
+      const updatedTooltipArray = [newStationTooltip, ...prevTooltipArray]
+      return updatedTooltipArray.slice(0,2)
+    }
+  });
 }
 
 function handleComplexClick(complexStationRouteIdObjs, averagePosition, complexId){
@@ -75,10 +83,20 @@ function handleComplexClick(complexStationRouteIdObjs, averagePosition, complexI
   let newComplexTooltip = <ComplexTooltip key={complexId + versionForKey} clearTooltip={clearTooltip} retrieveStationId={retrieveStationId} complexId={complexId} complexStationRouteIdObjs={complexStationRouteIdObjs} averagePosition={averagePosition}/>
   setVersionForKey(versionForKey + 1)
 
-  setToolTipArray(prev => {
-    
-    const updated = [newComplexTooltip, ...prev]
-    return updated.slice(0,2)
+  setToolTipArray(prevTooltipArray => {
+    let alreadyInArray = false
+    prevTooltipArray.map((tooltip)=>{
+        if (tooltip.props.complexId == complexId){
+          alreadyInArray = true
+        } 
+      })
+
+    if (alreadyInArray) {
+      return [...prevTooltipArray]
+    } else {
+      const updatedTooltipArray = [newComplexTooltip, ...prevTooltipArray]
+      return updatedTooltipArray.slice(0,2)
+    }
   })
 }
  // filter and only return id's that are not from the tooltip that had it's x clicked
