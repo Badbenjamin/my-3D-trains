@@ -15,6 +15,8 @@ import ComplexText from './ComplexText'
 import StationToolTip from './StationTooltip'
 import ComplexTooltip from './ComplexTooltip'
 
+import { findDistance } from './ModularFunctions'
+
 
 export default function StationsTracksAndText({vectorPosition}) {
     const {stationArray, retrieveStationId} = useOutletContext()
@@ -22,36 +24,30 @@ export default function StationsTracksAndText({vectorPosition}) {
     const [stationHtmlArray, setStationHtmlArray] = useState([])
     const [complexHtmlArray, setComplexHtmlArray] = useState([])
     const [toolTipArray, setToolTipArray] = useState([].slice(0,2))
+    // STILL HAVING KEY PROBLEMS WITH COMPLEXTEXT AND STATIONTEXT
     const [versionForKey, setVersionForKey] = useState(0)
-    // const [lineArray, setLineArray] = useState([])
+  
     const [cameraPosition, setCameraPosition] = useState({"x": 0, "y" : 0, "z" : 0})
-    // console.log('vfk', versionForKey)
-    // DO I NEED TO KEEP CREATING TOOLTIPARRAY?
-    // console.log('ttarr', toolTipArray)
-
-
-    // const {retrieveStationId} = useOutletContext()
-    // console.log('rsid stat', retrieveStationId)
-function findDistance(point1, point2){
-    let x1 = point1["x"]
-    let y1 = point1['y']
-    let z1 = point1['z']
+ 
+// function findDistance(point1, point2){
+//     let x1 = point1["x"]
+//     let y1 = point1['y']
+//     let z1 = point1['z']
   
-    let x2 = point2['x']
-    let y2 = point2['y']
-    let z2 = point2['z']
+//     let x2 = point2['x']
+//     let y2 = point2['y']
+//     let z2 = point2['z']
   
-    let result = Math.sqrt(((x2-x1)**2) + ((y2-y1)**2) + ((z2-z1)**2))
-    return result
-  }
+//     let result = Math.sqrt(((x2-x1)**2) + ((y2-y1)**2) + ((z2-z1)**2))
+//     return result
+//   }
 
-// 
+// Fetch to get data for stations, array of objects with info
 useEffect(()=>{
       fetch(`http://127.0.0.1:5555/api/stations`)
       .then(response => response.json())
       .then(stationInfoObjectArray => {setStationInfoObjectArray(stationInfoObjectArray)})
 },[])
-  // console.log('sioa',stationInfoObjectArray)
 
 // CREATE STATION TOOLTIP IF IT DOESN'T ALREADY EXIST
 function handleStationClick(stopId, name, position, daytime_routes){
@@ -60,7 +56,6 @@ function handleStationClick(stopId, name, position, daytime_routes){
   setVersionForKey(versionForKey + 1);
 
   setToolTipArray(prevTooltipArray => {
-  
     let alreadyInArray = false
     prevTooltipArray.map((tooltip)=>{
         if (tooltip.props.stopId == stopId){
@@ -77,8 +72,8 @@ function handleStationClick(stopId, name, position, daytime_routes){
   });
 }
 
+// CREATE COMPLEX TOOLTIP IF ITS NOT ALREADY IN TTARRAY
 function handleComplexClick(complexStationRouteIdObjs, averagePosition, complexId){
-  // console.log(complexStationRouteIdObjs, averagePosition, complexId)
 
   let newComplexTooltip = <ComplexTooltip key={complexId + versionForKey} clearTooltip={clearTooltip} retrieveStationId={retrieveStationId} complexId={complexId} complexStationRouteIdObjs={complexStationRouteIdObjs} averagePosition={averagePosition}/>
   setVersionForKey(versionForKey + 1)
@@ -99,12 +94,9 @@ function handleComplexClick(complexStationRouteIdObjs, averagePosition, complexI
     }
   })
 }
- // filter and only return id's that are not from the tooltip that had it's x clicked
+
+// REMOVE TOOLTIP WITH X CLICK (only return tts that don't match the id provided by button click)
 function clearTooltip(id, type){
-  // check if complex id and stopId are interchangable in this situatioin
-  console.log('id', id)
-  console.log('type',type)
-  // console.log('tta',toolTipArray)
   if (type === "stopId"){
     setToolTipArray(prevArray => {
       console.log('id2', id)
@@ -117,7 +109,6 @@ function clearTooltip(id, type){
   } else if (type === "complexId"){
     console.log('complexid')
     setToolTipArray(prevArray => {
-      console.log('id2', id)
       return prevArray.filter((tooltip)=>{
         if (tooltip.props.complexId != id){
           return tooltip
@@ -127,7 +118,7 @@ function clearTooltip(id, type){
   }
   
 }
-// console.log('tta',toolTipArray)
+
   // COMBINE station info from DB with location info from map model to display HTML text on map
   // THINK ABOUT HOW TO GET SMALL TEXT WHEN STATIONS ARE CLOSE!!!
 useEffect(()=>{
@@ -149,9 +140,10 @@ useEffect(()=>{
     let newComplexHtmlArray = []
     // let newTooltipArray = []
     let complexObject = {}
-    // let count = 0
-    // loop through meshes 
-    // maybe this is the issue?
+    // let localVersionForKey = versionForKey
+    
+      
+    // loop through meshes to get position, combine with info from fetch
     for (let j = 0 ; j < stationArray.length; j++){
       // filter out track names for now
       if (stationArray[j].props.name.length < 5){
@@ -159,11 +151,32 @@ useEffect(()=>{
         if( stationArray[j].props.name in stationInfoObject && !stationInfoObject[stationArray[j].props.name].complex){
           let status = false
           let newPosition = stationArray[j].props.mesh.position
-
+          // console.log('st pos', newPosition)
           let newInfoObject = stationInfoObject[stationArray[j].props.name]
-        
+          let size = 30
           // VERSION???
-          let newStationText = <StationText handleStationClick={handleStationClick}  wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
+          
+          // loop through positions and find if station is close to another???
+          let distToClosestStation = null
+          stationArray.map((otherStation)=>{
+            if ((otherStation.props.name.length < 5) && (otherStation.props.name != stationArray[j].props.name)){
+              
+              let distance = findDistance(otherStation.props.mesh.position, newPosition)
+              if (distToClosestStation == null){
+                distToClosestStation = distance
+              } else if (distance < distToClosestStation){
+                distToClosestStation = distance
+              }
+            }
+          })
+          console.log('d', distToClosestStation)
+          if (distToClosestStation < 0.6){
+            size = 20
+          } else if (distToClosestStation < 0.3){
+            size = 15
+          } 
+
+          let newStationText = <StationText handleStationClick={handleStationClick} size={size}  wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
           newStationHtmlArray.push(newStationText)
 
           // if complex = True, create key in complexObject from complex_id and add values to key
@@ -192,11 +205,6 @@ useEffect(()=>{
                 // "count" : count
             } 
           } else {
-            // maybe just concat routes in ComplexText component?
-            // let routes = complexObject[newInfoObject.complex_id]['daytime_routes']
-            // let newRoutes = newInfoObject.daytime_routes.split(" ")
-            // let concatRoutes = routes.concat(newRoutes)
-            // complexObject[newInfoObject.complex_id]['daytime_routes'] = concatRoutes
             complexObject[newInfoObject.complex_id]['daytime_routes'].push([newInfoObject.daytime_routes])
 
             // name route combos, might only need this after all
@@ -222,14 +230,14 @@ useEffect(()=>{
       
         }
       }
+      
     }
-    // console.log('comp obj',complexObject)
+    
+
     let i = 0
     for (let complex in complexObject){
       let status = true
       i += 1
-      
-      // let complexPositionsArray = complexObject[complex].positions
 
       function avereragePosition(positionsArray){
         let xTotal = 0
@@ -240,21 +248,25 @@ useEffect(()=>{
             yTotal += pos.y
             zTotal += pos.z
         }
-        // console.log(xArray,yArray,zArray)
         let xAv = xTotal/positionsArray.length
         let yAv = yTotal/positionsArray.length
         let zAv = zTotal/positionsArray.length
-        // console.log(xAv)
         return new THREE.Vector3(xAv, yAv, zAv)
       }
       let averagePosition = avereragePosition(complexObject[complex].positions)
-      // console.log('cid', complexObject[complex].complex_id)
-      let newComplexText = <ComplexText handleComplexClick={handleComplexClick}  complexStationRouteIdObjs={complexObject[complex].name_route_combo_obj_array} complexId={complexObject[complex].complex_id} wrapperClass="station_label"  index={i} status={status} key={complexObject[complex].complex_id}  distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={0} />
+      
+      
+     
+      // console.log(complexKey)
+      let newComplexText = <ComplexText key={complexObject[complex].complexId} handleComplexClick={handleComplexClick}  complexStationRouteIdObjs={complexObject[complex].name_route_combo_obj_array} complexId={complexObject[complex].complex_id} wrapperClass="station_label"  index={i} status={status} key={complexObject[complex].complex_id}  distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={0} />
+   
       newComplexHtmlArray.push(newComplexText)
     }
     setStationHtmlArray(newStationHtmlArray)
     setComplexHtmlArray(newComplexHtmlArray)
+    // setVersionForKey(localVersionForKey)
   }
+  
 },[stationInfoObjectArray])
 
 
@@ -273,7 +285,7 @@ useEffect(()=>{
 
 // check camera distance to fade in/out station html text
 useEffect(()=>{
-
+  
   let newStationHtmlArray = [...stationHtmlArray]
   let updatedStationHtml = newStationHtmlArray.map((stationText)=>{
     if (findDistance(stationText.props.position, cameraPosition) <= 20){
@@ -285,13 +297,12 @@ useEffect(()=>{
       } else {
         alphaLevel = 1
       }
-     
       let status = true
-      let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} name={stationText.props.name} daytime_routes={stationText.props.daytime_routes} gtfs_stop_id={stationText.props.gtfs_stop_id} alphaLevel={alphaLevel} />
+      let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label" size={stationText.props.size} index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} name={stationText.props.name} daytime_routes={stationText.props.daytime_routes} gtfs_stop_id={stationText.props.gtfs_stop_id} alphaLevel={alphaLevel} />
       return newStationText
     } else {
       let status = false
-      let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label"  index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} name={stationText.props.name} daytime_routes={stationText.props.daytime_routes} gtfs_stop_id={stationText.props.gtfs_stop_id} alphaLevel={1} />
+      let newStationText = <StationText handleStationClick={handleStationClick} wrapperClass="station_label" size={stationText.props.size} index={stationText.props.index} status={status} key={stationText.props.key}  distanceFactor={8} center={true} position={stationText.props.position} name={stationText.props.name} daytime_routes={stationText.props.daytime_routes} gtfs_stop_id={stationText.props.gtfs_stop_id} alphaLevel={1} />
       return newStationText
     }
   })

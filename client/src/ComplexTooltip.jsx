@@ -9,23 +9,19 @@ export default function ComplexTooltip({complexStationRouteIdObjs, averagePositi
     let [northArrivals, setNorthArrivals] = useState([])
     let [southArrivals, setSouthArrivals] = useState([])
     const [stationInfo, setStationInfo] = useState({})
-    console.log('si', stationInfo)
-    // need to bring up stationTooltip, or something like it, when a route is clicked. 
-    console.log(complexStationRouteIdObjs)
+
+    // 
     function handleClick(gtfsStopId){
         fetch(`http://127.0.0.1:5555/api/arrivals/${gtfsStopId}`)
                 .then(response => response.json())
                 .then(newStationInfo => {setStationInfo(newStationInfo)})
-        console.log('station info', stationInfo)
-        setComplexOrStation("station")
-        
+        setComplexOrStation("station")     
     }
 
     function buildArrivals(arrivalObjectArray){
         let imgTimePairs =[]
         if (arrivalObjectArray) {
             for (const arrivalObject of arrivalObjectArray){
-                console.log(arrivalObject['route'])
                 let imgTimePair = <div className="icon-time-pair">
                                      <img className="tooltip_route_icon" src={`../public/ICONS/${arrivalObject["route"]}.png`} />
                                      <div>{arrivalObject['time']}</div>
@@ -36,24 +32,21 @@ export default function ComplexTooltip({complexStationRouteIdObjs, averagePositi
         return imgTimePairs
     }
 
+    // set station back to complex and clear stationInfo
     function handleBackClick(){
         setStationInfo({})
         setComplexOrStation('complex')
     }
 
+    // click triggers fetch, when fetch updates stationInfo, the arrivals are updated
     useEffect(()=>{
         northArrivals = buildArrivals(stationInfo.n_bound_arrivals)
-        console.log(northArrivals)
         setNorthArrivals(northArrivals)
         southArrivals = buildArrivals(stationInfo.s_bound_arrivals)
         setSouthArrivals(southArrivals)
-
-        
-
     }, [stationInfo])
-    console.log('station info', stationInfo)
     
-     // line for tooltip. make variable according to cam position in future. 
+     // line for tooltip
     const lineMaterial = new THREE.LineBasicMaterial( { color: new THREE.Color('white') } );
     lineMaterial.linewidth = 500;
 
@@ -70,13 +63,13 @@ export default function ComplexTooltip({complexStationRouteIdObjs, averagePositi
         stationAndRoutesButtonArray.push(stationInfoButton)
     })
 
+    // remove tooltip
     function handleXClick(complexId){
-        console.log('cid', complexId)
         clearTooltip(complexId, "complexId");
     }
 
+    // set station as start or end
     function handleSetStationClick(id, startOrEnd){
-        console.log('set click', id, startOrEnd)
         retrieveStationId(id, startOrEnd);
     }
 

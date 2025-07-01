@@ -10,23 +10,16 @@ import NextTrains from "./NextTrains";
 function JourneyPlanner() {
 
     const {tripInfo, stations, setTripInfo, stationIdStartAndEnd, tripInfoIndex, setTripInfoIndex} = useOutletContext()
-    //
-    console.log('jp sid',stationIdStartAndEnd)
-    // look if this is an "option" number and not a gtfs id
     const [journeyStations, setJourneyStations] = useState([null, null])
-    console.log('js', journeyStations)
     
-    function getStations(stationValue, position){
-        console.log('get stations', stationValue, position)
-
-        
+    // 
+    function setStartOrEndStation(stationValue, position){
         const journey = [...journeyStations]
         if (position === 'start'){
             journey[0] = stationValue;
         } else if (position == 'end'){
             journey[1] = stationValue;
         }
-        console.log('journey', journey)
     setJourneyStations(journey)
     }
 
@@ -51,26 +44,13 @@ function JourneyPlanner() {
         }
     }
 
-    // function handleNextTrainClick(){
-    //     if (tripInfoIndex < tripInfo.length - 1){
-    //         setTripInfoIndex(tripInfoIndex + 1)
-    //     } 
-        
-    // }
-
-    // function handlePrevTrainClick(){
-    //     if (tripInfoIndex != 0){
-    //         setTripInfoIndex(tripInfoIndex - 1)
-    //     } 
-        
-    // }
 
     return (
         <div>
             
             <div className='journey-planner'>
-                <StationSearch className='station_search' stations={stations} getStations={getStations} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
-                <StationSearch className='station_search' stations={stations} getStations={getStations} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
+                <StationSearch className='station_search' stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
+                <StationSearch className='station_search' stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
                 <br></br>
                 <button className="plan-trip-button" onClick={planTrip}>Plan Trip</button>
             </div>

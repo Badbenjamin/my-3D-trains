@@ -26,8 +26,6 @@ function App() {
   const [tripInfoIndex, setTripInfoIndex] = useState(0)
   const [stationIdStartAndEnd, setStationIdStartAndEnd] = useState({"startId" : null, "endId" : null})
   const [vectorPosition, setVectorPositon] = useState({})
-  console.log('sid start and end', stationIdStartAndEnd)
-  // console.log('sa', statusArray)
 
   // get station info for trip planner  for station search. 
   useEffect(() => {
@@ -40,7 +38,7 @@ function App() {
     // look into how this is used 
     // This is triggered when ToolTip origin or dest button is clicked
   function retrieveStationId(id, startOrEnd) {
-    console.log('rsid func', id, startOrEnd)
+
     setStationIdStartAndEnd(prevState => {
       const newStationIdStartOrEnd = { ...prevState };
       if (startOrEnd === "start") {
@@ -51,12 +49,7 @@ function App() {
       return newStationIdStartOrEnd;
     });
   }
-  
-  // console.log('start or end',stationIdStartAndEnd)
 
-  // useEffect(()=>{
-  //   setStationIdStartAndEnd(stationIdStartOrEnd['startId'])
-  // }, [stationIdStartAndEnd])
 
   // build stationArray of 3D station components for LinesAndMap
   // this useEffect creates Station objects for each geometry in our model
@@ -79,16 +72,12 @@ function App() {
   // This useEffect listens for a change in tripInfo. 
   // It takes the stations from ttrain schedule and creates an array of GTFS ids that will be passed to the selectStations function
   // selectStations takes an array of gtfs ids and uses it to change the status of the stations in stationArray.
-
   useEffect(()=>{
-    console.log('ti',tripInfo[tripInfoIndex])
     // trip info contains trains, which contain schedules.
     // schedules are used to select meshes to be highlighted in our map.
     if (tripInfo == []){
       return 
-      // added [0] to deal with list?
     } else if (tripInfo[tripInfoIndex]) {
-      console.log('worked')
       let allIdsArray = []
       // Trigger some sort of animation change with errors?
       let allErrorsArray = []
@@ -132,7 +121,6 @@ function App() {
           }
         return newStation
       })
-      console.log('asa', alteredStationArray)
       setStationArray(alteredStationArray)
     }
   }, [tripInfoIndex])
@@ -142,7 +130,6 @@ function App() {
       return 
       // added [0] to deal with list?
     } else if (tripInfo[tripInfoIndex]) {
-      console.log('worked')
       let allIdsArray = []
       // Trigger some sort of animation change with errors?
       let allErrorsArray = []
@@ -186,24 +173,11 @@ function App() {
           }
         return newStation
       })
-      console.log('asa', alteredStationArray)
       setStationArray(alteredStationArray)
     }
 
     setTripInfoIndex(0)
   }, [tripInfo])
-
-          // console.log('vp', vectorPosition)
-          
-      
-
-
-  // function retrieveId(id, startOrEnd){
-  //    console.log(id, startOrEnd)
-  //   }
-  // console.log(typeof(retrieveId))
-
-  // let retrieveId = "STRING"
   
   if (!nodes || !stationArray){
     return (

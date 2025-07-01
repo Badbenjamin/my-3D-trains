@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Select from 'react-select'
 import './Component.css'
 
-function StationSearch({getStations, position, stations, stationId}) {
+function StationSearch({setStartOrEndStation, position, stations, stationId}) {
     // console.log('sid ',stations)
     const [selectedOption, setSelectedOption] = useState(null)
     // console.log('selectedOption', selectedOption)
@@ -24,11 +24,11 @@ function StationSearch({getStations, position, stations, stationId}) {
         }),
     }
 
-    // when station is selected from search dropdown, selecedOption is set, and then getStations callback functio (from JourneyPlanner) is invoked with gtfs id and start or end
+    // when station is selected from search dropdown, selecedOption is set, and then setStartOrEndStation callback functio (from JourneyPlanner) is invoked with gtfs id and start or end
     const handleChange = (option) => {
         console.log('op', option)
         setSelectedOption(option);
-        getStations(option.value, position)
+        setStartOrEndStation(option.value, position)
     }
 
     const optionsArray = []
@@ -53,7 +53,7 @@ function StationSearch({getStations, position, stations, stationId}) {
         }
         setSelectedOption(buttonSelectedStationObj)
         if (stationId != null){
-            getStations(buttonSelectedStationObj, position)
+            setStartOrEndStation(buttonSelectedStationObj, position)
         }
         
     },[stationId])

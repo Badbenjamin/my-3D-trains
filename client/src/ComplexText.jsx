@@ -1,9 +1,7 @@
 import { Html } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
-import * as THREE from "three"
 
 export default function ComplexText({handleComplexClick, averagePosition, names, routes, status, alphaLevel, complexId, complexStationRouteIdObjs}){
-    // console.log('ct sridobj', complexStationRouteIdObjs)
+
 
     let iconImageArray = []
     routes.map((routesArray)=>{
@@ -24,7 +22,7 @@ export default function ComplexText({handleComplexClick, averagePosition, names,
     }
     return(
         <>
-            {status ? <Html key={names[0]} style={{opacity : alphaLevel}} wrapperClass="complex_label" distanceFactor={6} center={true} position={averagePosition}>
+            {status ? <Html key={complexId} style={{opacity : alphaLevel}} wrapperClass="complex_label" distanceFactor={6} center={true} position={averagePosition}>
                 <button onClick={handleClick} className="complex-html-button-text">{names[0]}{iconImageArray}</button>
                 </Html> : <></>}
         </>

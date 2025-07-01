@@ -103,6 +103,15 @@ export function updateStatusArray(selectedIdArray, newStatusArray){
   return updatedStatusArray
 }
 
-// export function retrieveId(id, startOrEnd){
-//   return id, startOrEnd
-// }
+export function findDistance(point1, point2){
+  let x1 = point1["x"]
+  let y1 = point1['y']
+  let z1 = point1['z']
+
+  let x2 = point2['x']
+  let y2 = point2['y']
+  let z2 = point2['z']
+
+  let result = Math.sqrt(((x2-x1)**2) + ((y2-y1)**2) + ((z2-z1)**2))
+  return result
+}

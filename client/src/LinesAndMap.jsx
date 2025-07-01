@@ -18,46 +18,7 @@ function LinesAndMap(){
     const ref = useRef()
     const {vectorPosition, setVectorPositon} = useOutletContext()
    
-    // const [vectorPosition, setVectorPositon] = useState({})
-    // const [change, setChange] = 
-    // const cam = 
-    // const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 
-    // const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-//    const MyCamera =<CameraControls makeDefault />
-
-    // useEffect(()=>{
-    //     // let newVectorPosition = {...vectorPosition}
-    //     if (ref.current){
-    //         setVectorPositon(ref.current.object.position)
-    //     }
-    // },[vectorPosition])
-
-    // console.log('vp', vectorPosition)
-    
-
-    // const mapControls = <MapControls ref={ref} maxDistance={100} minDistance={1} maxPolarAngle={0.99} enableDamping={true}/>
-    // console.log('ref', ref)
-    // if (ref.current){
-    //     console.log(ref.current.object.position)
-    // }
-    // const camera = mapControls
-    // console.log('cam', camera)
-    // let getDistance = mapControls.getDistance()
-    // console.log('dist',getDistance)
-
-    // NOT SURE IF THIS WORKS
-    
-    // console.log(camera.position)
-    // useEffect(()=>{
-        
-    //     if (ref.current){
-    //         console.log('position', camera)
-    //         console.log('dist', getDistance)
-    //     }
-    // },[])
-
-    // let pos = {}
     // MAP CONTROLLS IN THIS COMPONENT, SO CAMERA POSITION DETERMINED HERE AND PASSED DOWN
     useFrame((state, delta) => {
         let newVectorPosition = {...vectorPosition}
