@@ -1,8 +1,8 @@
 import { Html } from "@react-three/drei";
 
-export default function ComplexText({handleComplexClick, averagePosition, names, routes, status, alphaLevel, complexId, complexStationRouteIdObjs}){
+export default function ComplexText({handleComplexClick, averagePosition, names, routes, status, alphaLevel, complexId, complexStationRouteIdObjs, size}){
 
-
+    let sizeInPx = size.toString()+"px"
     let iconImageArray = []
     routes.map((routesArray)=>{
         // routesArray is array of arrays
@@ -11,7 +11,7 @@ export default function ComplexText({handleComplexClick, averagePosition, names,
             for (let route of routes){
                 // route is each route
                 if (route != " "){
-                    iconImageArray.push(<img className="route_icon" src={`../public/ICONS/${route}.png`}/>);
+                    iconImageArray.push(<img className="route_icon" style={{width: size, height : size}} src={`../public/ICONS/${route}.png`}/>);
                 }
             }
         }
@@ -23,7 +23,7 @@ export default function ComplexText({handleComplexClick, averagePosition, names,
     return(
         <>
             {status ? <Html key={complexId} style={{opacity : alphaLevel}} wrapperClass="complex_label" distanceFactor={6} center={true} position={averagePosition}>
-                <button onClick={handleClick} className="complex-html-button-text">{names[0]}{iconImageArray}</button>
+                <button onClick={handleClick} style={{fontSize: size}} className="complex-html-button-text">{names[0]}{iconImageArray}</button>
                 </Html> : <></>}
         </>
     )

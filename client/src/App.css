@@ -59,7 +59,7 @@ html{
 .station-html-button-text{
   border: none;
   color: white;
-  font-size: 30px;
+  /* font-size: 30px; */
   font-weight: bold;
   background-color: rgba(0,0,0,0);
 }

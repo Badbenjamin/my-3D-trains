@@ -12,7 +12,7 @@ ct = datetime.now()
 @app.route('/api/plan_trip/<string:start_station_id>/<string:end_station_id>')
 # start and end station id are not gtfs ids but just ids from the id column in the Stations table. 
 def plan_trip(start_station_id, end_station_id):
-    print('apppy', start_station_id, end_station_id)
+    # print('apppy', start_station_id, end_station_id)
     # new_journey contains endpoints for start and end stations, and calculates a transfer if applicable.
     new_journey = Journey(start_station_id, end_station_id)
     # new_train_data takes the info from new_journey and uses it to make requests from the relevant MTA API route endpoints.

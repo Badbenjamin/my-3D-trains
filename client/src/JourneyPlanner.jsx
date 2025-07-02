@@ -33,7 +33,6 @@ function JourneyPlanner() {
     }, [stationIdStartAndEnd])
 
     function planTrip(e){
-        console.log(journeyStations)
         if (journeyStations[0] == null || journeyStations[1] == null){
             console.log('enter start and end stations')
         } else{

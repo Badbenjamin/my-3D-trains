@@ -29,7 +29,7 @@ function Station( { status, mesh, index}){
         const [isWhite, setIsWhite] = useState(false)
         let color = !isWhite ? newMaterial : selectedMaterial
 
-        
+        // animation loop triggered when selecteds
         useFrame(({clock})=>{
     
             let a = clock.getElapsedTime()

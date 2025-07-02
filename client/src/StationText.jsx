@@ -8,7 +8,7 @@ import './App.css'
 export default function StationText({handleStationClick, position, daytime_routes, name, status, gtfs_stop_id, alphaLevel, size}){
 
     let sizeInPx = size.toString()+"px"
-    console.log('si', sizeInPx)
+    // console.log('si', sizeInPx)
     let iconImageArray = []
     daytime_routes.split(" ").map((route)=>{
         iconImageArray.push(<img className="route_icon" style={{width: size, height : size}}  src={`../public/ICONS/${route}.png`}/>)
