@@ -27,7 +27,6 @@ app = Flask(__name__)
 # JUST SHOW ERRORS FOR REQUESTS
 import logging
 log = logging.getLogger('werkzeug')
-# log.setLevel(logging.ERROR)
 log.disabled = True
 
 # pip install python-dotenv in command line 

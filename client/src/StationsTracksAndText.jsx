@@ -146,7 +146,7 @@ useEffect(()=>{
           let newPosition = stationArray[j].props.mesh.position
           let newInfoObject = stationInfoObject[stationArray[j].props.name]
           // default size for text and route icons
-          let size = 50
+          let size = 35
           
           // loop through positions and find dist to closest other station
           // THIS IS DONE WHILE CREATING STATIONTEXT COMPONENTS BECAUSE WE HAVE ACCESS TO STATION POSITIONS, COMPLEX IS DONE AFTERWARDS
@@ -164,9 +164,9 @@ useEffect(()=>{
           })
           // set size of text and icons for station text
           if (distToClosestStation < 0.6 && distToClosestStation >= 0.4){
-            size = 35
+            size = 25
           } else if (distToClosestStation < 0.4){
-            size = 20
+            size = 17
           } 
 
           let newStationText = <StationText handleStationClick={handleStationClick} clearTooltip={clearTooltip} size={size}  wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name + versionForKey}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>

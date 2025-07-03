@@ -10,7 +10,7 @@ export default function ComplexTooltip({complexStationRouteIdObjs, averagePositi
     let [southArrivals, setSouthArrivals] = useState([])
     const [stationInfo, setStationInfo] = useState({})
 
-    // 
+    // tooltip displays routes until a route is clicked, then it changes to a station info tooltip
     function handleClick(gtfsStopId){
         fetch(`http://127.0.0.1:5555/api/arrivals/${gtfsStopId}`)
                 .then(response => response.json())
@@ -38,7 +38,7 @@ export default function ComplexTooltip({complexStationRouteIdObjs, averagePositi
         setComplexOrStation('complex')
     }
 
-    // click triggers fetch, when fetch updates stationInfo, the arrivals are updated
+    // route click triggers fetch, when fetch updates stationInfo, the arrivals are updated
     useEffect(()=>{
         northArrivals = buildArrivals(stationInfo.n_bound_arrivals)
         setNorthArrivals(northArrivals)
@@ -52,6 +52,7 @@ export default function ComplexTooltip({complexStationRouteIdObjs, averagePositi
 
     const tooltipPosition = new THREE.Vector3(averagePosition.x, averagePosition.y + 2, averagePosition.z);
 
+    // build the buttons that display the routes of the complex
     const stationAndRoutesButtonArray = []
     complexStationRouteIdObjs.map((stationObj)=>{
         let iconImageArray = [];
@@ -63,7 +64,7 @@ export default function ComplexTooltip({complexStationRouteIdObjs, averagePositi
         stationAndRoutesButtonArray.push(stationInfoButton)
     })
 
-    // remove tooltip
+    // remove tooltip with x click
     function handleXClick(complexId){
         clearTooltip(complexId, "complexId");
     }

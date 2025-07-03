@@ -9,6 +9,7 @@ import './App.css'
 export default function StationText({handleStationClick, position, daytime_routes, name, status, gtfs_stop_id, alphaLevel, size, clearTooltip}){
     const [tooltipStatus, setTooltipStatus] = useState(false)
     let sizeInPx = size.toString()+"px"
+    // COULD ALSO CONTROL MAX/MIN WIDTH WITH SIZE?
    
     let iconImageArray = []
     daytime_routes.split(" ").map((route)=>{

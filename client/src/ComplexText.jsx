@@ -3,7 +3,7 @@ import { useState } from "react";
 
 export default function ComplexText({handleComplexClick, averagePosition, names, routes, status, alphaLevel, complexId, complexStationRouteIdObjs, size, clearTooltip}){
     const [tooltipStatus, setTooltipStatus] = useState(false)
-
+     // COULD ALSO CONTROL MAX/MIN WIDTH WITH SIZE?
     let sizeInPx = size.toString()+"px"
     let iconImageArray = []
     routes.map((routesArray)=>{
@@ -39,8 +39,7 @@ export default function ComplexText({handleComplexClick, averagePosition, names,
                     <div className="icon-image-array">
                         {iconImageArray}
                     </div>
-                    
-                    </button>
+                </button>
                 </Html> : <></>}
         </>
     )
