@@ -33,7 +33,7 @@ function LinesAndMap(){
     
     return(
         <>
-            {/* <Perf position="top-left" /> */}
+            <Perf position="top-left" />
             <MapControls ref={ref} maxDistance={200} minDistance={1} maxPolarAngle={0.99} />
             
              {/* {mapControls} */}

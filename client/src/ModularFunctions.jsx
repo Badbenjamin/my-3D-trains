@@ -1,9 +1,10 @@
 import Station from "./Station"
 
-export  function getStationCode(name){
-  console.log('name',name)
+// WHAT USES THIS?
+// export  function getStationCode(name){
+//   console.log('name',name)
   
-}
+// }
 // takes a train (tripInfo) and statusArray as args, returns a list of station and track ids
 // these are used to update the status array and highlight a route
 export function getAllIds(tripInfo, statusArray){
@@ -75,7 +76,7 @@ export function createStationComponentsObj(nodes, materials, newStatusArray, ret
                       key={nodes[mesh].name} 
                       mesh={nodes[mesh]} 
                       materials={materials}
-                      getStationCode={getStationCode}
+                      // getStationCode={getStationCode}
                       // maybe remove if this is in text component now
                       retrieveStationId = {retrieveStationId}
                       />

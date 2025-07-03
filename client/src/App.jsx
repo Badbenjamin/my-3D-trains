@@ -8,7 +8,7 @@ import { useFrame } from '@react-three/fiber'
 
 import './App.css'
 import Station from './Station'
-import { getAllIds, createStatusObjectArray, createStationComponentsObj, updateStatusArray, getStationCode} from './ModularFunctions'
+import { getAllIds, createStatusObjectArray, createStationComponentsObj, updateStatusArray} from './ModularFunctions'
 
 
 function App() {

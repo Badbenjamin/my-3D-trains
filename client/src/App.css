@@ -67,21 +67,40 @@ html{
 .complex-html-button-text{
   border: none;
   color: white;
-  font-size: 35px;
+  /* font-size: 35px; */
   font-weight: bold;
   background-color: rgba(0,0,0,0);
+  max-width: 700px;
+  /* max-height: 300px; */
+  
+}
+
+.station-text-name{
+  /* word-wrap: break-word;
+  overflow-wrap: break-word; */
+  max-width: 600px;
+  max-height: 250px; 
+  word-wrap:break-word;
+}
+
+.icon-image-array{
+  min-width: 200px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
 }
 
 .route_icon{
-  width: 35px;
-  height: 35px;
+  /* width: 35px; */
+  /* height: 35px; */
   padding: 3px;
   pointer-events: none;
 }
 
 .route_icon_complex{
   width: 20px;
-  height: 20pxx;
+  height: 20px;
   padding: 3px;
   pointer-events: none;
 }

@@ -1,6 +1,8 @@
 import { Html } from "@react-three/drei";
+import { useState } from "react";
 
-export default function ComplexText({handleComplexClick, averagePosition, names, routes, status, alphaLevel, complexId, complexStationRouteIdObjs, size}){
+export default function ComplexText({handleComplexClick, averagePosition, names, routes, status, alphaLevel, complexId, complexStationRouteIdObjs, size, clearTooltip}){
+    const [tooltipStatus, setTooltipStatus] = useState(false)
 
     let sizeInPx = size.toString()+"px"
     let iconImageArray = []
@@ -11,19 +13,34 @@ export default function ComplexText({handleComplexClick, averagePosition, names,
             for (let route of routes){
                 // route is each route
                 if (route != " "){
-                    iconImageArray.push(<img className="route_icon" style={{width: size, height : size}} src={`../public/ICONS/${route}.png`}/>);
+                    iconImageArray.push(<img className="route_icon" style={{width: size, height : sizeInPx}} src={`../public/ICONS/${route}.png`}/>);
                 }
             }
         }
     })
 
     function handleClick(){
-        handleComplexClick(complexStationRouteIdObjs, averagePosition, complexId);
+        
+        if (!tooltipStatus){
+            handleComplexClick(complexStationRouteIdObjs, averagePosition, complexId);
+            setTooltipStatus(!tooltipStatus)
+        } else {
+            clearTooltip(complexId, 'complexId')
+            setTooltipStatus(!tooltipStatus)
+        }
     }
     return(
         <>
             {status ? <Html key={complexId} style={{opacity : alphaLevel}} wrapperClass="complex_label" distanceFactor={6} center={true} position={averagePosition}>
-                <button onClick={handleClick} style={{fontSize: size}} className="complex-html-button-text">{names[0]}{iconImageArray}</button>
+                <button onClick={handleClick} style={{fontSize: sizeInPx}} className="complex-html-button-text">
+                    <div className="station-text-name">
+                        {names[0]}
+                    </div>
+                    <div className="icon-image-array">
+                        {iconImageArray}
+                    </div>
+                    
+                    </button>
                 </Html> : <></>}
         </>
     )

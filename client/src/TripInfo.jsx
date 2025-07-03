@@ -4,9 +4,8 @@ import ErrorInfo from './ErrorInfo'
 
 function TripInfo({tripInfo, tripInfoIndex}){
 
-    console.log('ti', tripInfo[tripInfoIndex])
     const tripInformation = tripInfo[tripInfoIndex].map((leg) =>{
-        console.log('leg', leg)
+
         if ('schedule' in leg){
             return <LegInfo key={leg.start_station}  className='leg-info' leg={leg}/>
         } else if ('start_station_service' in leg){
