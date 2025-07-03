@@ -9,11 +9,14 @@ import './App.css'
 export default function StationText({handleStationClick, position, daytime_routes, name, status, gtfs_stop_id, alphaLevel, size, clearTooltip}){
     const [tooltipStatus, setTooltipStatus] = useState(false)
     let sizeInPx = size.toString()+"px"
+    let iconSizeInPx = (size + 3).toString()+"px"
+    let widthInPx = (size * 7).toString()+"px"
+    let widthInPxForIconArray = (size * 5).toString()+"px"
     // COULD ALSO CONTROL MAX/MIN WIDTH WITH SIZE?
    
     let iconImageArray = []
     daytime_routes.split(" ").map((route)=>{
-        iconImageArray.push(<img className="route_icon" style={{width: sizeInPx, height : sizeInPx}}  src={`../public/ICONS/${route}.png`}/>)
+        iconImageArray.push(<img className="route_icon" style={{width: iconSizeInPx, height : iconSizeInPx}}  src={`../public/ICONS/${route}.png`}/>)
     })
 
     // console.log(iconImageArray)
@@ -36,11 +39,11 @@ export default function StationText({handleStationClick, position, daytime_route
     return(
         <>
             {status ? <Html key={gtfs_stop_id} style={{opacity : alphaLevel}} wrapperClass="station_label" distanceFactor={5} center={true} position={position}>
-                {<button className="station-html-button-text" style={{fontSize: sizeInPx}} onClick={handleClick}>
+                {<button className="station-html-button-text" style={{fontSize: sizeInPx, inlineSize: widthInPx}} onClick={handleClick}>
                         <div className="station-text-name">
                             {name}
                         </div>
-                        <div className="icon-image-array">
+                        <div className="icon-image-array" style={{inlineSize : widthInPxForIconArray}}>
                             {iconImageArray}
                         </div>
                     </button>}

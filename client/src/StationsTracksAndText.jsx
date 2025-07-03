@@ -146,7 +146,7 @@ useEffect(()=>{
           let newPosition = stationArray[j].props.mesh.position
           let newInfoObject = stationInfoObject[stationArray[j].props.name]
           // default size for text and route icons
-          let size = 35
+          let size = 25
           
           // loop through positions and find dist to closest other station
           // THIS IS DONE WHILE CREATING STATIONTEXT COMPONENTS BECAUSE WE HAVE ACCESS TO STATION POSITIONS, COMPLEX IS DONE AFTERWARDS
@@ -163,10 +163,12 @@ useEffect(()=>{
             }
           })
           // set size of text and icons for station text
-          if (distToClosestStation < 0.6 && distToClosestStation >= 0.4){
-            size = 25
-          } else if (distToClosestStation < 0.4){
-            size = 17
+          if (distToClosestStation < 0.6 && distToClosestStation >= 0.5){
+            size = 20
+          } else if (distToClosestStation < 0.5 && distToClosestStation > 0.3){
+            size = 15
+          } else if (distToClosestStation < 0.3){
+            size = 10
           } 
 
           let newStationText = <StationText handleStationClick={handleStationClick} clearTooltip={clearTooltip} size={size}  wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name + versionForKey}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
@@ -251,7 +253,7 @@ useEffect(()=>{
       };
       let averagePosition = avereragePosition(complexObject[complex].positions);
   
-      let newComplexText = <ComplexText key={complexObject[complex].complex_id.toString() + " " + versionForKey.toString()} handleComplexClick={handleComplexClick} clearTooltip={clearTooltip} size={35} complexStationRouteIdObjs={complexObject[complex].name_route_combo_obj_array} complexId={complexObject[complex].complex_id} wrapperClass="station_label" status={status} distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={0} />
+      let newComplexText = <ComplexText key={complexObject[complex].complex_id.toString() + " " + versionForKey.toString()} handleComplexClick={handleComplexClick} clearTooltip={clearTooltip} size={40} complexStationRouteIdObjs={complexObject[complex].name_route_combo_obj_array} complexId={complexObject[complex].complex_id} wrapperClass="station_label" status={status} distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={0} />
       setVersionForKey((prevVersion)=>{
         return prevVersion + 1
       })
@@ -284,13 +286,13 @@ useEffect(()=>{
       if (distToClosestStationComplex >= 1.5){
         return currentComplex;
       } else if (distToClosestStationComplex < 1.5 && distToClosestStationComplex >= 1){
-        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 25});
+        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 35});
         return newComplexHtmlComponent;
       } else if (distToClosestStationComplex < 1 && distToClosestStationComplex >= 0.5) {
-        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 20});
+        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 25});
         return newComplexHtmlComponent;
       } else if (distToClosestStationComplex < 0.5){
-        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 10});
+        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 20});
         return newComplexHtmlComponent
       }
     })

@@ -5,6 +5,11 @@ export default function ComplexText({handleComplexClick, averagePosition, names,
     const [tooltipStatus, setTooltipStatus] = useState(false)
      // COULD ALSO CONTROL MAX/MIN WIDTH WITH SIZE?
     let sizeInPx = size.toString()+"px"
+    let iconSizeInPx = (size + 3).toString()+"px"
+    let widthInPx = (size * 10).toString()+"px"
+    let widthInPxForIconArray = (size * 7).toString()+"px"
+    // console.log( widthInPx)
+    console.log(widthInPx)
     let iconImageArray = []
     routes.map((routesArray)=>{
         // routesArray is array of arrays
@@ -13,7 +18,7 @@ export default function ComplexText({handleComplexClick, averagePosition, names,
             for (let route of routes){
                 // route is each route
                 if (route != " "){
-                    iconImageArray.push(<img className="route_icon" style={{width: size, height : sizeInPx}} src={`../public/ICONS/${route}.png`}/>);
+                    iconImageArray.push(<img className="route_icon" style={{width: iconSizeInPx, height : iconSizeInPx}} src={`../public/ICONS/${route}.png`}/>);
                 }
             }
         }
@@ -31,12 +36,12 @@ export default function ComplexText({handleComplexClick, averagePosition, names,
     }
     return(
         <>
-            {status ? <Html key={complexId} style={{opacity : alphaLevel}} wrapperClass="complex_label" distanceFactor={6} center={true} position={averagePosition}>
-                <button onClick={handleClick} style={{fontSize: sizeInPx}} className="complex-html-button-text">
+            {status ? <Html key={complexId} style={{opacity : alphaLevel}} wrapperClass="complex_label" distanceFactor={5} center={true} position={averagePosition}>
+                <button onClick={handleClick} style={{fontSize: sizeInPx, inlineSize : widthInPx}} className="complex-html-button-text">
                     <div className="station-text-name">
                         {names[0]}
                     </div>
-                    <div className="icon-image-array">
+                    <div className="icon-image-array" style={{inlineSize : widthInPxForIconArray}}>
                         {iconImageArray}
                     </div>
                 </button>
