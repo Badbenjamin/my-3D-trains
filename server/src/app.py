@@ -2,9 +2,8 @@ from config import app
 from datetime import datetime
 from models import Station
 from Classes import Journey, TrainData, FormattedTrainData, ArrivalsForStation
-# import modules
 import modules_app
-import pprint
+
 
 ct = datetime.now()
 
@@ -12,30 +11,40 @@ ct = datetime.now()
 @app.route('/api/plan_trip/<string:start_station_id>/<string:end_station_id>')
 # start and end station id are not gtfs ids but just ids from the id column in the Stations table. 
 def plan_trip(start_station_id, end_station_id):
-    
     # new_journey contains endpoints for start and end stations, and calculates a transfer if applicable.
     new_journey = Journey(start_station_id, end_station_id)
     # new_train_data takes the info from new_journey and uses it to make requests from the relevant MTA API route endpoints.
     # it contains the JSON train data from the realtime gtfs feed. 
     new_train_data = TrainData(new_journey)
     # trip_sequence is an array that contains either a TripSequenceElement object or a TripError object.
-    trip_sequence = modules_app.build_trip_sequence(new_journey, new_train_data)
+    trip_sequences = modules_app.build_trip_sequence(new_journey, new_train_data)
     # FormattedTrainData class takes our trip sequence (one or two trips), and converts the first arriving train to a dict, which is sent to client. 
-    return FormattedTrainData(trip_sequence).trains_for_react, 200
+    return FormattedTrainData(trip_sequences).trip_sequences_for_react, 200
 
 # get names and routes (and gtfs id) for react-select search bar in journey planner
 @app.route('/api/stations')
 def get_all_stations():
     stations = Station.query.all()
     station_list = []
+    complex_ids = []
     for station in stations:
         station_obj = {
         "name" : station.stop_name,
         "id" : station.id,
         "gtfs_stop_id" : station.gtfs_stop_id,
-        "daytime_routes" : station.daytime_routes
+        "daytime_routes" : station.daytime_routes,
+        "complex_id" : station.complex_id,
+        "complex" : False
         }
+        complex_ids.append(station.complex_id)
         station_list.append(station_obj)
+    complex_list = [complex_id for complex_id in complex_ids if complex_ids.count(complex_id)>1]
+    final_station_list = []
+    for station in station_list:
+        if station['complex_id'] in complex_list:
+            station['complex'] = True
+        final_station_list.append(station)
+
     return station_list, 200
 
 # get station names for HTML text on map
@@ -54,7 +63,8 @@ def get_arrivals(gtfs_id):
     stationInfo = ArrivalsForStation(gtfs_id)
     return stationInfo.arrivals_for_react
 
-# get train locations 
+# get train locations DO LATER
 @app.route('/api/trainlocations')
 def get_train_locations():
     pass
+

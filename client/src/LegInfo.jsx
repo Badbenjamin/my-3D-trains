@@ -3,13 +3,11 @@ import './Component.css'
 
 function LegInfo({leg}){
 
-        // console.log(tripInfo)
-
     return(
         <div className="leg-info-grid-cointainer">
             <div className="start-station-info">
                 <div className="top">{leg.start_station}</div>
-                <div className="middle">{leg.direction_label} Bound {leg.route}</div>
+                <div className="middle">{leg.direction_label} {leg.route}</div>
                 <div className="bottom">Departs {leg.start_station_departure}</div><>{leg.first_six_trains}</>
             </div>
             <div className="middle-info">

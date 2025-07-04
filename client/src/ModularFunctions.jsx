@@ -1,9 +1,5 @@
 import Station from "./Station"
 
-export  function getStationCode(name){
-  console.log('name',name)
-  
-}
 // takes a train (tripInfo) and statusArray as args, returns a list of station and track ids
 // these are used to update the status array and highlight a route
 export function getAllIds(tripInfo, statusArray){
@@ -58,9 +54,7 @@ export function createStatusObjectArray(nodes){
 export function createStationComponentsObj(nodes, materials, newStatusArray, retrieveStationId){
     // this loop creates Station components for every mesh in the nodes from our model import.
     // count and index are used to assign status from newStatusArray to each Station
-    // function retrieveStationId(id, startOrEnd){
-    //   console.log('mf retrieve',id, startOrEnd)
-    // }
+
     let newMapModelObj = {}
     let count = 0
     for (const mesh in nodes){
@@ -75,12 +69,12 @@ export function createStationComponentsObj(nodes, materials, newStatusArray, ret
                       key={nodes[mesh].name} 
                       mesh={nodes[mesh]} 
                       materials={materials}
-                      getStationCode={getStationCode}
+                      // getStationCode={getStationCode}
+                      // maybe remove if this is in text component now
                       retrieveStationId = {retrieveStationId}
                       />
         } 
       };
-    // console.log("nmmo func", newMapModelObj)
     return newMapModelObj
 }
 
@@ -102,6 +96,15 @@ export function updateStatusArray(selectedIdArray, newStatusArray){
   return updatedStatusArray
 }
 
-// export function retrieveId(id, startOrEnd){
-//   return id, startOrEnd
-// }
+export function findDistance(point1, point2){
+  let x1 = point1["x"]
+  let y1 = point1['y']
+  let z1 = point1['z']
+
+  let x2 = point2['x']
+  let y2 = point2['y']
+  let z2 = point2['z']
+
+  let result = Math.sqrt(((x2-x1)**2) + ((y2-y1)**2) + ((z2-z1)**2))
+  return result
+}

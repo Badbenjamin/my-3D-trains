@@ -6,7 +6,19 @@
 }
 
 .station_label{
-  font-size: 25px;
+  color: white;
+
+  font-size: 35px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  /* -webkit-text-stroke-width: 2px;
+  -webkit-text-stroke-color: black; */
+}
+
+.complex_label{
+  color: rgb(255, 255, 255);
+  
+  font-size: 55px;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
 }
@@ -14,13 +26,103 @@
 html{
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
-
 }
 
+
 .station-html{
-  /* display: inline-block; */
   border-style: solid ;
   background-color: white;
   border-radius: 15px;
   width: 280px;
+  align-items: center;
+}
+
+.x-button{
+  font-size: 12px;
+  font-weight: bold;
+  margin-top: 1px;
+  margin-right: 2px;
+  position:absolute;
+  top:0;
+  right:0;
+  border-style: solid;
+  border-color: black;
+  border-radius: 3px;
+}
+
+.station-html-button-text{
+  border: none;
+  color: white;
+  /* font-size: 30px; */
+  font-weight: bold;
+  background-color: rgba(0,0,0,0);
+  justify-content: center;
+}
+
+.complex-html-button-text{
+  border: none;
+  color: white;
+  font-weight: bold;
+  background-color: rgba(0,0,0,0);
+  /* max-width: 700px; */
+  text-align: center;
+  /* margin-left: auto;
+  margin-right: auto; */
+  /* justify-content: center; */
+}
+
+.station-text-name{
+  /* max-width: 600px; */
+  max-height: 250px; 
+  word-wrap:break-word;
+  justify-content: center;
+  text-align: center;
+}
+
+.icon-image-array{
+  /* min-width: 150px; */
+  display: inline-block;
+  /* display: flex;
+  flex-wrap: wrap; */
+  gap: 5px;
+  /* margin-left: auto;
+  margin-right: auto; */
+  /* justify-content: center; */
+}
+
+.route_icon{
+  padding: 3px;
+  pointer-events: none;
+}
+
+.route_icon_complex{
+  width: 20px;
+  height: 20px;
+  padding: 3px;
+  pointer-events: none;
+}
+
+.tooltip_route_icon{
+  width: 27px;
+  height: 27px;
+  padding: 3px;
+  pointer-events: none;
+}
+
+/* .arrivals-html{
+  display: flex;
+  flex-direction: row;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+} */
+
+.icon-time-pair{
+  display: flex;
+    flex-direction: row;
+}
+
+.station-routes-button{
+  white-space: nowrap;
+  overflow: hidden;
 }
