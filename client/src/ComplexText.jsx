@@ -9,7 +9,7 @@ export default function ComplexText({handleComplexClick, averagePosition, names,
     let widthInPx = (size * 10).toString()+"px"
     let widthInPxForIconArray = (size * 7).toString()+"px"
     // console.log( widthInPx)
-    console.log(widthInPx)
+    // console.log(widthInPx)
     let iconImageArray = []
     routes.map((routesArray)=>{
         // routesArray is array of arrays
@@ -36,7 +36,7 @@ export default function ComplexText({handleComplexClick, averagePosition, names,
     }
     return(
         <>
-            {status ? <Html key={complexId} style={{opacity : alphaLevel}} wrapperClass="complex_label" distanceFactor={5} center={true} position={averagePosition}>
+            {status ? <Html key={complexId} style={{opacity : alphaLevel}} wrapperClass="complex_label" distanceFactor={7} center={true} position={averagePosition}>
                 <button onClick={handleClick} style={{fontSize: sizeInPx, inlineSize : widthInPx}} className="complex-html-button-text">
                     <div className="station-text-name">
                         {names[0]}

@@ -4,11 +4,6 @@ import { useOutletContext } from 'react-router-dom'
 import { useFrame } from '@react-three/fiber'
 import { useState } from 'react'
 import * as THREE from "three"
-// import { useOutletContext } from "react-router-dom";
-// import { Html } from "@react-three/drei"
-// import { Line } from "@react-three/drei"
-// import { Line } from '@react-three/drei'
-
 
 import StationText from './StationText'
 import ComplexText from './ComplexText'
@@ -21,17 +16,15 @@ import { findDistance } from './ModularFunctions'
 export default function StationsTracksAndText({vectorPosition}) {
     const {stationArray, retrieveStationId} = useOutletContext()
     const [stationInfoObjectArray, setStationInfoObjectArray] = useState([])
-    // COULD I COMBINE STATION AND COMPLEX ARRAY? MAYBE LATER...
-    // const [htmlButtonArray, setHtmlButtonArray] = useState([])
     const [stationHtmlArray, setStationHtmlArray] = useState([])
     const [complexHtmlArray, setComplexHtmlArray] = useState([])
     // USE THIS LATER FOR ROUTE HIGHLIGHTING
     // const [tripInfoHtmlArray, setTripInfoHtmlArray] = useState([])
     const [toolTipArray, setToolTipArray] = useState([].slice(0,2))
-    // STILL HAVING KEY PROBLEMS WITH COMPLEXTEXT AND STATIONTEXT
+
     const [versionForKey, setVersionForKey] = useState(0)
     const [cameraPosition, setCameraPosition] = useState({"x": 0, "y" : 0, "z" : 0})
- 
+    // console.log('vfk', ver)
 
 // Fetch to get data for stations, array of objects with info
 useEffect(()=>{
@@ -47,7 +40,7 @@ function handleStationClick(stopId, name, position, daytime_routes){
   
   
   setVersionForKey((prevVersion)=>{
-    return prevVersion + 1
+    return prevVersion += 1
   });
 
   setToolTipArray(prevTooltipArray => {
@@ -73,7 +66,7 @@ function handleComplexClick(complexStationRouteIdObjs, averagePosition, complexI
 
   let newComplexTooltip = <ComplexTooltip key={complexId + versionForKey} clearTooltip={clearTooltip} retrieveStationId={retrieveStationId} complexId={complexId} complexStationRouteIdObjs={complexStationRouteIdObjs} averagePosition={averagePosition}/>
   setVersionForKey((prevVersion)=>{
-    return prevVersion + 1
+    return prevVersion += 1
   })
 
   setToolTipArray(prevTooltipArray => {
@@ -97,7 +90,6 @@ function handleComplexClick(complexStationRouteIdObjs, averagePosition, complexI
 function clearTooltip(id, type){
   if (type === "stopId"){
     setToolTipArray(prevArray => {
-      console.log('id2', id)
       return prevArray.filter((tooltip)=>{
         if (tooltip.props.stopId != id){
           return tooltip
@@ -105,7 +97,6 @@ function clearTooltip(id, type){
       })
     })
   } else if (type === "complexId"){
-    console.log('complexid')
     setToolTipArray(prevArray => {
       return prevArray.filter((tooltip)=>{
         if (tooltip.props.complexId != id){
@@ -171,12 +162,9 @@ useEffect(()=>{
             size = 10
           } 
 
-          let newStationText = <StationText handleStationClick={handleStationClick} clearTooltip={clearTooltip} size={size}  wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name + versionForKey}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
+          let newStationText = <StationText handleStationClick={handleStationClick} clearTooltip={clearTooltip} size={size}  wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
           newStationHtmlArray.push(newStationText)
-          setVersionForKey((prevVersion)=>{
-            return prevVersion + 1
-          })
-
+         
           // if the station name exists in the stationInfoObject & complex = True, create key in complexObject from complex_id and add values to key
         } else if ( stationArray[j].props.name in stationInfoObject && stationInfoObject[stationArray[j].props.name].complex){
     
@@ -201,7 +189,6 @@ useEffect(()=>{
                   "routes" : newInfoObject.daytime_routes,
                   "gtfs_stop_id" :newInfoObject.gtfs_stop_id
                 }]
-                // "count" : count
             } 
           // if the complexId already exists as a key in the complexObject, we condense the info of the new
           // station (part of the complex), into the value of the existing complexId key
@@ -252,11 +239,9 @@ useEffect(()=>{
         return new THREE.Vector3(xAv, yAv, zAv);
       };
       let averagePosition = avereragePosition(complexObject[complex].positions);
-  
-      let newComplexText = <ComplexText key={complexObject[complex].complex_id.toString() + " " + versionForKey.toString()} handleComplexClick={handleComplexClick} clearTooltip={clearTooltip} size={40} complexStationRouteIdObjs={complexObject[complex].name_route_combo_obj_array} complexId={complexObject[complex].complex_id} wrapperClass="station_label" status={status} distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={0} />
-      setVersionForKey((prevVersion)=>{
-        return prevVersion + 1
-      })
+
+      let newComplexText = <ComplexText key={complexObject[complex].complex_id.toString()} handleComplexClick={handleComplexClick} clearTooltip={clearTooltip} size={35} complexStationRouteIdObjs={complexObject[complex].name_route_combo_obj_array} complexId={complexObject[complex].complex_id} wrapperClass="station_label" status={status} distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={0} />
+
       newComplexHtmlArray.push(newComplexText);
     }
     // for each complex in complexHtmlArray, loop thorugh all complexes and stations and find distance to closest stationText or complexText
@@ -281,18 +266,30 @@ useEffect(()=>{
           }
         }
       })
-      console.log(distToClosestStationComplex)
-      // CONTROL ALPHA LEVEL BASED ON DIST FROM CAM
+
+      // CONTROL COMPLEX TEXT SIZE BASED ON DISTANCE TO CLOSEST STATIONTEXT OR COMPLEXTEXT
       if (distToClosestStationComplex >= 1.5){
         return currentComplex;
       } else if (distToClosestStationComplex < 1.5 && distToClosestStationComplex >= 1){
-        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 35});
+        let newKey = currentComplex.props.complexId.toString() + " " + versionForKey.toString()
+        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 25, key : newKey});
+        setVersionForKey((prevVersion)=>{
+          return prevVersion += 1
+        })
         return newComplexHtmlComponent;
       } else if (distToClosestStationComplex < 1 && distToClosestStationComplex >= 0.5) {
-        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 25});
+        let newKey = currentComplex.props.complexId.toString() + " " + versionForKey.toString()
+        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 20, key : newKey});
+        setVersionForKey((prevVersion)=>{
+          return prevVersion += 1
+        })
         return newComplexHtmlComponent;
       } else if (distToClosestStationComplex < 0.5){
-        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 20});
+        let newKey = currentComplex.props.complexId.toString() + " " + versionForKey.toString()
+        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 15, key : newKey});
+        setVersionForKey((prevVersion)=>{
+          return prevVersion += 1
+        })
         return newComplexHtmlComponent
       }
     })
@@ -325,15 +322,15 @@ useEffect(()=>{
   let newStationHtmlArray = [...stationHtmlArray]
   let updatedStationHtml = newStationHtmlArray.map((stationText)=>{
     let alphaLevel = 0
-    if (findDistance(stationText.props.position, cameraPosition) <= 20){
+    if (findDistance(stationText.props.position, cameraPosition) <= 30){
       let distance = findDistance(stationText.props.position, cameraPosition)
-      if (distance <= 20 && distance >= 15){
-        alphaLevel = Math.abs((distance - 20) / (20 - 15));
+      if (distance <= 30 && distance >= 20){
+        alphaLevel = Math.abs((distance - 30) / (30 - 20));
       } else {
         alphaLevel = 1;
       }
       let stationTextClone = React.cloneElement(stationText, {status : true, alphaLevel : alphaLevel});
-      return stationTextClone;
+      return stationTextClone
     } else {
       let stationTextClone = React.cloneElement(stationText, {status : false, alphaLevel : alphaLevel});
       return stationTextClone;
@@ -345,11 +342,10 @@ useEffect(()=>{
   let updatedComplexHtmlArray = newComplexHtmlArray.map((complexText, i)=>{
   //  console.log(complexText.props)
     let alphaLevel = 0
-    if (findDistance(complexText.props.averagePosition, cameraPosition) <= 40){
+    if (findDistance(complexText.props.averagePosition, cameraPosition) <= 30){
       let distance = findDistance(complexText.props.averagePosition, cameraPosition)
-      // let alphaLevel = 0
-      if (distance <= 40 && distance >= 30){
-        alphaLevel = Math.abs((distance - 40) / (40-30))
+      if (distance <= 30 && distance >= 20){
+        alphaLevel = Math.abs((distance - 30) / (30-20))
       } else {
         alphaLevel = 1
       }
@@ -363,7 +359,7 @@ useEffect(()=>{
   setComplexHtmlArray(updatedComplexHtmlArray)
 }, [cameraPosition])
   
-
+// RETURN COMPONENT 
   if (stationArray == []){
     return(
         <>loading</>
@@ -384,10 +380,6 @@ useEffect(()=>{
       </group>
     )
   }
-
-  
-  
-  
 }
 
 

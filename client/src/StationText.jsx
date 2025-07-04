@@ -38,7 +38,7 @@ export default function StationText({handleStationClick, position, daytime_route
     // console.log(iconImageArray)
     return(
         <>
-            {status ? <Html key={gtfs_stop_id} style={{opacity : alphaLevel}} wrapperClass="station_label" distanceFactor={5} center={true} position={position}>
+            {status ? <Html key={gtfs_stop_id} style={{opacity : alphaLevel}} wrapperClass="station_label" distanceFactor={7} center={true} position={position}>
                 {<button className="station-html-button-text" style={{fontSize: sizeInPx, inlineSize: widthInPx}} onClick={handleClick}>
                         <div className="station-text-name">
                             {name}

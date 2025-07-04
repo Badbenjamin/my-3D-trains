@@ -45,7 +45,6 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
 
     useEffect(()=>{
        northArrivals = buildArrivals(arrivalInfo.n_bound_arrivals)
-       console.log(northArrivals)
        setNorthArrivals(northArrivals)
        southArrivals = buildArrivals(arrivalInfo.s_bound_arrivals)
        setSouthArrivals(southArrivals)
