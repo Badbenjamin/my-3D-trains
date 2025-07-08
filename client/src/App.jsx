@@ -20,7 +20,8 @@ function App() {
   
   const [stations, setStations] = useState([])
   const [stationArray, setStationArray] = useState([])
-
+  // DUPLICATES IN STATUS ARRAY? 
+  // fix duplicates, see if errors occur
   const [statusArray, setStatusArray] = useState([])
   console.log(statusArray)
   const [version, setVersion] = useState(0)
@@ -72,7 +73,7 @@ function App() {
     setStationArray(newStationArray)
   }, [])
 
-  // This useEffect listens for a change in tripInfo. 
+  // This useEffect listens for a change in tripInfoIndex. 
   // It takes the stations from ttrain schedule and creates an array of GTFS ids that will be passed to the selectStations function
   // selectStations takes an array of gtfs ids and uses it to change the status of the stations in stationArray.
   useEffect(()=>{
@@ -131,7 +132,6 @@ function App() {
   useEffect(()=>{
     if (tripInfo == []){
       return 
-      // added [0] to deal with list?
     } else if (tripInfo[tripInfoIndex]) {
       let allIdsArray = []
       // Trigger some sort of animation change with errors?
