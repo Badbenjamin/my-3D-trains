@@ -1,13 +1,13 @@
 import { Outlet } from 'react-router-dom'
 import { useState, useEffect} from 'react'
 import { useGLTF } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
+// import { useFrame } from '@react-three/fiber'
 
 
 
 
 import './App.css'
-import Station from './Station'
+// import Station from './Station'
 import { getAllIds, createStatusObjectArray, createStationComponentsObj, updateStatusArray} from './ModularFunctions'
 
 
@@ -20,9 +20,12 @@ function App() {
   
   const [stations, setStations] = useState([])
   const [stationArray, setStationArray] = useState([])
+
   const [statusArray, setStatusArray] = useState([])
+  console.log(statusArray)
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
+  // THIS IS THE ARRAY OF TRAINS FOR CHOOSING THE NEXT TRAIN
   const [tripInfoIndex, setTripInfoIndex] = useState(0)
   const [stationIdStartAndEnd, setStationIdStartAndEnd] = useState({"startId" : null, "endId" : null})
   const [vectorPosition, setVectorPositon] = useState({})
@@ -35,7 +38,7 @@ function App() {
       .then(stationsData => setStations(stationsData))
   }, [])
 
-    // look into how this is used 
+    // THERE IS A BUG HERE (when tt is used to set waypoints after another trip has been planned)
     // This is triggered when ToolTip origin or dest button is clicked
   function retrieveStationId(id, startOrEnd) {
 
