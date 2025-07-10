@@ -7,6 +7,7 @@ import { useState } from "react";
 import './App.css'
 
 export default function StationText({handleStationClick, position, daytime_routes, name, status, gtfs_stop_id, alphaLevel, size, clearTooltip}){
+    // console.log(status)
     const [tooltipStatus, setTooltipStatus] = useState(false)
     let sizeInPx = size.toString()+"px"
     let iconSizeInPx = (size + 3).toString()+"px"

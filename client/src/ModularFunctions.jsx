@@ -38,20 +38,23 @@ export function getAllIds(tripInfo, statusArray){
 
 
 // this function creates a status object for each mesh in nodes from our model import and pushes to newStatusArray
+// maybe have gtfs_id : t_or_f for easier lookup? 
+// MAYBE I DONT EVEN NEED STATUS ARRAY AND CAN REPLACE IT WITH A PROP
 export function createStatusObjectArray(nodes){
   let newStatusArray = []
+  // let prevNameObj = {}
     for (const mesh in nodes){
-      if (nodes[mesh].type === "Mesh"){
-        // console.log('mat', nodes[mesh].material)
+      if (nodes[mesh].type === "Mesh" ){
         const status = {"name": nodes[mesh].name.slice(0,3), "status": false}
-        newStatusArray.push(status)   
+        newStatusArray.push(status) 
     } 
   }
+  // console.log('pno', prevNameObj)
   return newStatusArray
 }
 
 
-export function createStationComponentsObj(nodes, materials, newStatusArray, retrieveStationId){
+export function createStationComponentsObj(nodes, materials,retrieveStationId){
     // this loop creates Station components for every mesh in the nodes from our model import.
     // count and index are used to assign status from newStatusArray to each Station
 
@@ -64,7 +67,13 @@ export function createStationComponentsObj(nodes, materials, newStatusArray, ret
             // mesh (name of station) is used as key for mapModelObject
             newMapModelObj[mesh] = 
                 <Station name={nodes[mesh].name} 
-                      status={newStatusArray[index]}
+                      status={{
+                        "display" : true,
+                        "type" : null,
+                        "arrival" : null,
+                        "departure" : null,
+                        "gtfs_stop_id" : null
+                      }}
                       id={nodes[mesh].name} 
                       key={nodes[mesh].name} 
                       mesh={nodes[mesh]} 

@@ -15,6 +15,7 @@ import { findDistance } from './ModularFunctions'
 
 export default function StationsTracksAndText({vectorPosition}) {
     const {stationArray, retrieveStationId} = useOutletContext()
+    // console.log('stat', stationArray)
     const [stationInfoObjectArray, setStationInfoObjectArray] = useState([])
     const [stationHtmlArray, setStationHtmlArray] = useState([])
     const [complexHtmlArray, setComplexHtmlArray] = useState([])

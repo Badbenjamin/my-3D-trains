@@ -10,7 +10,7 @@ import { useFrame } from "@react-three/fiber"
 // import { is } from "@react-three/fiber/dist/declarations/src/core/utils"
 
 function Station( { status, mesh, index}){
-
+        // console.log(status, mesh.name)
         let stationRef = useRef()
 
         const selectedMaterial = new THREE.MeshStandardMaterial()
@@ -30,36 +30,43 @@ function Station( { status, mesh, index}){
         let color = !isWhite ? newMaterial : selectedMaterial
 
         // animation loop triggered when selecteds
-        useFrame(({clock})=>{
+        // useFrame(({clock})=>{
     
-            let a = clock.getElapsedTime()
-            if (status['status']){
-                if (Math.round(a) % 2 == 0){
-                    setIsWhite(true)
-                } else {
-                    setIsWhite(false)
-                }
-            }
+        //     let elapsedTime = clock.getElapsedTime()
+        //     // console.log(elapsedTime)
+        //     if (status['status']){
+        //         if (Math.round(currentTime) % 2 == 0){
+        //             setIsWhite(true)
+        //         } else {
+        //             setIsWhite(false)
+        //         }
+        //     }
            
             
-        })
-
-    return(
-        <group>
-            <mesh       
-                  ref={stationRef[index]}
-                  name={newName}
-                  castShadow={newCastShadow}
-                  receiveShadow={newRecieveShadow}
-                  geometry={newGeometry}
-                  material={color}
-                  position={newPosition}
-                  rotation={newRotation}
-                  scale={newScale}
-                  
-            />
-        </group>
-    )
+        // })
+    if (status["display"]){
+        return(
+            <group>
+                <mesh       
+                      ref={stationRef[index]}
+                      name={newName}
+                      castShadow={newCastShadow}
+                      receiveShadow={newRecieveShadow}
+                      geometry={newGeometry}
+                      material={color}
+                      position={newPosition}
+                      rotation={newRotation}
+                      scale={newScale}
+                      
+                />
+            </group>
+        )
+    } else {
+        return(
+            <></>
+        )
+    }
+    
 }
 
 export default Station
