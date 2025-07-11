@@ -134,7 +134,11 @@ useEffect(()=>{
       if (stationArray[j].props.name.length < 5){
         // if name is in stationInfoObject as key, and is not a complex, create <StationText> and push to stationHtmlArray
         if( stationArray[j].props.name in stationInfoObject && !stationInfoObject[stationArray[j].props.name].complex){
-          let status = false
+          // let status = false
+          let geometryStatus = stationArray[j].props.status
+          // let geometryDisplayStatus = geometryStatus.display 
+          // let geometryCamAlphaStatus = geometryStatus.disable_cam_alpha
+          // console.log(geometryDisplayStatus, geometryCamAlphaStatus)
           let newPosition = stationArray[j].props.mesh.position
           let newInfoObject = stationInfoObject[stationArray[j].props.name]
           // default size for text and route icons
@@ -162,13 +166,14 @@ useEffect(()=>{
           } else if (distToClosestStation < 0.3){
             size = 10
           } 
-
-          let newStationText = <StationText handleStationClick={handleStationClick} clearTooltip={clearTooltip} size={size}  wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
+          // console.log('stat status', status)
+          let newStationText = <StationText handleStationClick={handleStationClick} clearTooltip={clearTooltip} size={size}  wrapperClass="station_label"  index={j} geometryStatus={geometryStatus} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
           newStationHtmlArray.push(newStationText)
          
           // if the station name exists in the stationInfoObject & complex = True, create key in complexObject from complex_id and add values to key
         } else if ( stationArray[j].props.name in stationInfoObject && stationInfoObject[stationArray[j].props.name].complex){
-    
+          let geometryStatus = stationArray[j].props.status
+          // console.log(geometryStatus)
           let newPosition = stationArray[j].props.mesh.position
 
           let newInfoObject = stationInfoObject[stationArray[j].props.name]
@@ -177,12 +182,14 @@ useEffect(()=>{
           // OR if the newInfoObject does not have a matching complex_id in it, we create a new key value pair in the complexObject
           if (Object.keys(complexObject).length === 0 || !(complexObject.hasOwnProperty(newInfoObject.complex_id))){
  
-            
+            // need to add status to this. probably an array
+
             complexObject[newInfoObject.complex_id] = {
                 "complex_id" : newInfoObject.complex_id,
                 // "daytime_routes" : newInfoObject.daytime_routes.split(" "),
                 "daytime_routes" : [[newInfoObject.daytime_routes]],
                 "gtfs_stop_ids" : [newInfoObject.gtfs_stop_id],
+                "status_array" : [geometryStatus],
                 "positions" : [newPosition],
                 "stop_names" : [newInfoObject.name],
                 "name_route_combo_obj_array" : [{
@@ -203,6 +210,8 @@ useEffect(()=>{
                   "gtfs_stop_id" :newInfoObject.gtfs_stop_id
             })
 
+            complexObject[newInfoObject.complex_id]['status_array'].push(geometryStatus)
+
             let stopIds = complexObject[newInfoObject.complex_id]['gtfs_stop_ids']
             let newStopId = newInfoObject.gtfs_stop_id
             stopIds.push(newStopId)
@@ -222,7 +231,9 @@ useEffect(()=>{
     // COMPLEXES HAVE BEEN CONDESNED INTO AN OBJECT WITH COMPLEXIDS AS KEYS
     // LOOP THROUGH OBJECT KEYS AND CREATE AN ARRAY OF REACT COMPONENTS WITH COMPLEX PROPS
     for (let complex in complexObject){
-      let status = true
+      // let status = true
+      // console.log(complexObject[complex])
+      // console.log(complexObject[complex])
 
       // find the average position of the stations in the complex to place the complex text
       function avereragePosition(positionsArray){
@@ -241,7 +252,7 @@ useEffect(()=>{
       };
       let averagePosition = avereragePosition(complexObject[complex].positions);
 
-      let newComplexText = <ComplexText key={complexObject[complex].complex_id.toString()} handleComplexClick={handleComplexClick} clearTooltip={clearTooltip} size={35} complexStationRouteIdObjs={complexObject[complex].name_route_combo_obj_array} complexId={complexObject[complex].complex_id} wrapperClass="station_label" status={status} distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={0} />
+      let newComplexText = <ComplexText key={complexObject[complex].complex_id.toString()} handleComplexClick={handleComplexClick} clearTooltip={clearTooltip} size={30} complexStationRouteIdObjs={complexObject[complex].name_route_combo_obj_array} complexId={complexObject[complex].complex_id} wrapperClass="station_label" statusArray={complexObject[complex].status_array} distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={0} />
 
       newComplexHtmlArray.push(newComplexText);
     }
@@ -299,7 +310,7 @@ useEffect(()=>{
 
   }
   
-},[stationInfoObjectArray])
+},[stationInfoObjectArray, stationArray])
 
 
 // POSITION OF CAMERA

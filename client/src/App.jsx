@@ -21,7 +21,7 @@ function App() {
   // does this need to be state or can it be a variable?
   const [stations, setStations] = useState([])
   const [stationArray, setStationArray] = useState([])
-  console.log('sa', stationArray)
+  // console.log('sa', stationArray)
   // DUPLICATES IN STATUS ARRAY? 
   // fix duplicates, see if errors occur
   // const [statusArray, setStatusArray] = useState([])
@@ -143,6 +143,7 @@ function App() {
           let newStationGeometry = React.cloneElement(stationGeometry, {status : {
             "display" : true,
             // have some sort of camera effects variable? 
+            "disable_cam_alpha" : false,
             "type" : selectedStationInfoObj[stationGeometry.props.name].type,
             "arrival" : selectedStationInfoObj[stationGeometry.props.name].arrival,
             "departure" : selectedStationInfoObj[stationGeometry.props.name].departure,
@@ -157,6 +158,7 @@ function App() {
           let newStationGeometry = React.cloneElement(stationGeometry, {status : {
             "display" : false,
             "type" : "not_in_trip",
+            "disable_cam_alpha" : true,
             // "arrival" : selectedStationInfoObj[stationGeometry.props.name]['arrival'],
             // "departure" : selectedStationInfoObj[stationGeometry.props.name]['departure'],
             // "gtfs_stop_id" : selectedStationInfoObj[stationGeometry.props.name]['stopId']

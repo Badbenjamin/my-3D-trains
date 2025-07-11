@@ -69,6 +69,7 @@ export function createStationComponentsObj(nodes, materials,retrieveStationId){
                 <Station name={nodes[mesh].name} 
                       status={{
                         "display" : true,
+                        "disable_cam_alpha" : false,
                         "type" : null,
                         "arrival" : null,
                         "departure" : null,
