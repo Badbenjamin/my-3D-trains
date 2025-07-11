@@ -18,6 +18,7 @@ function App() {
   // each node contains a mesh, which has the properties for that geometry 
   const { nodes, materials } = useGLTF('./subway_map_stations_tracks_1.glb')
   
+  // does this need to be state or can it be a variable?
   const [stations, setStations] = useState([])
   const [stationArray, setStationArray] = useState([])
   console.log('sa', stationArray)
@@ -63,8 +64,6 @@ function App() {
   // CREATE A TRACK COMPONENT, WOULD HAVE SPECIAL ATTRIBUTES LIKE DURATION AND TRAIN POSITION
   useEffect(()=>{
     // newStatusArray is an array of objects with names of stations/meshes and a boolean to determine whether they are selected or not
-    // contains duplicates because some stations are broken into two geometries. maybe there is a better way...
-    // const newStatusArray = createStatusObjectArray(nodes)
 
     // newMapModelObj contains the info for all the station and track geometries in our scene
     const newMapModelObj = createStationComponentsObj(nodes, materials, retrieveStationId)
@@ -74,35 +73,14 @@ function App() {
     for (const meshName in newMapModelObj){
       newStationArray.push(newMapModelObj[meshName])
       };
-    // statusArray is set (should be all false, unselected)
-    // setStatusArray(newStatusArray)
-    // stationArray is set with our newly created Station components from newMapModelObject
-    // console.log('nsa',newStationArray)
     setStationArray(newStationArray)
   }, [])
 
-  // This useEffect listens for a change in tripInfoIndex. 
-  // It takes the stations from ttrain schedule and creates an array of GTFS ids that will be passed to the selectStations function
-  // selectStations takes an array of gtfs ids and uses it to change the status of the stations in stationArray.
-
+  // this UE listens for a change in tripInfo, or tripInfoIndex (next trains), and modifies stationArray to reset statuses of station geometries for display
   useEffect(()=>{
-    // TAKE TRIPINFO, ACCESS TRIPINFOELEMENTS
-    // ISOLATE STOPS (WITH INFO) BETWEEN START AND END STATION FOR EACH TSE
-    // ADD THESE TO HASHMAP, WITH INFO, START OR END, ARRIVAL, TRANSFER, PASSTHROUGH
-    // MAP STATION ARRAY, RETURNING ONLY STATIONS PRESENT IN HASHMAP
-    // PASS DOWN STATION INFO TO TEXT LAYER, TO DISPLAY START, END, TRANSFER
-    console.log('ti',tripInfo)
-    // console.log('sa',stationArray)
-    console.log('tii',tripInfoIndex)
-    // isolate gtfs stop ids from each leg of trip
     let currentTrip = tripInfo[tripInfoIndex]
-    console.log('ct', currentTrip)
-    
     let selectedStationInfoObj = {}
-    // stationId : {
-    //    type: start
-    //    arrival : 123345
-    // }
+ 
     if ((currentTrip && currentTrip.length == 1) && tripInfo != []){
       for (let tripSequenceElement of currentTrip){
         const currentTripSchedule = tripSequenceElement.schedule
@@ -164,6 +142,7 @@ function App() {
           console.log(selectedStationInfoObj[stationGeometry.props.name].arrival)
           let newStationGeometry = React.cloneElement(stationGeometry, {status : {
             "display" : true,
+            // have some sort of camera effects variable? 
             "type" : selectedStationInfoObj[stationGeometry.props.name].type,
             "arrival" : selectedStationInfoObj[stationGeometry.props.name].arrival,
             "departure" : selectedStationInfoObj[stationGeometry.props.name].departure,
@@ -195,121 +174,26 @@ function App() {
       }
     
     }
-    
-
   }, [tripInfo, tripInfoIndex])
 
-  // useEffect(()=>{
-  //   // trip info contains trains, which contain schedules.
-  //   // schedules are used to select meshes to be highlighted in our map.
-  //   // if (tripInfo == []){
-  //   //   return 
-  //   // } else if (tripInfo[tripInfoIndex]) {
-  //   //   let allIdsArray = []
-  //   //   // Trigger some sort of animation change with errors?
-  //   //   let allErrorsArray = []
+  function clearTripInfo(){
+    // loop through stationArray, reset all stations to default
+    let resetStationArray = stationArray.map((stationGeometry)=>{
+      let newStation = React.cloneElement(stationGeometry, { key : stationGeometry.props.name.toString() + version.toString(), status : {
+        "display" : true,
+      }})
+      setVersion((prevVersion)=>{
+        return prevVersion += 1
+      })
+      return newStation
+    })
+    // reset tripInfo
+    setStationArray(resetStationArray)
+    setTripInfo([])
+    setTripInfoIndex(0)
+    // make sure search bar is cleared (probably in component, not here)
+  }
 
-  //   //   for (let leg of tripInfo[tripInfoIndex]){
-  //   //     if(leg.schedule){
-  //   //       for (let id of getAllIds(leg,statusArray)){
-  //   //         allIdsArray.push(id)
-  //   //       }
-  //   //     } else {
-  //   //       console.log('error')
-  //   //       // allErrorsArray.push(leg.error)
-  //   //     }
-  //   //   }
-      
-  //   //   // version must update to change key and trigger re render
-  //   //   // does version need to be saved in state?
-  //   //   setVersion(version + 1)
-      
-  //   //   const newStatusArray = [...statusArray]
-  //   //   // reset statuses to false 
-  //   //   for (const status of newStatusArray){
-  //   //     status['status'] = false
-  //   //   }
-        
-  //   //   // set statusArray state to updated version
-  //   //   setStatusArray(updateStatusArray(allIdsArray, newStatusArray))
-    
-  //     // alteredStationArray will contain stations with updated status.
-  //   if (tripInfo == []){
-  //     return
-  //   } else {
-  //     console.log(tripInfo)
-  //   }
-  //     const alteredStationArray = stationArray.map((station) => {
-  //       const newStation = {...station}
-  //       const newStationName = newStation['props']['name']
-  //       let newStationStatus = newStation['props']['status']['status']
-          
-  //       // IMPORTANT TO UPDATE KEY TO TRIGGER RE RENDER
-  //       // look for match between station gtfs id and gtfs id's in statusArray
-  //       for (const status of newStatusArray){
-  //           newStationStatus = status['status']
-  //           newStation['key'] =  String(newStationName + version)
-  //           // newStation['id'] = String(newStationName + version)
-  //         }
-  //       return newStation
-  //     })
-  //     setStationArray(alteredStationArray)
-  //   // }
-  // }, [tripInfoIndex])
-
-  // THIS HAPPENS FIRST, THEN TRIPINFOINDEX
-  // useEffect(()=>{
-  //   if (tripInfo == []){
-  //     return 
-  //   } else if (tripInfo[tripInfoIndex]) {
-  //     let allIdsArray = []
-  //     // Trigger some sort of animation change with errors?
-  //     let allErrorsArray = []
-
-  //     for (let leg of tripInfo[tripInfoIndex]){
-  //       if(leg.schedule){
-  //         for (let id of getAllIds(leg,statusArray)){
-  //           allIdsArray.push(id)
-  //         }
-  //       } else {
-  //         console.log('error')
-  //         // allErrorsArray.push(leg.error)
-  //       }
-  //     }
-      
-  //     // version must update to change key and trigger re render
-  //     // does version need to be saved in state?
-  //     // setVersion(version + 1)
-      
-  //     // const newStatusArray = [...statusArray]
-  //     // // reset statuses to false 
-  //     // for (const status of newStatusArray){
-  //     //   status['status'] = false
-  //     // }
-        
-  //     // // set statusArray state to updated version
-  //     // setStatusArray(updateStatusArray(allIdsArray, newStatusArray))
-    
-  //     // alteredStationArray will contain stations with updated status.
-  //     const alteredStationArray = stationArray.map((station) => {
-  //       const newStation = {...station}
-  //       const newStationName = newStation['props']['name']
-  //       let newStationStatus = newStation['props']['status']['status']
-          
-  //       // IMPORTANT TO UPDATE KEY TO TRIGGER RE RENDER
-  //       // look for match between station gtfs id and gtfs id's in statusArray
-  //       for (const status of newStatusArray){
-  //           newStationStatus = status['status']
-  //           newStation['key'] =  String(newStationName + version)
-  //           // newStation['id'] = String(newStationName + version)
-  //         }
-  //       return newStation
-  //     })
-  //     setStationArray(alteredStationArray)
-  //   }
-
-  //   setTripInfoIndex(0)
-  // }, [tripInfo])
   
   if (!nodes || stationArray == []){
     return (
@@ -327,8 +211,6 @@ function App() {
         setVersion : setVersion, 
         tripInfoIndex: tripInfoIndex,
         setTripInfoIndex : setTripInfoIndex,
-        // statusArray : statusArray, 
-        // setStatusArray : setStatusArray, 
         stationArray : stationArray, 
         setStationArray : setStationArray,
         nodes : nodes,
@@ -337,10 +219,10 @@ function App() {
         tripInfo : tripInfo,
         setTripInfo : setTripInfo,
         stationIdStartAndEnd : stationIdStartAndEnd,
-        // retrieveId : retrieveId
         vectorPosition : vectorPosition,
         setVectorPositon : setVectorPositon,
-        retrieveStationId : retrieveStationId
+        retrieveStationId : retrieveStationId,
+        clearTripInfo : clearTripInfo
         }}/>
     </>
   )
