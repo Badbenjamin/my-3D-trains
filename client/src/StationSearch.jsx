@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import Select from 'react-select'
 import './Component.css'
 
-function StationSearch({setStartOrEndStation, position, stations, stationId}) {
-    // console.log('sid ',stations)
+function StationSearch({setStartOrEndStation, position, stationsData, stationId}) {
+    // console.log('stationsData stationsearch ',stationsData)
     const [selectedOption, setSelectedOption] = useState(null)
     // console.log('selectedOption', selectedOption)
 
@@ -33,7 +33,7 @@ function StationSearch({setStartOrEndStation, position, stations, stationId}) {
 
     const optionsArray = []
 
-    for (const station of stations){
+    for (const station of stationsData){
         // change value to equal gtfs stop id here and in classes.py
         // console.log(station.gtfs_stop_id)
         const stationObj = { value : station.gtfs_stop_id, label: `${station.name+" "+station.daytime_routes}`, pos: {position}};

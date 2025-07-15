@@ -9,7 +9,8 @@ import NextTrains from "./NextTrains";
 
 function JourneyPlanner() {
 
-    const {tripInfo, stations, setTripInfo, stationIdStartAndEnd, tripInfoIndex, setTripInfoIndex, clearTripInfo} = useOutletContext()
+    const {tripInfo, stationsData, setTripInfo, stationIdStartAndEnd, tripInfoIndex, setTripInfoIndex, clearTripInfo} = useOutletContext()
+
     const [journeyStations, setJourneyStations] = useState([null, null])
     
     // 
@@ -52,8 +53,8 @@ function JourneyPlanner() {
         <div>
             
             <div className='journey-planner'>
-                <StationSearch className='station_search' stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
-                <StationSearch className='station_search' stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
+                <StationSearch className='station_search' stationsData={stationsData} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
+                <StationSearch className='station_search' stationsData={stationsData} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
                 <br></br>
                 <button className="plan-trip-button" onClick={planTrip}>Plan Trip</button>
                 <button className="plan-trip-button" onClick={handleClearClick}>Clear Trip</button>

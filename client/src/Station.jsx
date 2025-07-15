@@ -44,7 +44,7 @@ function Station( { status, mesh, index}){
            
             
         // })
-    if (status["display"]){
+    if (status.geometryDisplay == true){
         return(
             <group>
                 <mesh       

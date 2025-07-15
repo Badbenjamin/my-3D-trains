@@ -19,7 +19,8 @@ function App() {
   const { nodes, materials } = useGLTF('./subway_map_stations_tracks_1.glb')
   
   // does this need to be state or can it be a variable?
-  const [stations, setStations] = useState([])
+  const [stationsData, setStationsData] = useState([])
+  console.log('app sd', stationsData.length)
   const [stationArray, setStationArray] = useState([])
   // console.log('sa', stationArray)
   // DUPLICATES IN STATUS ARRAY? 
@@ -39,7 +40,7 @@ function App() {
     // remove local host for deployment
     fetch("http://127.0.0.1:5555/api/stations")
       .then(response => response.json())
-      .then(stationsData => setStations(stationsData))
+      .then(newStationsData => setStationsData(newStationsData))
   }, [])
 
     // THERE IS A BUG HERE (when tt is used to set waypoints after another trip has been planned)
@@ -141,9 +142,8 @@ function App() {
         if (stationGeometry.props.name in selectedStationInfoObj){
           console.log(selectedStationInfoObj[stationGeometry.props.name].arrival)
           let newStationGeometry = React.cloneElement(stationGeometry, {status : {
-            "display" : true,
-            // have some sort of camera effects variable? 
-            "disable_cam_alpha" : false,
+            "geometryDisplay" : true,
+            "tripInProgress" : true, 
             "type" : selectedStationInfoObj[stationGeometry.props.name].type,
             "arrival" : selectedStationInfoObj[stationGeometry.props.name].arrival,
             "departure" : selectedStationInfoObj[stationGeometry.props.name].departure,
@@ -156,9 +156,10 @@ function App() {
           return newStationGeometry
         } else {
           let newStationGeometry = React.cloneElement(stationGeometry, {status : {
-            "display" : false,
+            "geometryDisplay" : false,
+            "textDisplay" : false,
             "type" : "not_in_trip",
-            "disable_cam_alpha" : true,
+            "camAlpha" : false,
             // "arrival" : selectedStationInfoObj[stationGeometry.props.name]['arrival'],
             // "departure" : selectedStationInfoObj[stationGeometry.props.name]['departure'],
             // "gtfs_stop_id" : selectedStationInfoObj[stationGeometry.props.name]['stopId']
@@ -182,7 +183,7 @@ function App() {
     // loop through stationArray, reset all stations to default
     let resetStationArray = stationArray.map((stationGeometry)=>{
       let newStation = React.cloneElement(stationGeometry, { key : stationGeometry.props.name.toString() + version.toString(), status : {
-        "display" : true,
+        "geometryDisplay" : true,
       }})
       setVersion((prevVersion)=>{
         return prevVersion += 1
@@ -201,33 +202,35 @@ function App() {
     return (
       <>loading</>
     )
+  } else if (stationArray != [] && stationsData != []){
+    return (
+      <>
+        {/* <h2>MY 3D TRAINS</h2> */}
+        {/* <NavBar/> */}
+        <Outlet context={{
+          stationsData : stationsData, 
+          version : version, 
+          setVersion : setVersion, 
+          tripInfoIndex: tripInfoIndex,
+          setTripInfoIndex : setTripInfoIndex,
+          stationArray : stationArray, 
+          setStationArray : setStationArray,
+          nodes : nodes,
+          materials : materials,
+          // trip info array passed down
+          tripInfo : tripInfo,
+          setTripInfo : setTripInfo,
+          stationIdStartAndEnd : stationIdStartAndEnd,
+          vectorPosition : vectorPosition,
+          setVectorPositon : setVectorPositon,
+          retrieveStationId : retrieveStationId,
+          clearTripInfo : clearTripInfo
+          }}/>
+      </>
+    )
   }
  
-  return (
-    <>
-      {/* <h2>MY 3D TRAINS</h2> */}
-      {/* <NavBar/> */}
-      <Outlet context={{
-        stations : stations, 
-        version : version, 
-        setVersion : setVersion, 
-        tripInfoIndex: tripInfoIndex,
-        setTripInfoIndex : setTripInfoIndex,
-        stationArray : stationArray, 
-        setStationArray : setStationArray,
-        nodes : nodes,
-        materials : materials,
-        // trip info array passed down
-        tripInfo : tripInfo,
-        setTripInfo : setTripInfo,
-        stationIdStartAndEnd : stationIdStartAndEnd,
-        vectorPosition : vectorPosition,
-        setVectorPositon : setVectorPositon,
-        retrieveStationId : retrieveStationId,
-        clearTripInfo : clearTripInfo
-        }}/>
-    </>
-  )
+  
 }
 
 useGLTF.preload('./public/subway_map_G_7.glb')

@@ -6,8 +6,8 @@ import { useState } from "react";
 
 import './App.css'
 
-export default function StationText({handleStationClick, position, daytime_routes, name, geometryStatus, gtfs_stop_id, alphaLevel, size, clearTooltip}){
-    // console.log(status)
+export default function StationText({handleStationClick, position, daytime_routes, name, textDisplayStatus, camAlpha, gtfs_stop_id, alphaLevel, size, clearTooltip}){
+    console.log(textDisplayStatus)
     const [tooltipStatus, setTooltipStatus] = useState(false)
     let sizeInPx = size.toString()+"px"
     let iconSizeInPx = (size + 3).toString()+"px"
@@ -20,10 +20,9 @@ export default function StationText({handleStationClick, position, daytime_route
         iconImageArray.push(<img className="route_icon" style={{width: iconSizeInPx, height : iconSizeInPx}}  src={`../public/ICONS/${route}.png`}/>)
     })
 
-    console.log(geometryStatus.disable_cam_alpha)
-    if (geometryStatus.disable_cam_alpha == false){
+    if (camAlpha == false){
         alphaLevel = 1.0
-    }
+    } 
 
     function handleClick(e){
         if (!tooltipStatus){
@@ -39,10 +38,10 @@ export default function StationText({handleStationClick, position, daytime_route
     useFrame((state, delta)=>{
     })
 
-    // console.log(iconImageArray)
+    // console.log(status.textDisplay, status)
     return(
         <>
-            {(geometryStatus.display) ? <Html key={gtfs_stop_id} style={{opacity : alphaLevel}} wrapperClass="station_label" distanceFactor={7} center={true} position={position}>
+            {(textDisplayStatus == true) ? <Html key={gtfs_stop_id} style={{opacity : alphaLevel}} wrapperClass="station_label" distanceFactor={7} center={true} position={position}>
                 {<button className="station-html-button-text" style={{fontSize: sizeInPx, inlineSize: widthInPx}} onClick={handleClick}>
                         <div className="station-text-name">
                             {name}

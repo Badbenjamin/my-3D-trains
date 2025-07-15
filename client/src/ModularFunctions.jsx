@@ -68,8 +68,8 @@ export function createStationComponentsObj(nodes, materials,retrieveStationId){
             newMapModelObj[mesh] = 
                 <Station name={nodes[mesh].name} 
                       status={{
-                        "display" : true,
-                        "disable_cam_alpha" : false,
+                        "geometryDisplay" : true,
+                        "tripInProgress" : false,
                         "type" : null,
                         "arrival" : null,
                         "departure" : null,
@@ -79,7 +79,6 @@ export function createStationComponentsObj(nodes, materials,retrieveStationId){
                       key={nodes[mesh].name} 
                       mesh={nodes[mesh]} 
                       materials={materials}
-                      // getStationCode={getStationCode}
                       // maybe remove if this is in text component now
                       retrieveStationId = {retrieveStationId}
                       />
