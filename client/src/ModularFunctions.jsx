@@ -38,20 +38,20 @@ export function getAllIds(tripInfo, statusArray){
 
 
 // this function creates a status object for each mesh in nodes from our model import and pushes to newStatusArray
-export function createStatusObjectArray(nodes){
-  let newStatusArray = []
-    for (const mesh in nodes){
-      if (nodes[mesh].type === "Mesh"){
-        // console.log('mat', nodes[mesh].material)
-        const status = {"name": nodes[mesh].name.slice(0,3), "status": false}
-        newStatusArray.push(status)   
-    } 
-  }
-  return newStatusArray
-}
+// export function createStatusObjectArray(nodes){
+//   let newStatusArray = []
+//     for (const mesh in nodes){
+//       if (nodes[mesh].type === "Mesh"){
+//         // console.log('mat', nodes[mesh].material)
+//         const status = {"name": nodes[mesh].name.slice(0,3), "status": false}
+//         newStatusArray.push(status)   
+//     } 
+//   }
+//   return newStatusArray
+// }
 
 
-export function createStationComponentsObj(nodes, materials, newStatusArray, retrieveStationId){
+export function createStationComponentsObj(nodes, materials, retrieveStationId){
     // this loop creates Station components for every mesh in the nodes from our model import.
     // count and index are used to assign status from newStatusArray to each Station
 
@@ -64,7 +64,10 @@ export function createStationComponentsObj(nodes, materials, newStatusArray, ret
             // mesh (name of station) is used as key for mapModelObject
             newMapModelObj[mesh] = 
                 <Station name={nodes[mesh].name} 
-                      status={newStatusArray[index]}
+                      // status={newStatusArray[index]}
+                      tripInProgress = {false}
+                      stationInTrip = {null}
+                      stationTripType = {null}
                       id={nodes[mesh].name} 
                       key={nodes[mesh].name} 
                       mesh={nodes[mesh]} 
