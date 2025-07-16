@@ -298,7 +298,7 @@ useEffect(()=>{
 
   }
   
-},[stationInfoObjectArray])
+},[stationInfoObjectArray, stationArray])
 
 
 // POSITION OF CAMERA
