@@ -78,59 +78,68 @@ function App() {
   useEffect(()=>{
     let currentTrip = tripInfo[tripInfoIndex]
     let selectedStationInfoObj = {}
- 
-    if ((currentTrip && currentTrip.length == 1) && tripInfo != []){
+   
+    if (currentTrip && tripInfo.length > 0){
+      let startStopId = currentTrip[0].start_station_gtfs
+      let endStopId = currentTrip[currentTrip.length - 1].end_station_gtfs
+      console.log('ssid',startStopId, endStopId)
+      // each TripSequenceElement is a leg of a trip on one train
       for (let tripSequenceElement of currentTrip){
         const currentTripSchedule = tripSequenceElement.schedule
         const startStationId = tripSequenceElement.start_station_gtfs
         const endStationId = tripSequenceElement.end_station_gtfs
-        console.log(tripSequenceElement)
-        console.log(currentTripSchedule)
 
         const justStationIds = currentTripSchedule.map((station) => {
           return station['stop_id'].slice(0,3)
         })
       
-      const startIndex = justStationIds.indexOf(startStationId)
-      const endIndex = justStationIds.indexOf(endStationId)
+        const startIndex = justStationIds.indexOf(startStationId)
+        const endIndex = justStationIds.indexOf(endStationId)
 
-      const startStop = currentTripSchedule[startIndex]
-      const endStop = currentTripSchedule[endIndex]
-      // console.log(currentTripSchedule.slice(startIndex, endIndex + 1))
-      const stopsForLeg = currentTripSchedule.slice(startIndex, endIndex + 1)
+        const startStop = currentTripSchedule[startIndex]
+        const endStop = currentTripSchedule[endIndex]
+        const stopsForLeg = currentTripSchedule.slice(startIndex, endIndex + 1)
+        // console.log(stopsForLeg)
 
-      for (let stop of stopsForLeg){
-        if (stop == startStop){
-          // console.log(stop.stop_id.slice(0,3))
-          selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
-            "stopId" : stop.stop_id.slice(0,3),
-            "arrival" : stop.arrival,
-            "departure" : stop.departure, 
-            "type" : "start"
+        // loop through all stops of a leg
+        // keep track of what TSE we are on? 
+        for (let stop of stopsForLeg){
+          console.log(stopsForLeg[0].stop_id.slice(0,3), stop.stop_id.slice(0,3))
+          // start stop
+          if (stop.stop_id.slice(0,3) == startStopId){
+            selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
+              "stopId" : stop.stop_id.slice(0,3),
+              "arrival" : stop.arrival,
+              "departure" : stop.departure, 
+              "type" : "start"
+            } 
+          } else if (stop.stop_id.slice(0,3) == endStopId){
+            selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
+              "stopId" : stop.stop_id.slice(0,3),
+              "arrival" : stop.arrival,
+              "departure" : stop.departure, 
+              "type" : "end"
+            }
+          }  else if ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) == stopsForLeg[0].stop_id.slice(0,3) || stop.stop_id.slice(0,3) == stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3))){
+            selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
+              "stopId" : stop.stop_id.slice(0,3),
+              "arrival" : stop.arrival,
+              "departure" : stop.departure, 
+              "type" : "transfer"
+            }
+          } else if ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) != stopsForLeg[0].stop_id.slice(0,3) && stop.stop_id.slice(0,3) != stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3))){
+            selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
+              "stopId" : stop.stop_id.slice(0,3),
+              "arrival" : stop.arrival,
+              "departure" : stop.departure, 
+              "type" : "passthrough"
+            }
           }
-        }  else if (!(stop == startStop || stop == endStop)){
-          selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
-            "stopId" : stop.stop_id.slice(0,3),
-            "arrival" : stop.arrival,
-            "departure" : stop.departure, 
-            "type" : "passthrough"
-          }
-        } else if (stop == endStop){
-          selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
-            "stopId" : stop.stop_id.slice(0,3),
-            "arrival" : stop.arrival,
-            "departure" : stop.departure, 
-            "type" : "end"
-          }
-        }
-      }
-      console.log(selectedStationInfoObj)
-      }
-    } else if (currentTrip && currentTrip.length >= 1) {
-      for (let tripSequenceElement of currentTrip){
-        console.log('tse', tripSequenceElement)
+        }  
       }
     }
+
+    console.log('sso', selectedStationInfoObj)
     
     // update this to current props
     // START, END, WAYPOINT, NOT IN TRIP
@@ -138,12 +147,12 @@ function App() {
     if (tripInfo != [] && selectedStationInfoObj != {}){
       let newStationArray = stationArray.map((stationGeometry)=>{
         if (stationGeometry.props.name in selectedStationInfoObj){
-          console.log(selectedStationInfoObj[stationGeometry.props.name].arrival)
+          // console.log(selectedStationInfoObj[stationGeometry.props.name].arrival)
           let newStationGeometry = React.cloneElement(stationGeometry, {tripInProgress : true, stationInTrip : true, stationTripType : "included", key : stationGeometry.props.name.toString() + version.toString()})
           setVersion((prevVersion)=>{
             return prevVersion += 1
           })
-          console.log('nsg', newStationGeometry)
+          // console.log('nsg', newStationGeometry)
           return newStationGeometry
         } else {
           let newStationGeometry = React.cloneElement(stationGeometry, {tripInProgress : true, stationInTrip : false, stationTripType : "not in trip", key : stationGeometry.props.name.toString() + version.toString()})

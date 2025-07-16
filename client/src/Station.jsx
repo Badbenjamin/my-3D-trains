@@ -8,7 +8,7 @@ import { Line } from "@react-three/drei"
 import './App.css'
 import { useFrame } from "@react-three/fiber"
 // import { is } from "@react-three/fiber/dist/declarations/src/core/utils"
-
+// stationTripType to stationTripInfo
 function Station( { tripInProgress, stationInTrip, stationTripType, mesh, index}){
         console.log(tripInProgress, stationInTrip, stationTripType)
         // console.log(mesh.material)
