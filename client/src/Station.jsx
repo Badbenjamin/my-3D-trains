@@ -9,8 +9,8 @@ import './App.css'
 import { useFrame } from "@react-three/fiber"
 // import { is } from "@react-three/fiber/dist/declarations/src/core/utils"
 // stationTripType to stationTripInfo
-function Station( { tripInProgress, stationInTrip, stationTripType, mesh, index}){
-        console.log(tripInProgress, stationInTrip, stationTripType)
+function Station( { tripInProgress, stationInTrip, stationInfo, mesh, index}){
+        // console.log(tripInProgress, stationInTrip, stationInfo)
         // console.log(mesh.material)
         const [geometryDisplay, setGeometryDisplay] = useState(false)
         let stationRef = useRef()
@@ -28,11 +28,11 @@ function Station( { tripInProgress, stationInTrip, stationTripType, mesh, index}
         const newScale = mesh.scale
 
     useEffect(()=>{
-        if (tripInProgress && stationInTrip && stationTripType === 'included'){
+        if (tripInProgress && stationInTrip && stationInfo != null){
             console.log(newName)
             setGeometryDisplay(true)
             // newMaterial.wireframe = false
-           } else if (tripInProgress && !stationInTrip && stationTripType === 'not in trip'){
+           } else if (tripInProgress && !stationInTrip && stationInfo === null){
             // newMaterial.wireframe = true
             // setGeometryDisplay(true)
             setGeometryDisplay(false)

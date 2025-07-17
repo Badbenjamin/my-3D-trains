@@ -67,7 +67,7 @@ export function createStationComponentsObj(nodes, materials, retrieveStationId){
                       // status={newStatusArray[index]}
                       tripInProgress = {false}
                       stationInTrip = {null}
-                      stationTripType = {null}
+                      stationInfo = {null}
                       id={nodes[mesh].name} 
                       key={nodes[mesh].name} 
                       mesh={nodes[mesh]} 

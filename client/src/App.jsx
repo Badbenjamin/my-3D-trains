@@ -147,15 +147,16 @@ function App() {
     if (tripInfo != [] && selectedStationInfoObj != {}){
       let newStationArray = stationArray.map((stationGeometry)=>{
         if (stationGeometry.props.name in selectedStationInfoObj){
-          // console.log(selectedStationInfoObj[stationGeometry.props.name].arrival)
-          let newStationGeometry = React.cloneElement(stationGeometry, {tripInProgress : true, stationInTrip : true, stationTripType : "included", key : stationGeometry.props.name.toString() + version.toString()})
+          // console.log(selectedStationInfoObj[stationGeometry.props.name].type)
+          let newStationGeometry = React.cloneElement(stationGeometry, {tripInProgress : true, stationInTrip : true, stationInfo : selectedStationInfoObj[stationGeometry.props.name], key : stationGeometry.props.name.toString() + version.toString()})
+          // console.log(newStationGeometry)
           setVersion((prevVersion)=>{
             return prevVersion += 1
           })
           // console.log('nsg', newStationGeometry)
           return newStationGeometry
         } else {
-          let newStationGeometry = React.cloneElement(stationGeometry, {tripInProgress : true, stationInTrip : false, stationTripType : "not in trip", key : stationGeometry.props.name.toString() + version.toString()})
+          let newStationGeometry = React.cloneElement(stationGeometry, {tripInProgress : true, stationInTrip : false, stationInfo : null, key : stationGeometry.props.name.toString() + version.toString()})
           setVersion((prevVersion)=>{
             return prevVersion += 1
           })
@@ -165,6 +166,7 @@ function App() {
 
       console.log(tripInfo != [], tripInfo)
       if((tripInfo.length > 0)){
+        console.log('nsa',newStationArray)
         setStationArray(newStationArray)
       }
     

@@ -1,14 +1,29 @@
 import { Html } from "@react-three/drei";
 import { useState } from "react";
 
-export default function ComplexText({handleComplexClick, averagePosition, names, routes, status, alphaLevel, complexId, complexStationRouteIdObjs, size, clearTooltip}){
+export default function ComplexText({handleComplexClick,stationInTripArray, tripInProgressArray, stationInfoArray, averagePosition, names, routes, status, alphaLevel, complexId, complexStationRouteIdObjs, size, clearTooltip}){
     const [tooltipStatus, setTooltipStatus] = useState(false)
      // COULD ALSO CONTROL MAX/MIN WIDTH WITH SIZE?
     let sizeInPx = size.toString()+"px"
     let iconSizeInPx = (size + 3).toString()+"px"
     let widthInPx = (size * 10).toString()+"px"
     let widthInPxForIconArray = (size * 7).toString()+"px"
-    // console.log( widthInPx)
+
+    let tripInProgress = false
+    for (let tripStatus of tripInProgressArray){
+        if (tripStatus == true){
+            tripInProgress = true
+        }
+    }
+
+    let complexInTrip = false
+    for (let stationInTrip of stationInTripArray){
+        if (stationInTrip == true){
+            complexInTrip = true
+        }
+    }
+    console.log(complexInTrip)
+    console.log( stationInfoArray)
     // console.log(widthInPx)
     let iconImageArray = []
     routes.map((routesArray)=>{
@@ -36,7 +51,7 @@ export default function ComplexText({handleComplexClick, averagePosition, names,
     }
     return(
         <>
-            {status ? <Html key={complexId} style={{opacity : alphaLevel}} wrapperClass="complex_label" distanceFactor={7} center={true} position={averagePosition}>
+            {(!tripInProgress || complexInTrip) ? <Html key={complexId} style={{opacity : alphaLevel}} wrapperClass="complex_label" distanceFactor={7} center={true} position={averagePosition}>
                 <button onClick={handleClick} style={{fontSize: sizeInPx, inlineSize : widthInPx}} className="complex-html-button-text">
                     <div className="station-text-name">
                         {names[0]}

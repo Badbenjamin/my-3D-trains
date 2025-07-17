@@ -133,7 +133,7 @@ useEffect(()=>{
       if (stationArray[j].props.name.length < 5){
         // if name is in stationInfoObject as key, and is not a complex, create <StationText> and push to stationHtmlArray
         if( stationArray[j].props.name in stationInfoObject && !stationInfoObject[stationArray[j].props.name].complex){
-          let status = false
+          // let status = false
           let newPosition = stationArray[j].props.mesh.position
           let newInfoObject = stationInfoObject[stationArray[j].props.name]
           // default size for text and route icons
@@ -161,8 +161,9 @@ useEffect(()=>{
           } else if (distToClosestStation < 0.3){
             size = 10
           } 
-
-          let newStationText = <StationText handleStationClick={handleStationClick} clearTooltip={clearTooltip} size={size}  wrapperClass="station_label"  index={j} status={status} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
+          // pass station geometry stationInfo to stationText for conditional rendering
+          console.log('props',stationArray[j].props.stationInTrip)
+          let newStationText = <StationText handleStationClick={handleStationClick} clearTooltip={clearTooltip} size={size}  wrapperClass="station_label"  index={j} tripInProgress={stationArray[j].props.tripInProgress} stationIntrip={stationArray[j].props.stationInTrip} stationInfo = {stationArray[j].props.stationInfo} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
           newStationHtmlArray.push(newStationText)
          
           // if the station name exists in the stationInfoObject & complex = True, create key in complexObject from complex_id and add values to key
@@ -175,7 +176,7 @@ useEffect(()=>{
           // if its the first complexText being added to the complexObject
           // OR if the newInfoObject does not have a matching complex_id in it, we create a new key value pair in the complexObject
           if (Object.keys(complexObject).length === 0 || !(complexObject.hasOwnProperty(newInfoObject.complex_id))){
- 
+            console.log('nio', stationArray[j].props)
             
             complexObject[newInfoObject.complex_id] = {
                 "complex_id" : newInfoObject.complex_id,
@@ -184,6 +185,9 @@ useEffect(()=>{
                 "gtfs_stop_ids" : [newInfoObject.gtfs_stop_id],
                 "positions" : [newPosition],
                 "stop_names" : [newInfoObject.name],
+                "station_in_trip_array" : [stationArray[j].props.stationInTrip],
+                "trip_in_progress_array" : [stationArray[j].props.tripInProgress],
+                "station_info_array" : [stationArray[j].props.stationInfo],
                 "name_route_combo_obj_array" : [{
                   "name" : newInfoObject.name,
                   "routes" : newInfoObject.daytime_routes,
@@ -213,6 +217,15 @@ useEffect(()=>{
             let stopNames = complexObject[newInfoObject.complex_id]['stop_names']
             let newStopName = newInfoObject.name
             stopNames.push(newStopName)
+
+            let stationInTrip = stationArray[j].props.stationInTrip
+            complexObject[newInfoObject.complex_id]['station_in_trip_array'].push(stationInTrip)
+
+            let tripInProgress = stationArray[j].props.tripInProgress
+            complexObject[newInfoObject.complex_id]['trip_in_progress_array'].push(tripInProgress)
+
+            let stationInfo = stationArray[j].props.stationInfo
+            complexObject[newInfoObject.complex_id]['station_info_array'].push(stationInfo)
           }
         }
       }
@@ -239,8 +252,24 @@ useEffect(()=>{
         return new THREE.Vector3(xAv, yAv, zAv);
       };
       let averagePosition = avereragePosition(complexObject[complex].positions);
-
-      let newComplexText = <ComplexText key={complexObject[complex].complex_id.toString()} handleComplexClick={handleComplexClick} clearTooltip={clearTooltip} size={35} complexStationRouteIdObjs={complexObject[complex].name_route_combo_obj_array} complexId={complexObject[complex].complex_id} wrapperClass="station_label" status={status} distanceFactor={8} center={true} routes={complexObject[complex].daytime_routes} averagePosition={averagePosition} names={complexObject[complex].stop_names} alphaLevel={0} />
+      // how to pass all stationInfo to complexText component for rendering? 
+      console.log('comptext', complexObject[complex].station_in_trip_array)
+      let newComplexText = <ComplexText key={complexObject[complex].complex_id.toString()}
+                           handleComplexClick={handleComplexClick} clearTooltip={clearTooltip} 
+                           size={35} 
+                           complexStationRouteIdObjs={complexObject[complex].name_route_combo_obj_array} 
+                           complexId={complexObject[complex].complex_id} 
+                           stationInTripArray= {complexObject[complex].station_in_trip_array}
+                           tripInProgressArray = {complexObject[complex].trip_in_progress_array}
+                           stationInfoArray = {complexObject[complex].station_info_array}
+                           wrapperClass="station_label" 
+                          //  status={status}
+                           distanceFactor={8} 
+                           center={true} 
+                           routes={complexObject[complex].daytime_routes} 
+                           averagePosition={averagePosition} 
+                           names={complexObject[complex].stop_names} 
+                           alphaLevel={0} />
 
       newComplexHtmlArray.push(newComplexText);
     }
@@ -329,10 +358,10 @@ useEffect(()=>{
       } else {
         alphaLevel = 1;
       }
-      let stationTextClone = React.cloneElement(stationText, {status : true, alphaLevel : alphaLevel});
+      let stationTextClone = React.cloneElement(stationText, { alphaLevel : alphaLevel});
       return stationTextClone
     } else {
-      let stationTextClone = React.cloneElement(stationText, {status : false, alphaLevel : alphaLevel});
+      let stationTextClone = React.cloneElement(stationText, { alphaLevel : alphaLevel});
       return stationTextClone;
     }
   })
