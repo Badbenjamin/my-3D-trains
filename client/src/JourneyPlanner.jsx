@@ -9,7 +9,7 @@ import NextTrains from "./NextTrains";
 
 function JourneyPlanner() {
 
-    const {tripInfo, stations, setTripInfo, stationIdStartAndEnd, tripInfoIndex, setTripInfoIndex} = useOutletContext()
+    const {tripInfo, stations, setTripInfo, stationIdStartAndEnd, tripInfoIndex, setTripInfoIndex, clearTripInfo} = useOutletContext()
     const [journeyStations, setJourneyStations] = useState([null, null])
     
     // 
@@ -43,15 +43,22 @@ function JourneyPlanner() {
         }
     }
 
+    function handleClearClick(){
+        clearTripInfo()
+        setJourneyStations([null,null])
+    }
+
 
     return (
         <div>
             
-            <div className='journey-planner'>
-                <StationSearch className='station_search' stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
-                <StationSearch className='station_search' stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
+            <div className='journey-planner'>\
+                {/* pass journeyStations down to stationSearch so that it knows when they have been cleared? */}
+                <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
+                <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
                 <br></br>
                 <button className="plan-trip-button" onClick={planTrip}>Plan Trip</button>
+                <button className="plan-trip-button" onClick={handleClearClick}>Clear Trip</button>
             </div>
             {tripInfo[tripInfoIndex] != undefined ? <TripInfo className='trip-info' tripInfo={tripInfo} tripInfoIndex={tripInfoIndex}/> : ""}
             

@@ -172,6 +172,27 @@ function App() {
     
     }
   }, [tripInfo, tripInfoIndex])
+
+  function clearTripInfo(){
+    // loop through stationArray, reset all stations to default
+    let resetStationArray = stationArray.map((stationGeometry)=>{
+      let newStation = React.cloneElement(stationGeometry, { 
+        key : stationGeometry.props.name.toString() + version.toString(),
+        tripInProgress : false,
+        stationInTrip : null ,
+        stationInfo : null
+        })
+      setVersion((prevVersion)=>{
+        return prevVersion += 1
+      })
+      return newStation
+    })
+    // reset tripInfo
+    setStationArray(resetStationArray)
+    setTripInfo([])
+    setTripInfoIndex(0)
+    // make sure search bar is cleared (probably in component, not here)
+  }
   
   if (!nodes || !stationArray){
     return (
@@ -202,7 +223,8 @@ function App() {
         // retrieveId : retrieveId
         vectorPosition : vectorPosition,
         setVectorPositon : setVectorPositon,
-        retrieveStationId : retrieveStationId
+        retrieveStationId : retrieveStationId,
+        clearTripInfo : clearTripInfo
         }}/>
     </>
   )

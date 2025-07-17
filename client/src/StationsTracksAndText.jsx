@@ -162,7 +162,7 @@ useEffect(()=>{
             size = 10
           } 
           // pass station geometry stationInfo to stationText for conditional rendering
-          console.log('props',stationArray[j].props.stationInTrip)
+          // console.log('props',stationArray[j].props.stationInTrip)
           let newStationText = <StationText handleStationClick={handleStationClick} clearTooltip={clearTooltip} size={size}  wrapperClass="station_label"  index={j} tripInProgress={stationArray[j].props.tripInProgress} stationIntrip={stationArray[j].props.stationInTrip} stationInfo = {stationArray[j].props.stationInfo} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
           newStationHtmlArray.push(newStationText)
          
@@ -176,7 +176,7 @@ useEffect(()=>{
           // if its the first complexText being added to the complexObject
           // OR if the newInfoObject does not have a matching complex_id in it, we create a new key value pair in the complexObject
           if (Object.keys(complexObject).length === 0 || !(complexObject.hasOwnProperty(newInfoObject.complex_id))){
-            console.log('nio', stationArray[j].props)
+            // console.log('nio', stationArray[j].props)
             
             complexObject[newInfoObject.complex_id] = {
                 "complex_id" : newInfoObject.complex_id,
@@ -253,7 +253,7 @@ useEffect(()=>{
       };
       let averagePosition = avereragePosition(complexObject[complex].positions);
       // how to pass all stationInfo to complexText component for rendering? 
-      console.log('comptext', complexObject[complex].station_in_trip_array)
+      // console.log('comptext', complexObject[complex].station_in_trip_array)
       let newComplexText = <ComplexText key={complexObject[complex].complex_id.toString()}
                            handleComplexClick={handleComplexClick} clearTooltip={clearTooltip} 
                            size={35} 

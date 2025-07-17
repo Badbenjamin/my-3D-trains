@@ -3,11 +3,17 @@ import { useState, useEffect } from "react";
 import Select from 'react-select'
 import './Component.css'
 
-function StationSearch({setStartOrEndStation, position, stations, stationId}) {
-    // console.log('sid ',stations)
+function StationSearch({setStartOrEndStation, position, stations, stationId, journeyStations}) {
+    console.log('js ',journeyStations)
     const [selectedOption, setSelectedOption] = useState(null)
     // console.log('selectedOption', selectedOption)
-
+    useEffect(()=>{
+        console.log('jsue',journeyStations)
+        if (journeyStations[0] == null && journeyStations[1] == null){
+            console.log('worked')
+            setSelectedOption(null)
+        }
+    },[journeyStations])
     
     // STYLING FOR SEARCH
     const customStyles = {
@@ -54,10 +60,12 @@ function StationSearch({setStartOrEndStation, position, stations, stationId}) {
         setSelectedOption(buttonSelectedStationObj)
         if (stationId != null){
             setStartOrEndStation(buttonSelectedStationObj, position)
+        } else {
+            console.log('else')
         }
         
     },[stationId])
-
+    console.log('so',selectedOption)
     return (
         <div>
             <Select
