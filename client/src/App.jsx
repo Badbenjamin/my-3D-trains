@@ -28,6 +28,7 @@ function App() {
   // THIS IS THE ARRAY OF TRAINS FOR CHOOSING THE NEXT TRAIN
   const [tripInfoIndex, setTripInfoIndex] = useState(0)
   const [stationIdStartAndEnd, setStationIdStartAndEnd] = useState({"startId" : null, "endId" : null})
+  console.log('sid se app', stationIdStartAndEnd)
   const [vectorPosition, setVectorPositon] = useState({})
 
   // get station info for trip planner  for station search. 
@@ -41,14 +42,19 @@ function App() {
     // THERE IS A BUG HERE (when tt is used to set waypoints after another trip has been planned)
     // This is triggered when ToolTip origin or dest button is clicked
   function retrieveStationId(id, startOrEnd) {
-
-    setStationIdStartAndEnd(prevState => {
+    console.log('rsid',id, startOrEnd)
+    // console.log('s&e',stationIdStartAndEnd)
+    setStationIdStartAndEnd((prevState )=> {
+      // console.log('ps', prevState)
       const newStationIdStartOrEnd = { ...prevState };
+      // console.log('nsid',prevState)
       if (startOrEnd === "start") {
         newStationIdStartOrEnd['startId'] = id;
       } else if (startOrEnd === "end") {
         newStationIdStartOrEnd['endId'] = id;
+        // console.log('end',newStationIdStartOrEnd['endId'])
       }
+      // console.log('nsid2', newStationIdStartOrEnd)
       return newStationIdStartOrEnd;
     });
   }
@@ -191,6 +197,7 @@ function App() {
     setStationArray(resetStationArray)
     setTripInfo([])
     setTripInfoIndex(0)
+    setStationIdStartAndEnd({"startId" : null, "endId" : null})
     // make sure search bar is cleared (probably in component, not here)
   }
   
@@ -220,6 +227,7 @@ function App() {
         tripInfo : tripInfo,
         setTripInfo : setTripInfo,
         stationIdStartAndEnd : stationIdStartAndEnd,
+        setStationIdStartAndEnd, setStationIdStartAndEnd,
         // retrieveId : retrieveId
         vectorPosition : vectorPosition,
         setVectorPositon : setVectorPositon,

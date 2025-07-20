@@ -9,27 +9,53 @@ import NextTrains from "./NextTrains";
 
 function JourneyPlanner() {
 
-    const {tripInfo, stations, setTripInfo, stationIdStartAndEnd, tripInfoIndex, setTripInfoIndex, clearTripInfo} = useOutletContext()
+    const {tripInfo, stations, setTripInfo, stationIdStartAndEnd, setStationIdStartAndEnd, tripInfoIndex, setTripInfoIndex, clearTripInfo} = useOutletContext()
     const [journeyStations, setJourneyStations] = useState([null, null])
+    console.log('jp js', journeyStations)
+    // stationIdStartAndEnd is from app.jsx and is the tooltip set station
     
-    // 
+    // THIS TAKES SELECTION FROM STATIONSEARCH AND USES IT TO SET JOURNEYSTATIONS
     function setStartOrEndStation(stationValue, position){
-        const journey = [...journeyStations]
-        if (position === 'start'){
-            journey[0] = stationValue;
-        } else if (position == 'end'){
-            journey[1] = stationValue;
-        }
-    setJourneyStations(journey)
+        console.log('set start end', stationValue, position)
+        // const newJourney = [...journeyStations]
+        // console.log('journ set start end', journey)
+        // if (position == 'start'){
+        //     newJourney[0] = stationValue;
+        // } else if (position == 'end'){
+        //     newJourney[1] = stationValue;
+        // }
+        // is journeyStations not resetting? 
+        setJourneyStations((prevJourney)=>{
+            let newJourney = [...prevJourney]
+            if (position == 'start'){
+                newJourney[0] = stationValue;
+            } else if (position == 'end'){
+                newJourney[1] = stationValue;
+            }
+            return newJourney
+        })
     }
+    console.log('sid start end jp', stationIdStartAndEnd)
+    console.log('js',journeyStations)
 
+    // FOR TT SET?
     // stationIdStartAndEnd passed down from app.jsx
     // sets journeyStations, which are used in fetch to plan trip
     useEffect(()=>{
-        let newJourney = [...journeyStations]
-        newJourney[0] = stationIdStartAndEnd['startId']
-        newJourney[1] = stationIdStartAndEnd['endId']
-        setJourneyStations(newJourney)
+        // console.log('sid s&e',stationIdStartAndEnd)
+        let newJourneyStations = [...journeyStations]
+        // console.log('nj', newJourney)
+        // newJourney[0] = stationIdStartAndEnd['startId']
+        // newJourney[1] = stationIdStartAndEnd['endId']
+        // setJourneyStations(newJourney)
+        if (stationIdStartAndEnd['startId']){
+            newJourneyStations[0] = stationIdStartAndEnd['startId']
+        }
+        if (stationIdStartAndEnd['endId']){
+            newJourneyStations[1] = stationIdStartAndEnd['endId']
+        }
+        setJourneyStations(newJourneyStations)
+        // but how do I pass this down and make sure selected Option stays in sync?
     }, [stationIdStartAndEnd])
 
     function planTrip(e){
@@ -45,14 +71,16 @@ function JourneyPlanner() {
 
     function handleClearClick(){
         clearTripInfo()
-        setJourneyStations([null,null])
+        setJourneyStations((prevJourney)=>{
+           return [null,null]
+        })
     }
 
 
     return (
         <div>
             
-            <div className='journey-planner'>\
+            <div className='journey-planner'>
                 {/* pass journeyStations down to stationSearch so that it knows when they have been cleared? */}
                 <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
                 <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
