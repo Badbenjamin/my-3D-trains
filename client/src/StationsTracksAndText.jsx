@@ -9,6 +9,7 @@ import StationText from './StationText'
 import ComplexText from './ComplexText'
 import StationToolTip from './StationTooltip'
 import ComplexTooltip from './ComplexTooltip'
+import RouteTooltip from './RouteTooltip'
 
 import { findDistance } from './ModularFunctions'
 
@@ -21,10 +22,9 @@ export default function StationsTracksAndText({vectorPosition}) {
     // USE THIS LATER FOR ROUTE HIGHLIGHTING
     // const [tripInfoHtmlArray, setTripInfoHtmlArray] = useState([])
     const [toolTipArray, setToolTipArray] = useState([].slice(0,2))
-
+    const [routeInfoArray, setRouteInfoArray] = useState([])
     const [versionForKey, setVersionForKey] = useState(0)
     const [cameraPosition, setCameraPosition] = useState({"x": 0, "y" : 0, "z" : 0})
-    // console.log('vfk', ver)
 
 // Fetch to get data for stations, array of objects with info
 useEffect(()=>{
@@ -125,12 +125,27 @@ useEffect(()=>{
     // we are combining the position of the mesh from the blender model with the information for the station from the backend
     let newStationHtmlArray = []
     let newComplexHtmlArray = []
+    let newRouteInfoHtmlArray = []
     let complexObject = {}
     
     // loop through meshes to get position, combine with info from fetch, create Html text overlay
     for (let j = 0 ; j < stationArray.length; j++){
       // filter out track names for now
       if (stationArray[j].props.name.length < 5){
+        // COULE PUT ROUTE TT PUSH HERE?!?!
+      
+        if(stationArray[j].props.stationInfo && ((stationArray[j].props.stationInfo.type == 'start')||(stationArray[j].props.stationInfo.type == 'end')||(stationArray[j].props.stationInfo.type == 'transfer'))){
+          // console.log('name',stationInfoObject[stationArray[j].props.name].name)
+          // console.log('station route tootltip push',stationArray[j].props.stationInfo)
+          let keyforRouteInfo = stationInfoObject[stationArray[j].props.name].name.toString() + versionForKey.toString()
+          let newRouteTooltip = <RouteTooltip key={keyforRouteInfo} name={stationInfoObject[stationArray[j].props.name].name} position={stationArray[j].props.mesh.position} stationInfo={stationArray[j].props.stationInfo}/>
+          newRouteInfoHtmlArray.push(newRouteTooltip)
+          setVersionForKey((prevVersion)=>{
+            return prevVersion += 1
+          })
+        }
+
+        
         // if name is in stationInfoObject as key, and is not a complex, create <StationText> and push to stationHtmlArray
         if( stationArray[j].props.name in stationInfoObject && !stationInfoObject[stationArray[j].props.name].complex){
           // let status = false
@@ -162,25 +177,26 @@ useEffect(()=>{
             size = 10
           } 
           // pass station geometry stationInfo to stationText for conditional rendering
-          // console.log('props',stationArray[j].props.stationInTrip)
           let newStationText = <StationText handleStationClick={handleStationClick} clearTooltip={clearTooltip} size={size}  wrapperClass="station_label"  index={j} tripInProgress={stationArray[j].props.tripInProgress} stationIntrip={stationArray[j].props.stationInTrip} stationInfo = {stationArray[j].props.stationInfo} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
           newStationHtmlArray.push(newStationText)
-         
+
           // if the station name exists in the stationInfoObject & complex = True, create key in complexObject from complex_id and add values to key
         } else if ( stationArray[j].props.name in stationInfoObject && stationInfoObject[stationArray[j].props.name].complex){
-    
-          let newPosition = stationArray[j].props.mesh.position
 
+          let newPosition = stationArray[j].props.mesh.position
           let newInfoObject = stationInfoObject[stationArray[j].props.name]
-     
+
           // if its the first complexText being added to the complexObject
           // OR if the newInfoObject does not have a matching complex_id in it, we create a new key value pair in the complexObject
           if (Object.keys(complexObject).length === 0 || !(complexObject.hasOwnProperty(newInfoObject.complex_id))){
-            // console.log('nio', stationArray[j].props)
-            
+            // console.log(newInfoObject)
+            // console.log(stationArray[j].props.stationInfo)
+            if (stationArray[j].props.name.slice(0,3) == "A42"){
+              console.log('co1 block',stationArray[j].props)
+              // console.log('co1 block new inf', complexObject[newInfoObject.complex_id])
+            }
             complexObject[newInfoObject.complex_id] = {
                 "complex_id" : newInfoObject.complex_id,
-                // "daytime_routes" : newInfoObject.daytime_routes.split(" "),
                 "daytime_routes" : [[newInfoObject.daytime_routes]],
                 "gtfs_stop_ids" : [newInfoObject.gtfs_stop_id],
                 "positions" : [newPosition],
@@ -188,6 +204,8 @@ useEffect(()=>{
                 "station_in_trip_array" : [stationArray[j].props.stationInTrip],
                 "trip_in_progress_array" : [stationArray[j].props.tripInProgress],
                 "station_info_array" : [stationArray[j].props.stationInfo],
+                // name should be tied to other info
+               
                 "name_route_combo_obj_array" : [{
                   "name" : newInfoObject.name,
                   "routes" : newInfoObject.daytime_routes,
@@ -205,7 +223,7 @@ useEffect(()=>{
                   "routes" : newInfoObject.daytime_routes,
                   "gtfs_stop_id" :newInfoObject.gtfs_stop_id
             })
-
+            
             let stopIds = complexObject[newInfoObject.complex_id]['gtfs_stop_ids']
             let newStopId = newInfoObject.gtfs_stop_id
             stopIds.push(newStopId)
@@ -234,8 +252,9 @@ useEffect(()=>{
     // COMPLEXES HAVE BEEN CONDESNED INTO AN OBJECT WITH COMPLEXIDS AS KEYS
     // LOOP THROUGH OBJECT KEYS AND CREATE AN ARRAY OF REACT COMPONENTS WITH COMPLEX PROPS
     for (let complex in complexObject){
-      let status = true
-
+      // let status = true
+      // why no complex 175 hoyt scherm???
+      // console.log('comp', complex)
       // find the average position of the stations in the complex to place the complex text
       function avereragePosition(positionsArray){
         let xTotal = 0;
@@ -253,7 +272,6 @@ useEffect(()=>{
       };
       let averagePosition = avereragePosition(complexObject[complex].positions);
       // how to pass all stationInfo to complexText component for rendering? 
-      // console.log('comptext', complexObject[complex].station_in_trip_array)
       let newComplexText = <ComplexText key={complexObject[complex].complex_id.toString()}
                            handleComplexClick={handleComplexClick} clearTooltip={clearTooltip} 
                            size={35} 
@@ -270,6 +288,15 @@ useEffect(()=>{
                            averagePosition={averagePosition} 
                            names={complexObject[complex].stop_names} 
                            alphaLevel={0} />
+
+        // Where do I put this to condense it into one entity with all the info from two stations? 
+        // console.log(complexObject[complex].stationInTrip)
+        if(complexObject[complex].stationInTrip){
+          console.log('1st complex push', stationArray[j].props.stationInfo)
+          // need to modify this to work with complex info
+          let newRouteTooltip = <RouteTooltip name={"complex"} position={averagePosition} stationInfo={complexObject[complex].name_arrival_info_combo_array}/>
+          newRouteInfoHtmlArray.push(newRouteTooltip)
+        }
 
       newComplexHtmlArray.push(newComplexText);
     }
@@ -324,7 +351,32 @@ useEffect(()=>{
     })
     setStationHtmlArray(newStationHtmlArray)
     setComplexHtmlArray(newComplexHtmlArrayWithSize)
-
+    // set RouteTooltipArray???
+    // local to express transfer handled by stationInfo.secondTransferInfo
+    // how to condense two transfer objects into one for display? 
+    // console.log('nria',newRouteInfoHtmlArray)
+    let routeInfoHtmlArrayObj = {}
+    for (let routeInfo of newRouteInfoHtmlArray){
+      // console.log(routeInfo.props)
+      // MIGHT NEED TO MAKE THIS COMPLEX ID? OR JUST START END TRANSFER
+      console.log(routeInfo.props.stationInfo.type in routeInfoHtmlArrayObj)
+      if (Object.keys(routeInfoHtmlArrayObj).length === 0 || !(routeInfo.props.stationInfo.type in routeInfoHtmlArrayObj)){
+        // console.log('1',routeInfo.props.stationInfo.type, Object.keys(routeInfoHtmlArrayObj).length)
+        routeInfoHtmlArrayObj[routeInfo.props.stationInfo.type] = routeInfo
+        
+      } else if ((routeInfo.props.stationInfo.type in routeInfoHtmlArrayObj)) {
+        
+        routeInfoHtmlArrayObj[routeInfo.props.stationInfo.type].props.stationInfo.second_transfer_info.push(routeInfo.props.stationInfo)
+      }
+      // console.log('obj',routeInfoHtmlArrayObj)
+    }
+    let condensedRouteInfoArray = []
+    for (let routeInfo in routeInfoHtmlArrayObj){
+      // console.log(routeInfo)
+      condensedRouteInfoArray.push(routeInfoHtmlArrayObj[routeInfo])
+    }
+   
+    setRouteInfoArray(condensedRouteInfoArray)
   }
   
 },[stationInfoObjectArray, stationArray])
@@ -369,7 +421,6 @@ useEffect(()=>{
   
   let newComplexHtmlArray = [...complexHtmlArray];
   let updatedComplexHtmlArray = newComplexHtmlArray.map((complexText, i)=>{
-  //  console.log(complexText.props)
     let alphaLevel = 0
     if (findDistance(complexText.props.averagePosition, cameraPosition) <= 30){
       let distance = findDistance(complexText.props.averagePosition, cameraPosition)
@@ -406,6 +457,7 @@ useEffect(()=>{
           {stationHtmlArray}
           {complexHtmlArray}
           {toolTipArray}
+          {routeInfoArray}
       </group>
     )
   }

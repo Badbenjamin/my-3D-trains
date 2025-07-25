@@ -3,12 +3,11 @@ import { useState, useEffect } from "react";
 import Select from 'react-select'
 import './Component.css'
 
-function StationSearch({setStartOrEndStation, position, stations, stationId, journeyStations}) {
+function StationSearch({setStartOrEndStation, position, stations, journeyStations}) {
     // journey stations is passed down
-    // console.log('js ',journeyStations)
-    console.log('sid',stationId)
-    const [selectedOption, setSelectedOption] = useState(null)
 
+    const [selectedOption, setSelectedOption] = useState(null)
+    // console.log(selectedOption)
     // this should keep selectedOption in sync with a clear trip from JournPlanner
     // hoping it works for tooltip
     useEffect(()=>{
@@ -16,7 +15,6 @@ function StationSearch({setStartOrEndStation, position, stations, stationId, jou
             setSelectedOption(null)
         } else if (position == 'start' && journeyStations[0] != null){
             // set selected option to station with same id
-            console.log(journeyStations[0])
             for (const option of optionsArray){
                 if (option.value == journeyStations[0]){
                     setSelectedOption(option)
@@ -28,7 +26,6 @@ function StationSearch({setStartOrEndStation, position, stations, stationId, jou
             setSelectedOption(null)
         } else if (position == 'end' && journeyStations[1] != null){
             // set selected option to station with same id
-            console.log(journeyStations[1])
             for (const option of optionsArray){
                 if (option.value == journeyStations[1]){
                     setSelectedOption(option)
@@ -54,7 +51,6 @@ function StationSearch({setStartOrEndStation, position, stations, stationId, jou
 
     // when station is selected from search dropdown, selecedOption is set, and then setStartOrEndStation callback functio (from JourneyPlanner) is invoked with gtfs id and start or end
     const handleChange = (option) => {
-        console.log('op', option)
         // this is the display
         setSelectedOption(option);
         // this cb func sends the info to JourneyPlanner, where it is used in a fetch. 
@@ -69,7 +65,6 @@ function StationSearch({setStartOrEndStation, position, stations, stationId, jou
         optionsArray.push(stationObj);
     }
    
-    console.log('so',selectedOption)
     return (
         <div>
             <Select

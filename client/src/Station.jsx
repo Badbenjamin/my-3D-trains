@@ -3,15 +3,17 @@ import * as THREE from 'three'
 import { Html } from "@react-three/drei"
 import { Line } from "@react-three/drei"
 
+import RouteTooltip from "./RouteTooltip"
 
 
 import './App.css'
 import { useFrame } from "@react-three/fiber"
-// import { is } from "@react-three/fiber/dist/declarations/src/core/utils"
-// stationTripType to stationTripInfo
+
 function Station( { tripInProgress, stationInTrip, stationInfo, mesh, index}){
-        // console.log(tripInProgress, stationInTrip, stationInfo)
-        // console.log(mesh.material)
+    if (stationInfo){
+        // console.log('si', stationInfo)
+    }
+        
         const [geometryDisplay, setGeometryDisplay] = useState(false)
         let stationRef = useRef()
 
@@ -29,12 +31,8 @@ function Station( { tripInProgress, stationInTrip, stationInfo, mesh, index}){
 
     useEffect(()=>{
         if (tripInProgress && stationInTrip && stationInfo != null){
-            console.log(newName)
             setGeometryDisplay(true)
-            // newMaterial.wireframe = false
            } else if (tripInProgress && !stationInTrip && stationInfo === null){
-            // newMaterial.wireframe = true
-            // setGeometryDisplay(true)
             setGeometryDisplay(false)
            } else if (tripInProgress == false){
             setGeometryDisplay(true)
@@ -47,20 +45,10 @@ function Station( { tripInProgress, stationInTrip, stationInfo, mesh, index}){
         let color = !isWhite ? newMaterial : selectedMaterial
 
         // animation loop triggered when selecteds
-        useFrame(({clock})=>{
+        // useFrame(({clock})=>{
     
-            // let a = clock.getElapsedTime()
-            // if (status['status']){
-            //     if (Math.round(a) % 2 == 0){
-            //         setIsWhite(true)
-            //     } else {
-            //         setIsWhite(false)
-            //     }
-            // }
-           
-            
-        })
-    if (geometryDisplay){
+        // })
+    if (geometryDisplay && stationInfo === null){
         return (
             <group>
                 <mesh       
@@ -77,10 +65,24 @@ function Station( { tripInProgress, stationInTrip, stationInfo, mesh, index}){
                 />
             </group>
         )
-        
-    }  else {
+        // might get rid of this
+    }  else if (geometryDisplay && stationInfo != null) {
         return(
-            <></>
+            <group>
+                <mesh       
+                    ref={stationRef[index]}
+                    name={newName}
+                    castShadow={newCastShadow}
+                    receiveShadow={newRecieveShadow}
+                    geometry={newGeometry}
+                    material={color}
+                    position={newPosition}
+                    rotation={newRotation}
+                    scale={newScale}
+                    
+                />
+                {/* <RouteTooltip name={newName} position={newPosition} stationInfo={stationInfo}/> */}
+            </group>
          )
     }
     

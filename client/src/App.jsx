@@ -16,19 +16,16 @@ function App() {
   // load station and track model. destructure to nodes and materials to create Station component
   // nodes correspond to each geometry in the model
   // each node contains a mesh, which has the properties for that geometry 
-  const { nodes, materials } = useGLTF('./subway_map_stations_tracks_1.glb')
+  const { nodes, materials } = useGLTF('./subway_map_Map_stations_7_24.glb')
   
   const [stations, setStations] = useState([])
   const [stationArray, setStationArray] = useState([])
 
-  // const [statusArray, setStatusArray] = useState([])
-  // console.log(statusArray)
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
   // THIS IS THE ARRAY OF TRAINS FOR CHOOSING THE NEXT TRAIN
   const [tripInfoIndex, setTripInfoIndex] = useState(0)
   const [stationIdStartAndEnd, setStationIdStartAndEnd] = useState({"startId" : null, "endId" : null})
-  console.log('sid se app', stationIdStartAndEnd)
   const [vectorPosition, setVectorPositon] = useState({})
 
   // get station info for trip planner  for station search. 
@@ -42,19 +39,13 @@ function App() {
     // THERE IS A BUG HERE (when tt is used to set waypoints after another trip has been planned)
     // This is triggered when ToolTip origin or dest button is clicked
   function retrieveStationId(id, startOrEnd) {
-    console.log('rsid',id, startOrEnd)
-    // console.log('s&e',stationIdStartAndEnd)
     setStationIdStartAndEnd((prevState )=> {
-      // console.log('ps', prevState)
       const newStationIdStartOrEnd = { ...prevState };
-      // console.log('nsid',prevState)
       if (startOrEnd === "start") {
         newStationIdStartOrEnd['startId'] = id;
       } else if (startOrEnd === "end") {
         newStationIdStartOrEnd['endId'] = id;
-        // console.log('end',newStationIdStartOrEnd['endId'])
       }
-      // console.log('nsid2', newStationIdStartOrEnd)
       return newStationIdStartOrEnd;
     });
   }
@@ -85,16 +76,18 @@ function App() {
     let currentTrip = tripInfo[tripInfoIndex]
     let selectedStationInfoObj = {}
    
+    // ad else branch for error
     if (currentTrip && tripInfo.length > 0){
       let startStopId = currentTrip[0].start_station_gtfs
       let endStopId = currentTrip[currentTrip.length - 1].end_station_gtfs
-      console.log('ssid',startStopId, endStopId)
       // each TripSequenceElement is a leg of a trip on one train
       for (let tripSequenceElement of currentTrip){
+        console.log('tse', tripSequenceElement)
         const currentTripSchedule = tripSequenceElement.schedule
         const startStationId = tripSequenceElement.start_station_gtfs
         const endStationId = tripSequenceElement.end_station_gtfs
-
+        console.log('cts',currentTripSchedule)
+        // ERROR WHEN STATION NOT IN SERVICE!!!
         const justStationIds = currentTripSchedule.map((station) => {
           return station['stop_id'].slice(0,3)
         })
@@ -105,40 +98,61 @@ function App() {
         const startStop = currentTripSchedule[startIndex]
         const endStop = currentTripSchedule[endIndex]
         const stopsForLeg = currentTripSchedule.slice(startIndex, endIndex + 1)
-        // console.log(stopsForLeg)
 
         // loop through all stops of a leg
         // keep track of what TSE we are on? 
         for (let stop of stopsForLeg){
-          console.log(stopsForLeg[0].stop_id.slice(0,3), stop.stop_id.slice(0,3))
           // start stop
+          // console.log(selectedStationInfoObj[stop.stop_id.slice(0,3)] in selectedStationInfoObj)
+          // console.log(tripSequenceElement)
           if (stop.stop_id.slice(0,3) == startStopId){
             selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
               "stopId" : stop.stop_id.slice(0,3),
               "arrival" : stop.arrival,
               "departure" : stop.departure, 
-              "type" : "start"
+              "type" : "start",
+              "direction_label" : tripSequenceElement.direction_label,
+              "route" : tripSequenceElement.route
             } 
           } else if (stop.stop_id.slice(0,3) == endStopId){
             selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
               "stopId" : stop.stop_id.slice(0,3),
               "arrival" : stop.arrival,
               "departure" : stop.departure, 
-              "type" : "end"
+              "type" : "end",
+              "direction_label" : tripSequenceElement.direction_label,
+              "route" : tripSequenceElement.route
             }
-          }  else if ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) == stopsForLeg[0].stop_id.slice(0,3) || stop.stop_id.slice(0,3) == stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3))){
+          }  else if (!(stop.stop_id.slice(0,3) in selectedStationInfoObj) && ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) == stopsForLeg[0].stop_id.slice(0,3) || stop.stop_id.slice(0,3) == stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3)))){
+            // key overwritten for LtoE transfer because its the same station. 
+            // console.log(stop.stop_id.slice(0,3))
             selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
               "stopId" : stop.stop_id.slice(0,3),
               "arrival" : stop.arrival,
               "departure" : stop.departure, 
-              "type" : "transfer"
+              "type" : "transfer",
+              "second_transfer_info" : [],
+              "direction_label" : tripSequenceElement.direction_label,
+              "route" : tripSequenceElement.route
             }
+          } else if ((stop.stop_id.slice(0,3) in selectedStationInfoObj) && ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) == stopsForLeg[0].stop_id.slice(0,3) || stop.stop_id.slice(0,3) == stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3)))){
+            // console.log('worked')
+            selectedStationInfoObj[stop.stop_id.slice(0,3)].second_transfer_info.push({
+              "stopId" : stop.stop_id.slice(0,3),
+              "arrival" : stop.arrival,
+              "departure" : stop.departure, 
+              "type" : "transfer",
+              "direction_label" : tripSequenceElement.direction_label,
+              "route" : tripSequenceElement.route
+            })
           } else if ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) != stopsForLeg[0].stop_id.slice(0,3) && stop.stop_id.slice(0,3) != stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3))){
             selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
               "stopId" : stop.stop_id.slice(0,3),
               "arrival" : stop.arrival,
               "departure" : stop.departure, 
-              "type" : "passthrough"
+              "type" : "passthrough",
+              "direction_label" : tripSequenceElement.direction_label,
+              "route" : tripSequenceElement.route
             }
           }
         }  
@@ -153,13 +167,10 @@ function App() {
     if (tripInfo != [] && selectedStationInfoObj != {}){
       let newStationArray = stationArray.map((stationGeometry)=>{
         if (stationGeometry.props.name in selectedStationInfoObj){
-          // console.log(selectedStationInfoObj[stationGeometry.props.name].type)
           let newStationGeometry = React.cloneElement(stationGeometry, {tripInProgress : true, stationInTrip : true, stationInfo : selectedStationInfoObj[stationGeometry.props.name], key : stationGeometry.props.name.toString() + version.toString()})
-          // console.log(newStationGeometry)
           setVersion((prevVersion)=>{
             return prevVersion += 1
           })
-          // console.log('nsg', newStationGeometry)
           return newStationGeometry
         } else {
           let newStationGeometry = React.cloneElement(stationGeometry, {tripInProgress : true, stationInTrip : false, stationInfo : null, key : stationGeometry.props.name.toString() + version.toString()})
@@ -170,9 +181,8 @@ function App() {
         }
       })
 
-      console.log(tripInfo != [], tripInfo)
+      // console.log(tripInfo != [], tripInfo)
       if((tripInfo.length > 0)){
-        console.log('nsa',newStationArray)
         setStationArray(newStationArray)
       }
     
@@ -217,8 +227,6 @@ function App() {
         setVersion : setVersion, 
         tripInfoIndex: tripInfoIndex,
         setTripInfoIndex : setTripInfoIndex,
-        // statusArray : statusArray, 
-        // setStatusArray : setStatusArray, 
         stationArray : stationArray, 
         setStationArray : setStationArray,
         nodes : nodes,
@@ -228,7 +236,6 @@ function App() {
         setTripInfo : setTripInfo,
         stationIdStartAndEnd : stationIdStartAndEnd,
         setStationIdStartAndEnd, setStationIdStartAndEnd,
-        // retrieveId : retrieveId
         vectorPosition : vectorPosition,
         setVectorPositon : setVectorPositon,
         retrieveStationId : retrieveStationId,
