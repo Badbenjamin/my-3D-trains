@@ -108,6 +108,9 @@ function clearTooltip(id, type){
   
 }
 
+// executes on planTrip click
+
+
   // COMBINE station info from DB with location info from map model to display HTML text on map
 useEffect(()=>{
   
@@ -378,7 +381,8 @@ useEffect(()=>{
    
     setRouteInfoArray(condensedRouteInfoArray)
   }
-  
+  // Clear tooltips when trip is in progress
+  setToolTipArray([])
 },[stationInfoObjectArray, stationArray])
 
 

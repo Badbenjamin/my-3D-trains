@@ -37,6 +37,17 @@ html{
   align-items: center;
 }
 
+.route-info-html{
+  border-style: solid ;
+  background-color: white;
+  border-radius: 15px;
+  width: 280px;
+  align-items: center;
+}
+
+.route-html-text{
+  font-size: 35px;
+}
 .x-button{
   font-size: 12px;
   font-weight: bold;
@@ -93,6 +104,15 @@ html{
 .route_icon{
   padding: 3px;
   pointer-events: none;
+  /* max-width: 15px;
+  max-height: 15px; */
+}
+
+.route_icon_route_tt{
+  padding: 3px;
+  pointer-events: none;
+  max-width: 20px;
+  max-height: 20px;
 }
 
 .route_icon_complex{

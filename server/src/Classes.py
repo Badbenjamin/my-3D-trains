@@ -29,7 +29,7 @@ class Journey:
 
         # This array contains objects with start terminus and end origin stations, which have been derived from the shared stations array
         self.transfer_info_obj_array = None
-        
+        print('tioa', self.transfer_info_obj_array)
         self.local_express = False
         self.time = time
         self.start_station_routes = self.start_station.daytime_routes.split()

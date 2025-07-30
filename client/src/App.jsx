@@ -50,7 +50,6 @@ function App() {
     });
   }
 
-
   // build stationArray of 3D station components for LinesAndMap
   // this useEffect creates Station objects for each geometry in our model
   useEffect(()=>{
