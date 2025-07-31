@@ -23,7 +23,7 @@ class Journey:
         # CHANGED TO GTFS STOP ID from ID (6/16)
         self.start_station = Station.query.filter(Station.gtfs_stop_id == start_station_id).first()
         self.end_station = Station.query.filter(Station.gtfs_stop_id == end_station_id).first()
-        # print(self.start_station, self.end_station)
+        print(self.start_station, self.end_station)
         # accounting for stations in complexes, these are the stations that are shared between two lines on a two part trip.
         self.shared_stations = []
 
