@@ -4,7 +4,7 @@ import TripInfo from './TripInfo'
 
 function ErrorInfo({leg}){
 
-        console.log('leg',leg)
+        // console.log('leg',leg)
 
     return(
         <div className="leg-info-grid-cointainer">

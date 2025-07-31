@@ -18,12 +18,12 @@ function SubwayMap(){
     
     
 
-    useFrame((state, delta) => {
-        // const elapsedTime = clock.getElapsedTime()
-        // // console.log(elapsedTime)
-        // torusRef.current.rotation.y += delta
-        // cubeRef.current.position.y = Math.sin(elapsedTime) * 4
-    })
+    // useFrame((state, delta) => {
+    //     // const elapsedTime = clock.getElapsedTime()
+    //     // // console.log(elapsedTime)
+    //     // torusRef.current.rotation.y += delta
+    //     // cubeRef.current.position.y = Math.sin(elapsedTime) * 4
+    // })
 
     return( 
         <>
