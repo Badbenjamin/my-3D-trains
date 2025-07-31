@@ -38,7 +38,7 @@ class Journey:
         
         # This variable contains info for the type of trip. Whether there is a transfer or if it involves local and express trains. 
         journey_info_obj = modules_classes.get_journey_info(self.start_station_routes, self.end_station_routes)
-
+        print('journey info obj', journey_info_obj)
         # if not on same route, and also not on same colored line, the trip requires a transfer btw lines
         if (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == False):
             # find complexes on start and end lines
@@ -54,7 +54,7 @@ class Journey:
             # return all stations that serve a route that is served by both the start and end station
             shared_stations = modules_classes.get_shared_stations(stations_in_complexes, start_and_end_routes)
             self.shared_stations = shared_stations
-            
+            # print('shared stations', self.shared_stations)
             # Assign correct shared station to start_terminus and end_origin. This array will be used to create routes for a trip involving two different lines. 
             if shared_stations:
                 self.transfer_info_obj_array = modules_classes.get_transfer_station_info(shared_stations, self.start_station_routes, self.end_station_routes)
