@@ -7,7 +7,6 @@ function StationSearch({setStartOrEndStation, position, stations, journeyStation
     // journey stations is passed down
 
     const [selectedOption, setSelectedOption] = useState(null)
-    // console.log(selectedOption)
     // this should keep selectedOption in sync with a clear trip from JournPlanner
     // hoping it works for tooltip
     useEffect(()=>{

@@ -13,6 +13,7 @@ ct = datetime.now()
 def plan_trip(start_station_id, end_station_id):
     # new_journey contains endpoints for start and end stations, and calculates a transfer if applicable.
     new_journey = Journey(start_station_id, end_station_id)
+    # print('shared', new_journey.shared_stations)
     # new_train_data takes the info from new_journey and uses it to make requests from the relevant MTA API route endpoints.
     # it contains the JSON train data from the realtime gtfs feed. 
     new_train_data = TrainData(new_journey)

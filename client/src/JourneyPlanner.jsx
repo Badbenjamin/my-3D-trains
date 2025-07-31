@@ -61,6 +61,8 @@ function JourneyPlanner() {
         setJourneyStations((prevJourney)=>{
            return [null,null]
         })
+        // clear complex TT, clear Station TT
+        
     }
 
 

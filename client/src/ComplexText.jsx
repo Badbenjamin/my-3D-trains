@@ -22,9 +22,7 @@ export default function ComplexText({handleComplexClick,stationInTripArray, trip
             complexInTrip = true
         }
     }
-    // console.log(complexInTrip)
-    // console.log( stationInfoArray)
-    // console.log(widthInPx)
+
     let iconImageArray = []
     routes.map((routesArray)=>{
         // routesArray is array of arrays

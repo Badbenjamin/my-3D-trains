@@ -6,12 +6,17 @@ import pprint
 current_time = datetime.now()
 current_time_int = int(math.ceil(current_time.timestamp()))
 
+# clinton washington c to coney island should be through j street but is not? 
+# why is this not working? 
 def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
 
     start_station_id = journey_obj.start_station.gtfs_stop_id
     end_station_id = journey_obj.end_station.gtfs_stop_id
     all_possible_ts_pairs = []
-
+    # EXAMINE THIS FOR FLAWS
+    # start terminal, end origin? looks like it may just be choosing last on list? 
+    # how do i compare all trips and transfers? 
+    # print('tioa', journey_obj.transfer_info_obj_array)
     for transfer_obj in journey_obj.transfer_info_obj_array:
         start_terminus_gtfs_id = transfer_obj['start_term'].gtfs_stop_id
         end_origin_gtfs_id = transfer_obj['end_origin'].gtfs_stop_id
@@ -84,7 +89,9 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
 def build_trip_sequence(journey_obj, train_data_obj):
     trip_sequences = []
     # IF TRIP HAS TRANSFER
+    
     if (journey_obj.shared_stations):
+        print('jo shared stat', journey_obj.shared_stations)
         # FILTERED TRAINS PASSED TO FUNCTION
         trip_sequence = build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj)
         for ts_pair in trip_sequence:

@@ -3,7 +3,6 @@ import { useState, useEffect } from "react"
 import * as THREE from "three"
 
 export default function RouteTooltip({stationInfo, name, position}){
-    // console.log('si rtt', stationInfo)
     // where do I get name from, how can I get name of transfer? 
 
     const [startStatonInfo, setStartStationInfo] = useState({})
@@ -13,10 +12,6 @@ export default function RouteTooltip({stationInfo, name, position}){
         "second_station" : null
     })
 
-    if (transferStationInfo.first_station){
-        console.log('tsi', transferStationInfo)
-    }
-    
     useEffect(()=>{
         if(stationInfo.type == "start"){
             setStartStationInfo((prevInfo)=>{
@@ -82,7 +77,6 @@ export default function RouteTooltip({stationInfo, name, position}){
         // construct ordered objects based on arrival and departure times
        
         setTransferStationInfo((prevInfo)=>{
-            console.log('pi', prevInfo)
             let newInfo = {...prevInfo}
 
             let firstStationObject = {}
@@ -116,8 +110,6 @@ export default function RouteTooltip({stationInfo, name, position}){
                 hour12: true 
             })
 
-
-            console.log('transtationinfo',stationInfo)
             if (stationInfo.arrival < stationInfo.second_transfer_info[0].arrival){
 
 
@@ -145,7 +137,6 @@ export default function RouteTooltip({stationInfo, name, position}){
                     "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.second_transfer_info[0].route}.png`}/>
                 }
             } else {
-                console.log('second station first')
                 secondStationObject =  {
                     "arrival_ts" : stationInfo.arrival,
                     "departure_ts" : stationInfo.departure,
@@ -180,46 +171,13 @@ export default function RouteTooltip({stationInfo, name, position}){
     }
 
     },[stationInfo])
-    // console.log(primaryStatonInfo)
-    // const formatter = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
     const tooltipPosition = new THREE.Vector3(position.x, position.y + 2, position.z)
 
       // line for tooltip. make variable according to cam position in future. 
     const lineMaterial = new THREE.LineBasicMaterial( { color: new THREE.Color('white') } );
     lineMaterial.linewidth = 500
 
-    // const routeLogo = <img className="route_icon"   src={`../public/ICONS/${stationInfo.route}.png`}/>
-
-    // let arrivalTime = Date(stationInfo.arrivalTime)
-    // let arrivalTimeDate = new Date(arrivalTime)
-    //             // console.log(typeof arrivalTimeDate)
-    // let mainArrivalTimeString = arrivalTimeDate.toLocaleTimeString('en-US', { 
-    //     hour: 'numeric', 
-    //     minute: '2-digit',
-    //     hour12: true 
-    // })
-    
-    // let arrivalTime = Date(stationInfo.arrivalTime)
-    // let arrivalTimeDate = new Date(arrivalTime)
-    // // console.log(typeof arrivalTimeDate)
-    // mainArrivalTimeString = arrivalTimeDate.toLocaleTimeString('en-US', { 
-    //     hour: 'numeric', 
-    //     minute: '2-digit',
-    //     hour12: true 
-    // })
-    // let departureTime = Date(stationInfo.departureTime)
-    // let departureTimeDate = new Date(departureTime)
-    // mainDepartureTimeString = departureTimeDate.toLocaleTimeString('en-US', { 
-    //     hour: 'numeric', 
-    //     minute: '2-digit',
-    //     hour12: true 
-    // });
-  
-
-    
-
-
-    // if (stationInfo)
 
     if (stationInfo.type == "start"){
         return(

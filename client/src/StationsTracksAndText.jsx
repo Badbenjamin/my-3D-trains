@@ -138,8 +138,7 @@ useEffect(()=>{
         // COULE PUT ROUTE TT PUSH HERE?!?!
       
         if(stationArray[j].props.stationInfo && ((stationArray[j].props.stationInfo.type == 'start')||(stationArray[j].props.stationInfo.type == 'end')||(stationArray[j].props.stationInfo.type == 'transfer'))){
-          // console.log('name',stationInfoObject[stationArray[j].props.name].name)
-          // console.log('station route tootltip push',stationArray[j].props.stationInfo)
+
           let keyforRouteInfo = stationInfoObject[stationArray[j].props.name].name.toString() + versionForKey.toString()
           let newRouteTooltip = <RouteTooltip key={keyforRouteInfo} name={stationInfoObject[stationArray[j].props.name].name} position={stationArray[j].props.mesh.position} stationInfo={stationArray[j].props.stationInfo}/>
           newRouteInfoHtmlArray.push(newRouteTooltip)
@@ -192,12 +191,7 @@ useEffect(()=>{
           // if its the first complexText being added to the complexObject
           // OR if the newInfoObject does not have a matching complex_id in it, we create a new key value pair in the complexObject
           if (Object.keys(complexObject).length === 0 || !(complexObject.hasOwnProperty(newInfoObject.complex_id))){
-            // console.log(newInfoObject)
-            // console.log(stationArray[j].props.stationInfo)
-            if (stationArray[j].props.name.slice(0,3) == "A42"){
-              console.log('co1 block',stationArray[j].props)
-              // console.log('co1 block new inf', complexObject[newInfoObject.complex_id])
-            }
+
             complexObject[newInfoObject.complex_id] = {
                 "complex_id" : newInfoObject.complex_id,
                 "daytime_routes" : [[newInfoObject.daytime_routes]],
@@ -255,9 +249,7 @@ useEffect(()=>{
     // COMPLEXES HAVE BEEN CONDESNED INTO AN OBJECT WITH COMPLEXIDS AS KEYS
     // LOOP THROUGH OBJECT KEYS AND CREATE AN ARRAY OF REACT COMPONENTS WITH COMPLEX PROPS
     for (let complex in complexObject){
-      // let status = true
-      // why no complex 175 hoyt scherm???
-      // console.log('comp', complex)
+
       // find the average position of the stations in the complex to place the complex text
       function avereragePosition(positionsArray){
         let xTotal = 0;
@@ -293,9 +285,8 @@ useEffect(()=>{
                            alphaLevel={0} />
 
         // Where do I put this to condense it into one entity with all the info from two stations? 
-        // console.log(complexObject[complex].stationInTrip)
         if(complexObject[complex].stationInTrip){
-          console.log('1st complex push', stationArray[j].props.stationInfo)
+
           // need to modify this to work with complex info
           let newRouteTooltip = <RouteTooltip name={"complex"} position={averagePosition} stationInfo={complexObject[complex].name_arrival_info_combo_array}/>
           newRouteInfoHtmlArray.push(newRouteTooltip)
@@ -357,25 +348,20 @@ useEffect(()=>{
     // set RouteTooltipArray???
     // local to express transfer handled by stationInfo.secondTransferInfo
     // how to condense two transfer objects into one for display? 
-    // console.log('nria',newRouteInfoHtmlArray)
+
     let routeInfoHtmlArrayObj = {}
     for (let routeInfo of newRouteInfoHtmlArray){
-      // console.log(routeInfo.props)
       // MIGHT NEED TO MAKE THIS COMPLEX ID? OR JUST START END TRANSFER
-      console.log(routeInfo.props.stationInfo.type in routeInfoHtmlArrayObj)
       if (Object.keys(routeInfoHtmlArrayObj).length === 0 || !(routeInfo.props.stationInfo.type in routeInfoHtmlArrayObj)){
-        // console.log('1',routeInfo.props.stationInfo.type, Object.keys(routeInfoHtmlArrayObj).length)
         routeInfoHtmlArrayObj[routeInfo.props.stationInfo.type] = routeInfo
         
       } else if ((routeInfo.props.stationInfo.type in routeInfoHtmlArrayObj)) {
         
         routeInfoHtmlArrayObj[routeInfo.props.stationInfo.type].props.stationInfo.second_transfer_info.push(routeInfo.props.stationInfo)
       }
-      // console.log('obj',routeInfoHtmlArrayObj)
     }
     let condensedRouteInfoArray = []
     for (let routeInfo in routeInfoHtmlArrayObj){
-      // console.log(routeInfo)
       condensedRouteInfoArray.push(routeInfoHtmlArrayObj[routeInfo])
     }
    
