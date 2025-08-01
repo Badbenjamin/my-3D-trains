@@ -54,6 +54,7 @@ function JourneyPlanner() {
             .then(response => response.json())
             .then(stopData => setTripInfo(stopData))
         }
+        setTripInfoIndex(0)
     }
 
     function handleClearClick(){
@@ -65,6 +66,10 @@ function JourneyPlanner() {
         
     }
 
+    function handleReverseClick(){
+        setJourneyStations([journeyStations[1], journeyStations[0]])
+    }
+
 
     return (
         <div>
@@ -72,6 +77,7 @@ function JourneyPlanner() {
             <div className='journey-planner'>
                 {/* pass journeyStations down to stationSearch so that it knows when they have been cleared? */}
                 <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
+                <button className="plan-trip-button" onClick={handleReverseClick}>⮂</button>
                 <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
                 <br></br>
                 <button className="plan-trip-button" onClick={planTrip}>Plan Trip</button>
