@@ -356,7 +356,7 @@ useEffect(()=>{
         routeInfoHtmlArrayObj[routeInfo.props.stationInfo.type] = routeInfo
         
       } else if ((routeInfo.props.stationInfo.type in routeInfoHtmlArrayObj)) {
-        
+        // BUG HERE
         routeInfoHtmlArrayObj[routeInfo.props.stationInfo.type].props.stationInfo.second_transfer_info.push(routeInfo.props.stationInfo)
       }
     }

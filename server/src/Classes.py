@@ -27,6 +27,9 @@ class Journey:
         # accounting for stations in complexes, these are the stations that are shared between two lines on a two part trip.
         self.shared_stations = []
 
+        # TRANSFERERROR would be determined in this class
+        # if not on same line, and no shared stations, there should be a transfer error, since a trip is not possible in one transfer
+
         # This array contains objects with start terminus and end origin stations, which have been derived from the shared stations array
         self.transfer_info_obj_array = None
         
@@ -38,7 +41,7 @@ class Journey:
         
         # This variable contains info for the type of trip. Whether there is a transfer or if it involves local and express trains. 
         journey_info_obj = modules_classes.get_journey_info(self.start_station_routes, self.end_station_routes)
-        print('journey info obj', journey_info_obj)
+        # print('journey info obj', journey_info_obj)
         # if not on same route, and also not on same colored line, the trip requires a transfer btw lines
         if (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == False):
             # find complexes on start and end lines
@@ -79,6 +82,8 @@ class TrainData:
         self.end_station_name = journey_object.end_station.stop_name
         self.journey_object = journey_object
         self.routes = set(journey_object.start_station_routes + journey_object.end_station_routes)
+        self.shared_stations = journey_object.shared_stations
+        print('shared',self.shared_stations)
         self.local_express = None
         
         if journey_object.local_express:
@@ -196,6 +201,9 @@ class FilteredTrains:
         self.start_station = Station.query.filter(Station.gtfs_stop_id == start_station_id).first()
         self.end_station = Station.query.filter(Station.gtfs_stop_id == end_station_id).first()
         
+        # need direction for more accurate tripError object
+        # if no southbound trains stop at a station, the user should know
+
         self.trip_error_obj = None
         self.best_train = None
         self.train_objects_sorted_by_dest_arrival = None
@@ -263,11 +271,26 @@ class TripError:
         self.train_data = train_data
         self.start_station_id = start_station_id
         self.end_station_id = end_station_id
-        station_service_obj = modules_classes.check_for_station_service_on_failed_trip(train_data, start_station_id, end_station_id)
+        station_service_obj = modules_classes.check_for_station_service_on_failed_leg(train_data, start_station_id, end_station_id)
+        # HOW DO I FIND DIRECTION IF NO TRAIN DATA? 
+        
+        # I need the status of direction service on stations (ig. no trains northbound)
+        # I need to determine if there is a possible transfer between lines. 
+        # self.shared_stations = train_data.shared_stations
+        # print('te shared', train_data)
 
         self.start_station_service = station_service_obj['start_station_service']
         self.end_station_service = station_service_obj['end_station_service']
+        # should tell if they are on same line?!?!
         self.between_station_service = station_service_obj['start_to_end_service']
+
+        self.start_north_bound_service = station_service_obj['start_north_bound_service']
+        self.start_south_bound_service = station_service_obj['start_south_bound_service']
+        self.end_north_bound_service = station_service_obj['end_north_bound_service']
+        self.end_south_bound_service = station_service_obj['end_south_bound_service']
+
+
+        # self.direction_service_for_platform = modules_classes.check_station_direction_service()
         
     def __repr__(self):
         return f'<TripError {self.start_station_id} {self.start_station_service} {self.end_station_id} {self.end_station_service} trains between: {self.between_station_service}>'
@@ -332,7 +355,12 @@ class FormattedTrainData:
                         "end_station_name" : end_station.stop_name,
                         "end_station_gtfs" : trip_sequence_element.end_station_id,
                         "end_station_service" : trip_sequence_element.end_station_service,
-                        "station_to_station_service" : trip_sequence_element.between_station_service
+                        "station_to_station_service" : trip_sequence_element.between_station_service,
+
+                        "start_north_bound_service" : trip_sequence_element.start_north_bound_service,
+                        "start_south_bound_service" : trip_sequence_element.start_south_bound_service,
+                        "end_north_bound_service" : trip_sequence_element.end_north_bound_service,
+                        "end_south_bound_service" : trip_sequence_element.end_south_bound_service
                     }
                     trip_sequence.append(error_for_react)
             self.trip_sequences_for_react.append(trip_sequence)

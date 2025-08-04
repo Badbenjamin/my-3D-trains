@@ -4,7 +4,8 @@ import TripInfo from './TripInfo'
 
 function ErrorInfo({leg}){
 
-        // console.log('leg',leg)
+        console.log('leg error',leg)
+        // ON SAME LINE, TRANSFER? TRANSFER POSSIBLE? 
 
     return(
         <div className="leg-info-grid-cointainer">
@@ -12,6 +13,8 @@ function ErrorInfo({leg}){
                 <div className="top">{leg.start_station_name}</div>
                 {/* <div className="middle">{tripInfo.direction_label} Bound {tripInfo.route}</div> */}
                 <div className="bottom">{leg.start_station_service ? 'IN SERVICE' : 'NOT IN SERVICE'}</div>
+                <div className="bottom">{leg.start_north_bound_service ? <></> : 'No north bound departures'}</div>
+                <div className="bottom">{leg.start_south_bound_service ? <></> : 'No south bound departures'}</div>
             </div>
             <div className="middle-info">
                 {/* <div className="top">{tripInfo.number_of_stops} Stops</div> */}
@@ -22,6 +25,8 @@ function ErrorInfo({leg}){
                 <div className="top">{leg.end_station_name}</div>
                 {/* <div className="middle">Arrives {tripInfo.end_station_arrival}</div> */}
                 <div className="bottom">{leg.end_station_service ? 'IN SERVICE' : 'NOT IN SERVICE'}</div>
+                <div className="bottom">{leg.end_north_bound_service ? <></> : 'No north bound arrivals'}</div>
+                <div className="bottom">{leg.end_south_bound_service ? <></> : 'No south bound arrivals'}</div>
             </div>
         </div>
     )

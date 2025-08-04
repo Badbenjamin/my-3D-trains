@@ -22,6 +22,7 @@ function App() {
   const [stationArray, setStationArray] = useState([])
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
+  console.log('ti', tripInfo)
   const [tripInfoIndex, setTripInfoIndex] = useState(0)
   const [stationIdStartAndEnd, setStationIdStartAndEnd] = useState({"startId" : null, "endId" : null})
   const [vectorPosition, setVectorPositon] = useState({})
@@ -74,6 +75,7 @@ function App() {
     let selectedStationInfoObj = {}
    
     // ad else branch for error
+    // are there any instances where an impossible trip returns an empty tripInfo vs one with a TripError? 
     if (currentTrip && tripInfo.length > 0){
       let startStopId = currentTrip[0].start_station_gtfs
       let endStopId = currentTrip[currentTrip.length - 1].end_station_gtfs
@@ -102,7 +104,7 @@ function App() {
         const stopsForLeg = currentTripSchedule.slice(startIndex, endIndex + 1)
 
         // loop through all stops of a leg
-        // keep track of what TSE we are on? 
+        // create stationInfo object for all stations involved in trip
         for (let stop of stopsForLeg){
           // start stop
           if (stop.stop_id.slice(0,3) == startStopId){
@@ -155,6 +157,10 @@ function App() {
           }
         }  
       }
+    } else {
+      
+      console.log('NO TRIP POSSIBLE')
+      return
     }
     
     // update this to current props

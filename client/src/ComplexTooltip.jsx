@@ -9,6 +9,7 @@ export default function ComplexTooltip({complexStationRouteIdObjs, averagePositi
     let [northArrivals, setNorthArrivals] = useState([])
     let [southArrivals, setSouthArrivals] = useState([])
     const [stationInfo, setStationInfo] = useState({})
+    
 
     // tooltip displays routes until a route is clicked, then it changes to a station info tooltip
     function handleClick(gtfsStopId){
