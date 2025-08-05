@@ -10,11 +10,13 @@ import ComplexText from './ComplexText'
 import StationToolTip from './StationTooltip'
 import ComplexTooltip from './ComplexTooltip'
 import RouteTooltip from './RouteTooltip'
+// import TripPlannerError from './TripPlannerError'
 
 import { findDistance } from './ModularFunctions'
 
 
 export default function StationsTracksAndText({vectorPosition}) {
+  // stations could pass down error info? 
     const {stationArray, retrieveStationId} = useOutletContext()
     const [stationInfoObjectArray, setStationInfoObjectArray] = useState([])
     const [stationHtmlArray, setStationHtmlArray] = useState([])
@@ -25,6 +27,7 @@ export default function StationsTracksAndText({vectorPosition}) {
     const [routeInfoArray, setRouteInfoArray] = useState([])
     const [versionForKey, setVersionForKey] = useState(0)
     const [cameraPosition, setCameraPosition] = useState({"x": 0, "y" : 0, "z" : 0})
+    // const [errorPopup, setErrorPopup] = useState(null)
 
 // Fetch to get data for stations, array of objects with info
 useEffect(()=>{
@@ -32,6 +35,18 @@ useEffect(()=>{
       .then(response => response.json())
       .then(stationInfoObjectArray => {setStationInfoObjectArray(stationInfoObjectArray)})
 },[])
+
+// if tripInfo contains transfer error, create a popup
+// useEffect(()=>{
+//   if ("trip_planner_error" in tripInfo){
+//     console.log(tripInfo['trip_planner_error'])
+//     let newTripPlannerError = <TripPlannerError
+//       key = {tripInfo.start_station_gtfs + "to" + tripInfo.end_station_gtfs}
+//       tripInfo={tripInfo}
+//     />
+//     setErrorPopup(newTripPlannerError)
+//   }
+// }, [tripInfo])
 
 // CREATE STATION TOOLTIP IF IT DOESN'T ALREADY EXIST
 function handleStationClick(stopId, name, position, daytime_routes){
@@ -448,6 +463,7 @@ useEffect(()=>{
           {complexHtmlArray}
           {toolTipArray}
           {routeInfoArray}
+          {/* {(errorPopup === null) ? <></> : errorPopup} */}
       </group>
     )
   }

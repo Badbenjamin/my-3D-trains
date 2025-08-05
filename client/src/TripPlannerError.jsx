@@ -3,8 +3,10 @@ import { useState, useEffect } from "react"
 
 export default function TripPlannerError(){
     return(
-        <div>
-            <Html>COULDNT FIND TRANSFER</Html>
-        </div>
+            
+            <div className="error-popup-box">
+                <h2>TRANSFER PLANNING ERROR</h2>
+            </div>
+        
     )
 }

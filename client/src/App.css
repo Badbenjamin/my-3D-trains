@@ -146,3 +146,19 @@ html{
   white-space: nowrap;
   overflow: hidden;
 }
+
+.trip-error-popup{
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: auto;
+  margin-right: auto;
+  align-items: center;
+}
+
+.error-popup-box{
+  border-style: solid ;
+  background-color: white;
+  border-radius: 150px;
+  width: 500px;
+  align-items: center;
+}
