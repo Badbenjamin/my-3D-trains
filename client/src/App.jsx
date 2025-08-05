@@ -92,7 +92,7 @@ function App() {
           })
         } else {
           console.log('trip schedule doesnt exist')
-          return
+          return 
         }
         
       
@@ -159,7 +159,7 @@ function App() {
       }
     } else {
       
-      console.log('NO TRIP POSSIBLE')
+      console.log(tripInfo)
       return
     }
     

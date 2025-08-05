@@ -99,21 +99,25 @@ def check_for_station_service_on_failed_leg(train_data, start_station_id, end_st
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
                     stops = create_stop_schedule(train)
-                    direction = train.trip_update.stop_time_update[0].stop_id[-1]
+                    direction = None
+                    if (len(train.trip_update.stop_time_update)>0):
+                        direction = train.trip_update.stop_time_update[0].stop_id[-1]
+
                     if (start_station_id in stops):
                          start_service = True
                     if (end_station_id in stops):
                          end_service = True
                     if (start_station_id in stops) and (end_station_id in stops):
                          start_to_end_service = True
-                    if ((direction == "N") and (start_station_id in stops)):
-                         start_north_bound_service = True
-                    if ((direction == "S") and (start_station_id in stops)):
-                         start_south_bound_service = True
-                    if ((direction == "N") and (end_station_id in stops)):
-                         end_north_bound_service = True
-                    if ((direction == "S") and (end_station_id in stops)):
-                         end_south_bound_service = True
+                    if (direction):
+                        if ((direction == "N") and (start_station_id in stops)):
+                            start_north_bound_service = True
+                        if ((direction == "S") and (start_station_id in stops)):
+                            start_south_bound_service = True
+                        if ((direction == "N") and (end_station_id in stops)):
+                            end_north_bound_service = True
+                        if ((direction == "S") and (end_station_id in stops)):
+                            end_south_bound_service = True
                     
     service_obj = {
         'start_station_service' : start_service,
@@ -124,7 +128,7 @@ def check_for_station_service_on_failed_leg(train_data, start_station_id, end_st
         "end_north_bound_service" : end_north_bound_service, 
         "end_south_bound_service" : end_south_bound_service
     }
-    print('so', service_obj)
+    # print('so', service_obj)
     return service_obj
 
 # returns true if the station appears in the schedule of a train

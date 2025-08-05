@@ -40,10 +40,10 @@ class Journey:
         start_and_end_routes = list(set(self.start_station_routes + self.end_station_routes))
         
         # This variable contains info for the type of trip. Whether there is a transfer or if it involves local and express trains. 
-        journey_info_obj = modules_classes.get_journey_info(self.start_station_routes, self.end_station_routes)
-        # print('journey info obj', journey_info_obj)
+        self.journey_info_obj = modules_classes.get_journey_info(self.start_station_routes, self.end_station_routes)
+        print('journey info obj', self.journey_info_obj)
         # if not on same route, and also not on same colored line, the trip requires a transfer btw lines
-        if (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == False):
+        if (self.journey_info_obj['start_shares_routes_with_end'] == False) and (self.journey_info_obj['on_same_colored_line'] == False):
             # find complexes on start and end lines
             start_line_complex_ids = modules_classes.find_complex_ids(self.start_station.daytime_routes)
             end_line_complex_ids = modules_classes.find_complex_ids(self.end_station.daytime_routes)
@@ -62,7 +62,7 @@ class Journey:
             if shared_stations:
                 self.transfer_info_obj_array = modules_classes.get_transfer_station_info(shared_stations, self.start_station_routes, self.end_station_routes)
         # IF ON SAME COLORED LINE, BUT NOT SHARING ROUTE BTW START AND END, IT IS A LOCAL TO EXPRESS OR EXPRESS TO LOCAL TRIP
-        elif (journey_info_obj['start_shares_routes_with_end'] == False) and (journey_info_obj['on_same_colored_line'] == True):
+        elif (self.journey_info_obj['start_shares_routes_with_end'] == False) and (self.journey_info_obj['on_same_colored_line'] == True):
             self.local_express = True
         
         # Might not need end station endpoints? Train is leaving from a station that is served by a start station line to get to end station. 

@@ -93,6 +93,7 @@ def build_trip_sequence(journey_obj, train_data_obj):
         # print('jo shared stat', journey_obj.shared_stations)
         # FILTERED TRAINS PASSED TO FUNCTION
         trip_sequence = build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj)
+
         for ts_pair in trip_sequence:
             trip_sequences.append(ts_pair)
     
