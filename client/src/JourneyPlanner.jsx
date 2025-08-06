@@ -7,13 +7,13 @@ import NextTrains from "./NextTrains";
 
 
 
+
 function JourneyPlanner() {
 
     const {tripInfo, stations, setTripInfo, stationIdStartAndEnd, tripInfoIndex, setTripInfoIndex, clearTripInfo} = useOutletContext()
     const [journeyStations, setJourneyStations] = useState([null, null])
+  
     // stationIdStartAndEnd is from app.jsx and is the tooltip set station
-    console.log('ti jp', tripInfo)
-    // THIS TAKES SELECTION FROM STATIONSEARCH AND USES IT TO SET JOURNEYSTATIONS
     function setStartOrEndStation(stationValue, position){
   
         setJourneyStations((prevJourney)=>{
@@ -83,8 +83,7 @@ function JourneyPlanner() {
                 <button className="plan-trip-button" onClick={planTrip}>Plan Trip</button>
                 <button className="plan-trip-button" onClick={handleClearClick}>Clear Trip</button>
             </div>
-            {(tripInfo[tripInfoIndex] != undefined || "trip_planner_error" in tripInfo)? <TripInfo className='trip-info' tripInfo={tripInfo} tripInfoIndex={tripInfoIndex}/> : ""}
-            
+            {tripInfo[tripInfoIndex] != undefined ? <TripInfo className='trip-info' tripInfo={tripInfo} tripInfoIndex={tripInfoIndex}/> : ""}
             <NextTrains tripInfo={tripInfo} tripInfoIndex={tripInfoIndex} setTripInfoIndex={setTripInfoIndex}/>
             
         </div>

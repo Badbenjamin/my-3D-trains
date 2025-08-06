@@ -10,7 +10,7 @@ import ComplexText from './ComplexText'
 import StationToolTip from './StationTooltip'
 import ComplexTooltip from './ComplexTooltip'
 import RouteTooltip from './RouteTooltip'
-// import TripPlannerError from './TripPlannerError'
+
 
 import { findDistance } from './ModularFunctions'
 
@@ -36,17 +36,6 @@ useEffect(()=>{
       .then(stationInfoObjectArray => {setStationInfoObjectArray(stationInfoObjectArray)})
 },[])
 
-// if tripInfo contains transfer error, create a popup
-// useEffect(()=>{
-//   if ("trip_planner_error" in tripInfo){
-//     console.log(tripInfo['trip_planner_error'])
-//     let newTripPlannerError = <TripPlannerError
-//       key = {tripInfo.start_station_gtfs + "to" + tripInfo.end_station_gtfs}
-//       tripInfo={tripInfo}
-//     />
-//     setErrorPopup(newTripPlannerError)
-//   }
-// }, [tripInfo])
 
 // CREATE STATION TOOLTIP IF IT DOESN'T ALREADY EXIST
 function handleStationClick(stopId, name, position, daytime_routes){
