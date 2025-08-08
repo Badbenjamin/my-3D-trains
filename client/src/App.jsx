@@ -171,6 +171,7 @@ function App() {
             }
           } 
           // TURN ERROR INFO INTO SELECTEDSTATIONINFOOBJ INFO
+          // HOW DO I HANDLE TRANSFERS IN COMPLEXES, OR 
         }   else if ((errorElementObject != null)){
           console.log('eeo', errorElementObject)
           selectedStationInfoObj[errorElementObject.start_station_gtfs] ={
@@ -179,6 +180,8 @@ function App() {
             "south_bound_service" : errorElementObject.start_south_bound_service,
             "north_direction_label" : errorElementObject.start_north_direction_label,
             "south_direction_label" : errorElementObject.start_south_direction_label,
+            "station_to_station_service" : errorElementObject.station_to_station_service,
+            "start_station_routes" : errorElementObject.start_station_routes,
             "type" : "errorStart"
           };
 
@@ -188,9 +191,10 @@ function App() {
             "south_bound_service" : errorElementObject.end_south_bound_service,
             "north_direction_label" : errorElementObject.end_north_direction_label,
             "south_direction_label" : errorElementObject.end_south_direction_label,
+            "station_to_station_service" : errorElementObject.station_to_station_service,
+            "end_station_routes" : errorElementObject.end_station_routes,
             "type" : "errorEnd"
           }
-
         }
       }
     } else {

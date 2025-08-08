@@ -1,10 +1,11 @@
 import { Html, Line } from "@react-three/drei"
 import { useState, useEffect } from "react"
 import * as THREE from "three"
+import TripInfo from "./TripInfo"
 
 export default function RouteTooltip({stationInfo, name, position}){
     // where do I get name from, how can I get name of transfer? 
-    // console.log('si rttt', stationInfo)
+    console.log('si rttt', stationInfo)
     // THESE COULD ALL JUST BE ONE I THINK???
     const [startStatonInfo, setStartStationInfo] = useState({})
     const [endStationInfo, setEndStationInfo] = useState({})
@@ -77,7 +78,7 @@ export default function RouteTooltip({stationInfo, name, position}){
             })
     } else if (stationInfo.type == "transfer"){
         // construct ordered objects based on arrival and departure times
-       
+        console.log('102 bug',stationInfo.second_transfer_info[0].arrival)
         setTransferStationInfo((prevInfo)=>{
             let newInfo = {...prevInfo}
 
@@ -97,7 +98,11 @@ export default function RouteTooltip({stationInfo, name, position}){
                 minute: '2-digit',
                 hour12: true 
             })
-
+            
+            // if (stationInfo.second_transfer_info[0].arrival && stationInfo.second_transfer_info[0].departure){
+            //     console.log('is this a trip error error?')
+            //     return
+            // }
             let secondArrivalTime = new Date(stationInfo.second_transfer_info[0].arrival * 1000)
             let secondArrivalTimeString = secondArrivalTime.toLocaleTimeString('en-US', { 
                 hour: 'numeric', 
@@ -170,21 +175,44 @@ export default function RouteTooltip({stationInfo, name, position}){
             }
         })
         // GET THESE TO WORK
-    } else if (stationInfo.type === "errorStart"){
+    } else if ((stationInfo.type === "errorStart") || (stationInfo.type === "errorEnd")){
         console.log('start station info rtt', stationInfo)
         setErrorInfo(()=>{
-            let startErrorObj = {
-
+            // start or end
+            let errorObject = {
+                "complete_service" : (stationInfo.north_bound_service) && (stationInfo.south_bound_service),
+                "trains_between_stations" : stationInfo.station_to_station_service,
+                "north_bound_service" : null,
+                "south_bound_service" : null,
+                "type" : stationInfo.type
+            
             }
-        })
-    } else if ((stationInfo.type === "errorEnd")){
-        console.log('end station info rtt', stationInfo)
-        setErrorInfo(()=>{
-            let endErrorObj = {
-                
+
+            console.log('nb', stationInfo.north_bound_service)
+            
+            if (!(stationInfo.north_bound_service)){
+                errorObject['north_bound_service'] = false
+            } 
+            if (!(stationInfo.south_bound_service)){
+                errorObject['south_bound_service'] = false
+            } 
+            if ((stationInfo.north_bound_service)){
+                errorObject['north_bound_service'] = true
+            } 
+            if ((stationInfo.south_bound_service)){
+                errorObject['south_bound_service'] = true
             }
 
+            
+
+
+           
+
+            console.log('di',errorObject)
+            setErrorInfo(errorObject)
         })
+    } else {
+        console.log('route tooltip error')
     }
 
     },[stationInfo])
@@ -235,14 +263,20 @@ export default function RouteTooltip({stationInfo, name, position}){
             </>
         )
     } else if (stationInfo.type == "errorStart" || stationInfo.type == "errorEnd"){
-        console.log('worked')
+        console.log('si error return', errorInfo)
         return(
             <>
             <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={5}>
                 <div className="route-info-html">
                    <div>{name}</div>
-                  
-                   <div>WHAAAA</div>
+                   <div>
+                        {errorInfo.complete_service ? <>station in service</> : 
+                        !(errorInfo.north_bound_service) ? <>no {stationInfo.north_direction_label} platform {(stationInfo.type === "errorStart") ? "departures" : (stationInfo.type === "errorEnd") ? "arrivals" : ""}</> : 
+                        !(errorInfo.south_bound_service) ? <>no {stationInfo.south_direction_label} platform {(stationInfo.type === "errorStart") ? "departures" : (stationInfo.type === "errorEnd") ? "arrivals" : ""}</> :
+                        !(errorInfo.trains_between_stations) ? <>no trains running between stations</> : <>trains running between stations</>
+                        }
+
+                   </div>
                 </div>
             </Html>
             <Line points={[position, tooltipPosition]} lineWidth={2}/>
