@@ -271,17 +271,29 @@ class TripError:
         self.train_data = train_data
         self.start_station_id = start_station_id
         self.end_station_id = end_station_id
+        start_station = Station.query.filter(Station.gtfs_stop_id == self.start_station_id).first()
+        end_station = Station.query.filter(Station.gtfs_stop_id == self.end_station_id).first()
+        # JUST DO QUERY ONCE and get data from that?
+        self.start_station_routes = start_station.daytime_routes.split()
+        self.end_station_routes = end_station.daytime_routes.split()
+
+        self.start_north_direction_label = start_station.north_direction_label
+        self.start_south_direction_label = start_station.south_direction_label
+
+        self.end_north_direction_label = end_station.north_direction_label
+        self.end_south_direction_label = end_station.south_direction_label
         station_service_obj = modules_classes.check_for_station_service_on_failed_leg(train_data, start_station_id, end_station_id)
         # HOW DO I FIND DIRECTION IF NO TRAIN DATA? 
-        
+        print(self.start_north_direction_label)
         # I need the status of direction service on stations (ig. no trains northbound)
         # I need to determine if there is a possible transfer between lines. 
         # self.shared_stations = train_data.shared_stations
         # print('te shared', train_data)
 
+        
+
         self.start_station_service = station_service_obj['start_station_service']
         self.end_station_service = station_service_obj['end_station_service']
-        # should tell if they are on same line?!?!
         self.between_station_service = station_service_obj['start_to_end_service']
 
         self.start_north_bound_service = station_service_obj['start_north_bound_service']
@@ -357,10 +369,18 @@ class FormattedTrainData:
                         "end_station_service" : trip_sequence_element.end_station_service,
                         "station_to_station_service" : trip_sequence_element.between_station_service,
 
+                        "start_station_routes" : trip_sequence_element.start_station_routes,
+                        "end_station_routes" : trip_sequence_element.end_station_routes,
+
                         "start_north_bound_service" : trip_sequence_element.start_north_bound_service,
                         "start_south_bound_service" : trip_sequence_element.start_south_bound_service,
                         "end_north_bound_service" : trip_sequence_element.end_north_bound_service,
-                        "end_south_bound_service" : trip_sequence_element.end_south_bound_service
+                        "end_south_bound_service" : trip_sequence_element.end_south_bound_service,
+
+                        "start_north_direction_label" : trip_sequence_element.start_north_direction_label,
+                        "start_south_direction_label" : trip_sequence_element.start_south_direction_label,
+                        "end_north_direction_label" : trip_sequence_element.start_north_direction_label,
+                        "end_south_direction_label" : trip_sequence_element.start_south_direction_label,
                     }
                     trip_sequence.append(error_for_react)
             self.trip_sequences_for_react.append(trip_sequence)

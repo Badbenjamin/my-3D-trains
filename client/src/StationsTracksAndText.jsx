@@ -140,8 +140,9 @@ useEffect(()=>{
       // filter out track names for now
       if (stationArray[j].props.name.length < 5){
         // COULE PUT ROUTE TT PUSH HERE?!?!
-      
-        if(stationArray[j].props.stationInfo && ((stationArray[j].props.stationInfo.type == 'start')||(stationArray[j].props.stationInfo.type == 'end')||(stationArray[j].props.stationInfo.type == 'transfer'))){
+        
+        // ADD tripError type? LEFT OFF HERE
+        if(stationArray[j].props.stationInfo && ((stationArray[j].props.stationInfo.type == 'start')||(stationArray[j].props.stationInfo.type == 'end')||(stationArray[j].props.stationInfo.type == 'transfer')||(stationArray[j].props.stationInfo.type == 'errorStart')||(stationArray[j].props.stationInfo.type == 'errorEnd'))){
 
           let keyforRouteInfo = stationInfoObject[stationArray[j].props.name].name.toString() + versionForKey.toString()
           let newRouteTooltip = <RouteTooltip key={keyforRouteInfo} name={stationInfoObject[stationArray[j].props.name].name} position={stationArray[j].props.mesh.position} stationInfo={stationArray[j].props.stationInfo}/>
@@ -355,12 +356,14 @@ useEffect(()=>{
 
     let routeInfoHtmlArrayObj = {}
     for (let routeInfo of newRouteInfoHtmlArray){
+      console.log('ri', routeInfo)
       // MIGHT NEED TO MAKE THIS COMPLEX ID? OR JUST START END TRANSFER
       if (Object.keys(routeInfoHtmlArrayObj).length === 0 || !(routeInfo.props.stationInfo.type in routeInfoHtmlArrayObj)){
         routeInfoHtmlArrayObj[routeInfo.props.stationInfo.type] = routeInfo
         
-      } else if ((routeInfo.props.stationInfo.type in routeInfoHtmlArrayObj)) {
-        // BUG HERE
+        // problem with push here, probably bcause second transfer info does not exist on error obj
+      } else if ((routeInfo.props.stationInfo.type in routeInfoHtmlArrayObj) && (routeInfo.props.stationInfo.type === "transfer")) {
+        // WILL THER BE A PROBLEM IF THERE IS AN ERROR IN A COMPLEX?
         routeInfoHtmlArrayObj[routeInfo.props.stationInfo.type].props.stationInfo.second_transfer_info.push(routeInfo.props.stationInfo)
       }
     }

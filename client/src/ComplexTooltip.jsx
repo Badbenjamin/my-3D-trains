@@ -112,13 +112,14 @@ export default function ComplexTooltip({complexStationRouteIdObjs, averagePositi
                     <button onClick={handleBackClick}>BACK</button>
                     <button onClick={()=>{handleXClick(complexId)}}>X</button>
                     <h2 className="station-html-text">{stationInfo.stop_name} </h2>
+                    <hr width="100%" size="2"/>
                     <div className="arrivals-html">
                         {stationInfo.north_direction_label}
                         {northArrivals}
                         {stationInfo.south_direction_label}
                         {southArrivals}
                     </div>
-                    
+                    <hr width="100%" size="2"/>
                     <button onClick={()=>handleSetStationClick(stationInfo.gtfs_stop_id, "start")}>ORIGIN</button>
                     <button onClick={()=>handleSetStationClick(stationInfo.gtfs_stop_id, "end")}>DESTINATION</button>
                 </div>

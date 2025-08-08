@@ -86,83 +86,119 @@ function App() {
         const endStationId = tripSequenceElement.end_station_gtfs
         // ERROR WHEN STATION NOT IN SERVICE!!!
         let justStationIds = []
+        let errorElementObject = null
         if (currentTripSchedule){
           justStationIds = currentTripSchedule.map((station) => {
             return station['stop_id'].slice(0,3)
           })
+          // TRIP ERROR BRANCH!!!
         } else {
-          console.log('trip schedule doesnt exist')
-          return 
+          console.log('trip error el', tripSequenceElement)
+          errorElementObject = tripSequenceElement
+          // justStationIds.push(tripSequenceElement['start_station_gtfs'])
+          // justStationIds.push(tripSequenceElement['end_station_gtfs'])
+        }
+        console.log('sids',justStationIds)
+        // console.log('ee', errorElementObject)
+
+        let startIndex = null
+        let endIndex = null
+        let startStop = null
+        let endStop = null
+        let stopsForLeg = null
+        if (justStationIds.length > 0){
+          startIndex = justStationIds.indexOf(startStationId)
+          endIndex = justStationIds.indexOf(endStationId)
+          startStop = currentTripSchedule[startIndex]
+          endStop = currentTripSchedule[endIndex]
+          stopsForLeg = currentTripSchedule.slice(startIndex, endIndex + 1)
         }
         
-      
-        const startIndex = justStationIds.indexOf(startStationId)
-        const endIndex = justStationIds.indexOf(endStationId)
-
-        const startStop = currentTripSchedule[startIndex]
-        const endStop = currentTripSchedule[endIndex]
-        const stopsForLeg = currentTripSchedule.slice(startIndex, endIndex + 1)
 
         // loop through all stops of a leg
         // create stationInfo object for all stations involved in trip
-        for (let stop of stopsForLeg){
-          // start stop
-          if (stop.stop_id.slice(0,3) == startStopId){
-            selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
-              "stopId" : stop.stop_id.slice(0,3),
-              "arrival" : stop.arrival,
-              "departure" : stop.departure, 
-              "type" : "start",
-              "direction_label" : tripSequenceElement.direction_label,
-              "route" : tripSequenceElement.route
-            } 
-          } else if (stop.stop_id.slice(0,3) == endStopId){
-            selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
-              "stopId" : stop.stop_id.slice(0,3),
-              "arrival" : stop.arrival,
-              "departure" : stop.departure, 
-              "type" : "end",
-              "direction_label" : tripSequenceElement.direction_label,
-              "route" : tripSequenceElement.route
+        // This branch executes for valid tripSequenceElements with stops and info, not tripErrorElements
+        if (stopsForLeg != null){
+          for (let stop of stopsForLeg){
+            // start stop
+            if (stop.stop_id.slice(0,3) == startStopId){
+              selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
+                "stopId" : stop.stop_id.slice(0,3),
+                "arrival" : stop.arrival,
+                "departure" : stop.departure, 
+                "type" : "start",
+                "direction_label" : tripSequenceElement.direction_label,
+                "route" : tripSequenceElement.route
+              } 
+            } else if (stop.stop_id.slice(0,3) == endStopId){
+              selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
+                "stopId" : stop.stop_id.slice(0,3),
+                "arrival" : stop.arrival,
+                "departure" : stop.departure, 
+                "type" : "end",
+                "direction_label" : tripSequenceElement.direction_label,
+                "route" : tripSequenceElement.route
+              }
+            }  else if (!(stop.stop_id.slice(0,3) in selectedStationInfoObj) && ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) == stopsForLeg[0].stop_id.slice(0,3) || stop.stop_id.slice(0,3) == stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3)))){
+              // key overwritten for LtoE transfer because its the same station. 
+              selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
+                "stopId" : stop.stop_id.slice(0,3),
+                "arrival" : stop.arrival,
+                "departure" : stop.departure, 
+                "type" : "transfer",
+                "second_transfer_info" : [],
+                "direction_label" : tripSequenceElement.direction_label,
+                "route" : tripSequenceElement.route
+              }
+            } else if ((stop.stop_id.slice(0,3) in selectedStationInfoObj) && ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) == stopsForLeg[0].stop_id.slice(0,3) || stop.stop_id.slice(0,3) == stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3)))){
+              selectedStationInfoObj[stop.stop_id.slice(0,3)].second_transfer_info.push({
+                "stopId" : stop.stop_id.slice(0,3),
+                "arrival" : stop.arrival,
+                "departure" : stop.departure, 
+                "type" : "transfer",
+                "direction_label" : tripSequenceElement.direction_label,
+                "route" : tripSequenceElement.route
+              })
+            } else if ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) != stopsForLeg[0].stop_id.slice(0,3) && stop.stop_id.slice(0,3) != stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3))){
+              selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
+                "stopId" : stop.stop_id.slice(0,3),
+                "arrival" : stop.arrival,
+                "departure" : stop.departure, 
+                "type" : "passthrough",
+                "direction_label" : tripSequenceElement.direction_label,
+                "route" : tripSequenceElement.route
+              }
             }
-          }  else if (!(stop.stop_id.slice(0,3) in selectedStationInfoObj) && ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) == stopsForLeg[0].stop_id.slice(0,3) || stop.stop_id.slice(0,3) == stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3)))){
-            // key overwritten for LtoE transfer because its the same station. 
-            selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
-              "stopId" : stop.stop_id.slice(0,3),
-              "arrival" : stop.arrival,
-              "departure" : stop.departure, 
-              "type" : "transfer",
-              "second_transfer_info" : [],
-              "direction_label" : tripSequenceElement.direction_label,
-              "route" : tripSequenceElement.route
-            }
-          } else if ((stop.stop_id.slice(0,3) in selectedStationInfoObj) && ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) == stopsForLeg[0].stop_id.slice(0,3) || stop.stop_id.slice(0,3) == stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3)))){
-            selectedStationInfoObj[stop.stop_id.slice(0,3)].second_transfer_info.push({
-              "stopId" : stop.stop_id.slice(0,3),
-              "arrival" : stop.arrival,
-              "departure" : stop.departure, 
-              "type" : "transfer",
-              "direction_label" : tripSequenceElement.direction_label,
-              "route" : tripSequenceElement.route
-            })
-          } else if ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) != stopsForLeg[0].stop_id.slice(0,3) && stop.stop_id.slice(0,3) != stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3))){
-            selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
-              "stopId" : stop.stop_id.slice(0,3),
-              "arrival" : stop.arrival,
-              "departure" : stop.departure, 
-              "type" : "passthrough",
-              "direction_label" : tripSequenceElement.direction_label,
-              "route" : tripSequenceElement.route
-            }
+          } 
+          // TURN ERROR INFO INTO SELECTEDSTATIONINFOOBJ INFO
+        }   else if ((errorElementObject != null)){
+          console.log('eeo', errorElementObject)
+          selectedStationInfoObj[errorElementObject.start_station_gtfs] ={
+            "stopId" : errorElementObject.start_station_gtfs,
+            "north_bound_service" : errorElementObject.start_north_bound_service,
+            "south_bound_service" : errorElementObject.start_south_bound_service,
+            "north_direction_label" : errorElementObject.start_north_direction_label,
+            "south_direction_label" : errorElementObject.start_south_direction_label,
+            "type" : "errorStart"
+          };
+
+          selectedStationInfoObj[errorElementObject.end_station_gtfs] ={
+            "stopId" : errorElementObject.end_station_gtfs,
+            "north_bound_service" : errorElementObject.end_north_bound_service,
+            "south_bound_service" : errorElementObject.end_south_bound_service,
+            "north_direction_label" : errorElementObject.end_north_direction_label,
+            "south_direction_label" : errorElementObject.end_south_direction_label,
+            "type" : "errorEnd"
           }
-        }  
+
+        }
       }
     } else {
-      
-      console.log(tripInfo)
+      // NO TRIP INFO RETURNED, NO ERRORS
+      console.log('trip info empty')
       return
     }
-    
+    console.log('ssio', selectedStationInfoObj)
     // update this to current props
     // START, END, WAYPOINT, NOT IN TRIP
     // map through stationArray and change status of stations that are present in ids from tripInfo

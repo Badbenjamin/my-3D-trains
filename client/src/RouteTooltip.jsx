@@ -4,13 +4,15 @@ import * as THREE from "three"
 
 export default function RouteTooltip({stationInfo, name, position}){
     // where do I get name from, how can I get name of transfer? 
-
+    // console.log('si rttt', stationInfo)
+    // THESE COULD ALL JUST BE ONE I THINK???
     const [startStatonInfo, setStartStationInfo] = useState({})
     const [endStationInfo, setEndStationInfo] = useState({})
     const [transferStationInfo, setTransferStationInfo] = useState({
         "first_station" : null,
         "second_station" : null
     })
+    const [errorInfo, setErrorInfo] = useState({})
 
     useEffect(()=>{
         if(stationInfo.type == "start"){
@@ -167,7 +169,22 @@ export default function RouteTooltip({stationInfo, name, position}){
                 'second_station' : secondStationObject
             }
         })
-        
+        // GET THESE TO WORK
+    } else if (stationInfo.type === "errorStart"){
+        console.log('start station info rtt', stationInfo)
+        setErrorInfo(()=>{
+            let startErrorObj = {
+
+            }
+        })
+    } else if ((stationInfo.type === "errorEnd")){
+        console.log('end station info rtt', stationInfo)
+        setErrorInfo(()=>{
+            let endErrorObj = {
+                
+            }
+
+        })
     }
 
     },[stationInfo])
@@ -217,6 +234,21 @@ export default function RouteTooltip({stationInfo, name, position}){
                 <Line points={[position, tooltipPosition]} lineWidth={2}/>
             </>
         )
+    } else if (stationInfo.type == "errorStart" || stationInfo.type == "errorEnd"){
+        console.log('worked')
+        return(
+            <>
+            <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={5}>
+                <div className="route-info-html">
+                   <div>{name}</div>
+                  
+                   <div>WHAAAA</div>
+                </div>
+            </Html>
+            <Line points={[position, tooltipPosition]} lineWidth={2}/>
+        </>
+        )
+
     }
     
 }
