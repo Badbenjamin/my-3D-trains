@@ -277,6 +277,9 @@ class TripError:
         self.start_station_routes = start_station.daytime_routes.split()
         self.end_station_routes = end_station.daytime_routes.split()
 
+        self.start_station_complex_id = start_station.complex_id
+        self.end_station_complex_id = end_station.complex_id
+
         self.start_north_direction_label = start_station.north_direction_label
         self.start_south_direction_label = start_station.south_direction_label
 
@@ -284,7 +287,7 @@ class TripError:
         self.end_south_direction_label = end_station.south_direction_label
         station_service_obj = modules_classes.check_for_station_service_on_failed_leg(train_data, start_station_id, end_station_id)
         # HOW DO I FIND DIRECTION IF NO TRAIN DATA? 
-        print(self.start_north_direction_label)
+        print('complex', start_station.complex_id, end_station.complex_id)
         # I need the status of direction service on stations (ig. no trains northbound)
         # I need to determine if there is a possible transfer between lines. 
         # self.shared_stations = train_data.shared_stations
@@ -372,6 +375,9 @@ class FormattedTrainData:
                         "start_station_routes" : trip_sequence_element.start_station_routes,
                         "end_station_routes" : trip_sequence_element.end_station_routes,
 
+                        "start_station_complex_id" : trip_sequence_element.start_station_complex_id,
+                        "end_station_complex_id" : trip_sequence_element.end_station_complex_id,
+
                         "start_north_bound_service" : trip_sequence_element.start_north_bound_service,
                         "start_south_bound_service" : trip_sequence_element.start_south_bound_service,
                         "end_north_bound_service" : trip_sequence_element.end_north_bound_service,
@@ -379,8 +385,8 @@ class FormattedTrainData:
 
                         "start_north_direction_label" : trip_sequence_element.start_north_direction_label,
                         "start_south_direction_label" : trip_sequence_element.start_south_direction_label,
-                        "end_north_direction_label" : trip_sequence_element.start_north_direction_label,
-                        "end_south_direction_label" : trip_sequence_element.start_south_direction_label,
+                        "end_north_direction_label" : trip_sequence_element.end_north_direction_label,
+                        "end_south_direction_label" : trip_sequence_element.end_south_direction_label,
                     }
                     trip_sequence.append(error_for_react)
             self.trip_sequences_for_react.append(trip_sequence)

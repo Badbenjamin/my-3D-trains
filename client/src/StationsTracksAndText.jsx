@@ -142,7 +142,7 @@ useEffect(()=>{
         // COULE PUT ROUTE TT PUSH HERE?!?!
         
         // ADD tripError type? LEFT OFF HERE
-        if(stationArray[j].props.stationInfo && ((stationArray[j].props.stationInfo.type == 'start')||(stationArray[j].props.stationInfo.type == 'end')||(stationArray[j].props.stationInfo.type == 'transfer')||(stationArray[j].props.stationInfo.type == 'errorStart')||(stationArray[j].props.stationInfo.type == 'errorEnd'))){
+        if(stationArray[j].props.stationInfo && ((stationArray[j].props.stationInfo.type == 'start')||(stationArray[j].props.stationInfo.type == 'end')||(stationArray[j].props.stationInfo.type == 'transfer')||(stationArray[j].props.stationInfo.type == 'errorStart')||(stationArray[j].props.stationInfo.type == 'errorEnd')||(stationArray[j].props.stationInfo.type == 'errorTransfer'))){
 
           let keyforRouteInfo = stationInfoObject[stationArray[j].props.name].name.toString() + versionForKey.toString()
           let newRouteTooltip = <RouteTooltip key={keyforRouteInfo} name={stationInfoObject[stationArray[j].props.name].name} position={stationArray[j].props.mesh.position} stationInfo={stationArray[j].props.stationInfo}/>
@@ -217,6 +217,7 @@ useEffect(()=>{
           // if the complexId already exists as a key in the complexObject, we condense the info of the new
           // station (part of the complex), into the value of the existing complexId key
           } else {
+            console.log('complex object push')
             complexObject[newInfoObject.complex_id]['daytime_routes'].push([newInfoObject.daytime_routes])
 
             // name route combos, might only need this after all
@@ -290,8 +291,9 @@ useEffect(()=>{
                            alphaLevel={0} />
 
         // Where do I put this to condense it into one entity with all the info from two stations? 
+        
         if(complexObject[complex].stationInTrip){
-
+          console.log('complex tooltip?')
           // need to modify this to work with complex info
           let newRouteTooltip = <RouteTooltip name={"complex"} position={averagePosition} stationInfo={complexObject[complex].name_arrival_info_combo_array}/>
           newRouteInfoHtmlArray.push(newRouteTooltip)
@@ -356,7 +358,7 @@ useEffect(()=>{
 
     let routeInfoHtmlArrayObj = {}
     for (let routeInfo of newRouteInfoHtmlArray){
-      console.log('ri', routeInfo)
+      // console.log('ri', routeInfo)
       // MIGHT NEED TO MAKE THIS COMPLEX ID? OR JUST START END TRANSFER
       if (Object.keys(routeInfoHtmlArrayObj).length === 0 || !(routeInfo.props.stationInfo.type in routeInfoHtmlArrayObj)){
         routeInfoHtmlArrayObj[routeInfo.props.stationInfo.type] = routeInfo

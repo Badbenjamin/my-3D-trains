@@ -22,7 +22,7 @@ function App() {
   const [stationArray, setStationArray] = useState([])
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
-  console.log('ti', tripInfo)
+  // console.log('ti', tripInfo)
   const [tripInfoIndex, setTripInfoIndex] = useState(0)
   const [stationIdStartAndEnd, setStationIdStartAndEnd] = useState({"startId" : null, "endId" : null})
   const [vectorPosition, setVectorPositon] = useState({})
@@ -118,9 +118,11 @@ function App() {
         // loop through all stops of a leg
         // create stationInfo object for all stations involved in trip
         // This branch executes for valid tripSequenceElements with stops and info, not tripErrorElements
+        console.log('stops for leg', stopsForLeg)
         if (stopsForLeg != null){
           for (let stop of stopsForLeg){
             // start stop
+            
             if (stop.stop_id.slice(0,3) == startStopId){
               selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
                 "stopId" : stop.stop_id.slice(0,3),
@@ -151,6 +153,7 @@ function App() {
                 "route" : tripSequenceElement.route
               }
             } else if ((stop.stop_id.slice(0,3) in selectedStationInfoObj) && ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) == stopsForLeg[0].stop_id.slice(0,3) || stop.stop_id.slice(0,3) == stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3)))){
+              console.log('does this occur in tripError in transfer?')
               selectedStationInfoObj[stop.stop_id.slice(0,3)].second_transfer_info.push({
                 "stopId" : stop.stop_id.slice(0,3),
                 "arrival" : stop.arrival,
@@ -159,6 +162,7 @@ function App() {
                 "direction_label" : tripSequenceElement.direction_label,
                 "route" : tripSequenceElement.route
               })
+              
             } else if ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) != stopsForLeg[0].stop_id.slice(0,3) && stop.stop_id.slice(0,3) != stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3))){
               selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
                 "stopId" : stop.stop_id.slice(0,3),
@@ -168,33 +172,70 @@ function App() {
                 "direction_label" : tripSequenceElement.direction_label,
                 "route" : tripSequenceElement.route
               }
-            }
+            } 
+            
           } 
+          console.log('ssio first branch', selectedStationInfoObj)
           // TURN ERROR INFO INTO SELECTEDSTATIONINFOOBJ INFO
           // HOW DO I HANDLE TRANSFERS IN COMPLEXES, OR 
         }   else if ((errorElementObject != null)){
+          // might need to put this into the transfer object? 
+          console.log('start end', startStopId, endStopId)
           console.log('eeo', errorElementObject)
-          selectedStationInfoObj[errorElementObject.start_station_gtfs] ={
-            "stopId" : errorElementObject.start_station_gtfs,
-            "north_bound_service" : errorElementObject.start_north_bound_service,
-            "south_bound_service" : errorElementObject.start_south_bound_service,
-            "north_direction_label" : errorElementObject.start_north_direction_label,
-            "south_direction_label" : errorElementObject.start_south_direction_label,
-            "station_to_station_service" : errorElementObject.station_to_station_service,
-            "start_station_routes" : errorElementObject.start_station_routes,
-            "type" : "errorStart"
+          console.log('ssio', selectedStationInfoObj)
+          console.log('errorStart', errorElementObject.start_station_gtfs in selectedStationInfoObj, errorElementObject.start_station_gtfs)
+          // if key not in obj, add start station key value pair to object
+
+          if (!(errorElementObject.start_station_gtfs in selectedStationInfoObj) && errorElementObject.start_station_gtfs === startStopId){
+            console.log('errorStart')
+            selectedStationInfoObj[errorElementObject.start_station_gtfs] ={
+              "stopId" : errorElementObject.start_station_gtfs,
+              "north_bound_service" : errorElementObject.start_north_bound_service,
+              "south_bound_service" : errorElementObject.start_south_bound_service,
+              "north_direction_label" : errorElementObject.start_north_direction_label,
+              "south_direction_label" : errorElementObject.start_south_direction_label,
+              "station_to_station_service" : errorElementObject.station_to_station_service,
+              "start_station_routes" : errorElementObject.start_station_routes,
+              "type" : "errorStart"
+            };
           };
 
-          selectedStationInfoObj[errorElementObject.end_station_gtfs] ={
-            "stopId" : errorElementObject.end_station_gtfs,
-            "north_bound_service" : errorElementObject.end_north_bound_service,
-            "south_bound_service" : errorElementObject.end_south_bound_service,
-            "north_direction_label" : errorElementObject.end_north_direction_label,
-            "south_direction_label" : errorElementObject.end_south_direction_label,
-            "station_to_station_service" : errorElementObject.station_to_station_service,
-            "end_station_routes" : errorElementObject.end_station_routes,
-            "type" : "errorEnd"
-          }
+          // append error info to transfer obj in selectedStationInfoObj
+          // if the second leg of a trip has a tripError, the start stationError of an error object should be added to the second_transfer_info array of the transfer station
+          if ((errorElementObject.start_station_gtfs != startStopId || errorElementObject.end_station_gtfs != endStopId)){
+            console.log('errorTransfer')
+            for (let selectedStation in selectedStationInfoObj){
+              if (selectedStationInfoObj[selectedStation].type === 'transfer'){
+                selectedStationInfoObj[selectedStation].second_transfer_info.push({
+                  "stopId" : errorElementObject.start_station_gtfs,
+                  "north_bound_service" : errorElementObject.start_north_bound_service,
+                  "south_bound_service" : errorElementObject.start_south_bound_service,
+                  "north_direction_label" : errorElementObject.start_north_direction_label,
+                  "south_direction_label" : errorElementObject.start_south_direction_label,
+                  "station_to_station_service" : errorElementObject.station_to_station_service,
+                  "start_station_routes" : errorElementObject.start_station_routes,
+                  "type" : "errorTransfer"
+                });
+              }
+            }
+            
+          }; 
+
+          if (!(errorElementObject.end_station_gtfs in selectedStationInfoObj) && errorElementObject.end_station_gtfs === endStopId){
+            console.log('errorEnd', errorElementObject.end_station_gtfs in selectedStationInfoObj, errorElementObject.end_station_gtfs)
+            selectedStationInfoObj[errorElementObject.end_station_gtfs] ={
+              "stopId" : errorElementObject.end_station_gtfs,
+              "north_bound_service" : errorElementObject.end_north_bound_service,
+              "south_bound_service" : errorElementObject.end_south_bound_service,
+              "north_direction_label" : errorElementObject.end_north_direction_label,
+              "south_direction_label" : errorElementObject.end_south_direction_label,
+              "station_to_station_service" : errorElementObject.station_to_station_service,
+              "end_station_routes" : errorElementObject.end_station_routes,
+              "type" : "errorEnd"
+            }
+          };
+
+          
         }
       }
     } else {
@@ -224,6 +265,7 @@ function App() {
       })
 
       if((tripInfo.length > 0)){
+        // console.log('nsa', newStationArray)
         setStationArray(newStationArray)
       }
     

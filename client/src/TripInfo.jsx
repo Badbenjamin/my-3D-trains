@@ -8,9 +8,9 @@ function TripInfo({tripInfo, tripInfoIndex}){
 
   
         let newDisplayInfo = []
-        console.log(tripInfo.length > 0)
+        // console.log(tripInfo.length > 0)
         if (tripInfo.length > 0){
-            console.log('worked')
+            // console.log('worked')
             newDisplayInfo = tripInfo[tripInfoIndex].map((leg) =>{
     
                 if ('schedule' in leg){
@@ -25,7 +25,7 @@ function TripInfo({tripInfo, tripInfoIndex}){
             console.log('other error')
         }
   
-    console.log('ti ti el', tripInfo)
+    // console.log('ti ti el', tripInfo)
     
     
     
