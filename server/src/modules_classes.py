@@ -165,8 +165,8 @@ def check_station_arrival_or_departure(stop, station_id, deptarture_or_arrival):
              deptarture_or_arrival_time = departure_time
         if deptarture_or_arrival == "arrival":
              deptarture_or_arrival_time = arrival_time
-        
-        if (stop.stop_id[:-1] == station_id) and (deptarture_or_arrival_time > current_time_int):
+
+        if ((stop.stop_id[:-1] == station_id) and (deptarture_or_arrival_time > current_time_int)):
             return True
         else:
             return False
@@ -192,6 +192,7 @@ def filter_trains_for_stations_direction_future_arrival(train_data, start_statio
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
                     stops = create_stop_schedule(train)
+                    # need 
                     if ((check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id)) and (check_for_correct_direction(stops, start_station_id, end_station_id))):
                         stop_schedule = train.trip_update.stop_time_update
                         for stop in stop_schedule:

@@ -22,7 +22,6 @@ function App() {
   const [stationArray, setStationArray] = useState([])
   const [version, setVersion] = useState(0)
   const [tripInfo, setTripInfo] = useState([])
-  // console.log('ti', tripInfo)
   const [tripInfoIndex, setTripInfoIndex] = useState(0)
   const [stationIdStartAndEnd, setStationIdStartAndEnd] = useState({"startId" : null, "endId" : null})
   const [vectorPosition, setVectorPositon] = useState({})
@@ -35,7 +34,6 @@ function App() {
       .then(stationsData => setStations(stationsData))
   }, [])
 
-    // THERE IS A BUG HERE (when tt is used to set waypoints after another trip has been planned)
     // This is triggered when ToolTip origin or dest button is clicked
   function retrieveStationId(id, startOrEnd) {
     setStationIdStartAndEnd((prevState )=> {
@@ -53,7 +51,6 @@ function App() {
   // this useEffect creates Station objects for each geometry in our model
   useEffect(()=>{
     // newStatusArray is an array of objects with names of stations/meshes and a boolean to determine whether they are selected or not
-    // const newStatusArray = createStatusObjectArray(nodes)
     // newMapModelObj contains the info for all the station and track geometries in our scene
     const newMapModelObj = createStationComponentsObj(nodes, materials, retrieveStationId)
     // this loop populates newStationArray with meshes from our newMapModelObject
@@ -62,19 +59,17 @@ function App() {
       newStationArray.push(newMapModelObj[station])
       };
     // statusArray is set (should be all false, unselected)
-    // setStatusArray(newStatusArray)
     // stationArray is set with our newly created Station components from newMapModelObject
     setStationArray(newStationArray)
   }, [])
 
-  // This useEffect listens for a change in tripInfo. 
-  // It takes the stations from ttrain schedule and creates an array of GTFS ids that will be passed to the selectStations function
-  // selectStations takes an array of gtfs ids and uses it to change the status of the stations in stationArray.
+  // This useEffect listens for a change in tripInfo. Also TripInfoIndex. 
+  // It takes the stations from tripInfo train schedule (or tripError), adds them to SelectedStationInfoObj, 
+  // then SSInfoObj is used to add stationInfo to the r3F station geometries/components. 
   useEffect(()=>{
     let currentTrip = tripInfo[tripInfoIndex]
     let selectedStationInfoObj = {}
    
-    // ad else branch for error
     // are there any instances where an impossible trip returns an empty tripInfo vs one with a TripError? 
     if (currentTrip && tripInfo.length > 0){
       let startStopId = currentTrip[0].start_station_gtfs
@@ -84,7 +79,6 @@ function App() {
         const currentTripSchedule = tripSequenceElement.schedule
         const startStationId = tripSequenceElement.start_station_gtfs
         const endStationId = tripSequenceElement.end_station_gtfs
-        // ERROR WHEN STATION NOT IN SERVICE!!!
         let justStationIds = []
         let errorElementObject = null
         if (currentTripSchedule){
@@ -93,14 +87,13 @@ function App() {
           })
           // TRIP ERROR BRANCH!!!
         } else {
-          console.log('trip error el', tripSequenceElement)
           errorElementObject = tripSequenceElement
           // justStationIds.push(tripSequenceElement['start_station_gtfs'])
           // justStationIds.push(tripSequenceElement['end_station_gtfs'])
         }
-        console.log('sids',justStationIds)
-        // console.log('ee', errorElementObject)
 
+        // take all stops from each train's schedule
+        // remove all stops not involved in user's trip
         let startIndex = null
         let endIndex = null
         let startStop = null
@@ -116,12 +109,10 @@ function App() {
         
 
         // loop through all stops of a leg
-        // create stationInfo object for all stations involved in trip
+        // create stationInfo object key value pair for all stations involved in trip
         // This branch executes for valid tripSequenceElements with stops and info, not tripErrorElements
-        console.log('stops for leg', stopsForLeg)
         if (stopsForLeg != null){
           for (let stop of stopsForLeg){
-            // start stop
             
             if (stop.stop_id.slice(0,3) == startStopId){
               selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
@@ -142,7 +133,6 @@ function App() {
                 "route" : tripSequenceElement.route
               }
             }  else if (!(stop.stop_id.slice(0,3) in selectedStationInfoObj) && ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) == stopsForLeg[0].stop_id.slice(0,3) || stop.stop_id.slice(0,3) == stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3)))){
-              // key overwritten for LtoE transfer because its the same station. 
               selectedStationInfoObj[stop.stop_id.slice(0,3)] = {
                 "stopId" : stop.stop_id.slice(0,3),
                 "arrival" : stop.arrival,
@@ -175,19 +165,11 @@ function App() {
             } 
             
           } 
-          console.log('ssio first branch', selectedStationInfoObj)
           // TURN ERROR INFO INTO SELECTEDSTATIONINFOOBJ INFO
-          // HOW DO I HANDLE TRANSFERS IN COMPLEXES, OR 
         }   else if ((errorElementObject != null)){
-          // might need to put this into the transfer object? 
-          console.log('start end', startStopId, endStopId)
-          console.log('eeo', errorElementObject)
-          console.log('ssio', selectedStationInfoObj)
-          console.log('errorStart', errorElementObject.start_station_gtfs in selectedStationInfoObj, errorElementObject.start_station_gtfs)
-          // if key not in obj, add start station key value pair to object
-
+      
+          // if key not in selcectedStationInfoObj and gtfs id matches start id, add start station key value pair to object
           if (!(errorElementObject.start_station_gtfs in selectedStationInfoObj) && errorElementObject.start_station_gtfs === startStopId){
-            console.log('errorStart')
             selectedStationInfoObj[errorElementObject.start_station_gtfs] ={
               "stopId" : errorElementObject.start_station_gtfs,
               "north_bound_service" : errorElementObject.start_north_bound_service,
@@ -200,10 +182,10 @@ function App() {
             };
           };
 
-          // append error info to transfer obj in selectedStationInfoObj
-          // if the second leg of a trip has a tripError, the start stationError of an error object should be added to the second_transfer_info array of the transfer station
+          // if gtfs_stop_id is not start or end gtfs, it must be a transfer
+          // find the transfer in the selectedStationINfoObj, and push this to the second_transfer_info array
+          // there will only be a transfer if the first leg of the trip is not an error, and the second is
           if ((errorElementObject.start_station_gtfs != startStopId || errorElementObject.end_station_gtfs != endStopId)){
-            console.log('errorTransfer')
             for (let selectedStation in selectedStationInfoObj){
               if (selectedStationInfoObj[selectedStation].type === 'transfer'){
                 selectedStationInfoObj[selectedStation].second_transfer_info.push({
@@ -220,9 +202,8 @@ function App() {
             }
             
           }; 
-
+          // if gtfs_stop_id is not the end, then add this to the selectedStationInfoObj
           if (!(errorElementObject.end_station_gtfs in selectedStationInfoObj) && errorElementObject.end_station_gtfs === endStopId){
-            console.log('errorEnd', errorElementObject.end_station_gtfs in selectedStationInfoObj, errorElementObject.end_station_gtfs)
             selectedStationInfoObj[errorElementObject.end_station_gtfs] ={
               "stopId" : errorElementObject.end_station_gtfs,
               "north_bound_service" : errorElementObject.end_north_bound_service,
@@ -243,10 +224,11 @@ function App() {
       console.log('trip info empty')
       return
     }
-    console.log('ssio', selectedStationInfoObj)
-    // update this to current props
-    // START, END, WAYPOINT, NOT IN TRIP
+  
+    // CREATE NEW STATION ARRAY WITH INFO FROM USER'S TRIP (tripInfo)
     // map through stationArray and change status of stations that are present in ids from tripInfo
+    // selcetedStationInfoObj contains info for stations involved in trip, whether, start, end, transfer, passthrough, errorStart, errorEnd, or errorTransfer
+    // all stations involved in a trip will have stationInfo prop containing thesir info
     if (tripInfo != [] && selectedStationInfoObj != {}){
       let newStationArray = stationArray.map((stationGeometry)=>{
         if (stationGeometry.props.name in selectedStationInfoObj){
@@ -265,7 +247,6 @@ function App() {
       })
 
       if((tripInfo.length > 0)){
-        // console.log('nsa', newStationArray)
         setStationArray(newStationArray)
       }
     
@@ -286,12 +267,10 @@ function App() {
       })
       return newStation
     })
-    // reset tripInfo
     setStationArray(resetStationArray)
     setTripInfo([])
     setTripInfoIndex(0)
     setStationIdStartAndEnd({"startId" : null, "endId" : null})
-    // make sure search bar is cleared (probably in component, not here)
   }
   
   if (!nodes || !stationArray){

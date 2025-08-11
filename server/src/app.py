@@ -13,10 +13,6 @@ ct = datetime.now()
 def plan_trip(start_station_id, end_station_id):
     # new_journey contains endpoints for start and end stations, and calculates a transfer if applicable.
     new_journey = Journey(start_station_id, end_station_id)
-    # print('shared', new_journey.shared_stations)
-    print('jinfo', new_journey.journey_info_obj)
-    # IF NO SHARED STATIONS AND NOT ON SAME LINE
-    # NEED TO WORK ON THIS!!!!
     if (len(new_journey.shared_stations)==0 and (new_journey.journey_info_obj['on_same_colored_line'] == False) and (new_journey.journey_info_obj['start_shares_routes_with_end'] == False)):
         trip_planner_error_obj = {
             "start_station_name" : new_journey.start_station.stop_name,

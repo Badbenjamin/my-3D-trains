@@ -1,23 +1,21 @@
 import { Html, Line } from "@react-three/drei"
 import { useState, useEffect } from "react"
 import * as THREE from "three"
-import TripInfo from "./TripInfo"
 
 export default function RouteTooltip({stationInfo, name, position}){
-    // where do I get name from, how can I get name of transfer? 
-    // console.log('si rttt', stationInfo)
-    // THESE COULD ALL JUST BE ONE I THINK???
+
     const [startStatonInfo, setStartStationInfo] = useState(null)
     const [endStationInfo, setEndStationInfo] = useState(null)
     const [transferStationInfo, setTransferStationInfo] = useState({
         "first_station" : null,
         "second_station" : null
     })
-    // console.log('trans inf', transferStationInfo)
     const [errorInfo, setErrorInfo] = useState({})
 
+    // stationInfo is info passed from server to geometry, then combined with text in stationsTracksAndText
+    // types of tooltip info to display are start, end, transfer, errorStart, errorEnd, and errorTransfer
     useEffect(()=>{
-        console.log('si type', stationInfo.type)
+        // create start info to display
         if(stationInfo.type == "start"){
             setStartStationInfo((prevInfo)=>{
                 let newInfo = {...prevInfo}
@@ -50,8 +48,8 @@ export default function RouteTooltip({stationInfo, name, position}){
                 }
                 return newInfo
             })
+        // create end info to display
         } else if (stationInfo.type == "end"){
-            console.log('end')
             setEndStationInfo((prevInfo)=>{
                 let newInfo = {...prevInfo}
                 let arrivalTime = new Date(stationInfo.arrival * 1000)
@@ -81,13 +79,13 @@ export default function RouteTooltip({stationInfo, name, position}){
                 }
                 return newInfo
             })
+    // transfer is a little more complex
+    // because of hashmaps, the order of the transfer has been lost
+    // it must be re constructed by ordering the transfers by arrival time
     } else if (stationInfo.type === "transfer"){
         // construct ordered objects based on arrival and departure times
-        console.log('transfer')
-        console.log(stationInfo.second_transfer_info)
         
         // BRANCH FOR SUCCESSFUL TRANSFER
-        console.log('error',stationInfo )
         if (stationInfo.second_transfer_info[0].type != 'errorTransfer'){
             console.log('sucsessful transfer')
             setTransferStationInfo((prevInfo)=>{
@@ -110,10 +108,6 @@ export default function RouteTooltip({stationInfo, name, position}){
                     hour12: true 
                 })
                 
-                // if (stationInfo.second_transfer_info[0].arrival && stationInfo.second_transfer_info[0].departure){
-                //     console.log('is this a trip error error?')
-                //     return
-                // }
                 let secondArrivalTime = new Date(stationInfo.second_transfer_info[0].arrival * 1000)
                 let secondArrivalTimeString = secondArrivalTime.toLocaleTimeString('en-US', { 
                     hour: 'numeric', 
@@ -129,7 +123,6 @@ export default function RouteTooltip({stationInfo, name, position}){
                 })
     
                 if (stationInfo.arrival < stationInfo.second_transfer_info[0].arrival){
-    
     
                     firstStationObject =  {
                         "arrival_ts" : stationInfo.arrival,
@@ -155,8 +148,7 @@ export default function RouteTooltip({stationInfo, name, position}){
                         "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.second_transfer_info[0].route}.png`}/>
                     }
                 } else if ((stationInfo.arrival > stationInfo.second_transfer_info[0].arrival)){
-                    // is this my error branch? 
-                    console.log('bug here with error and transfer? ')
+   
                     secondStationObject =  {
                         "arrival_ts" : stationInfo.arrival,
                         "departure_ts" : stationInfo.departure,
@@ -188,8 +180,8 @@ export default function RouteTooltip({stationInfo, name, position}){
                 }
             })
             // BRANCH WHEN SECOND LEG IS AN ERROR
+            // there shouldnt be a transfer if first leg is an error
         } else  {
-            console.log('second station info error transfer branch')
             setTransferStationInfo(()=>{
 
                 let firstStationObject = {}
@@ -208,7 +200,6 @@ export default function RouteTooltip({stationInfo, name, position}){
                     minute: '2-digit',
                     hour12: true 
                 })
-                console.log('route icon', stationInfo.route)
                 firstStationObject =  {
                     "arrival_ts" : stationInfo.arrival,
                     "departure_ts" : stationInfo.departure,
@@ -221,7 +212,6 @@ export default function RouteTooltip({stationInfo, name, position}){
                     "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.route}.png`}/>
                 }
 
-                console.log(stationInfo.second_transfer_info[0])
                 secondStationObject = {
                     "north_bound_service" : stationInfo.second_transfer_info[0].north_bound_service,
                     "south_bound_service" : stationInfo.second_transfer_info[0].south_bound_service,
@@ -244,11 +234,10 @@ export default function RouteTooltip({stationInfo, name, position}){
 
         }
         
-        // GET THESE TO WORK
+        // IF ERROR AT START OR END STATION, THESE WILL DISPLAY
     } else if ((stationInfo.type === "errorStart") || (stationInfo.type === "errorEnd")){
-        console.log('start or end error')
         setErrorInfo(()=>{
-            // start or end
+
             let errorObject = {
                 "complete_service" : (stationInfo.north_bound_service) && (stationInfo.south_bound_service),
                 "trains_between_stations" : stationInfo.station_to_station_service,
@@ -258,8 +247,6 @@ export default function RouteTooltip({stationInfo, name, position}){
             
             }
 
-            console.log('nb', stationInfo.north_bound_service)
-            
             if (!(stationInfo.north_bound_service)){
                 errorObject['north_bound_service'] = false
             } 
@@ -273,12 +260,6 @@ export default function RouteTooltip({stationInfo, name, position}){
                 errorObject['south_bound_service'] = true
             }
 
-            
-
-
-           
-
-            console.log('di',errorObject)
             setErrorInfo(errorObject)
         })
     } else {
@@ -293,7 +274,7 @@ export default function RouteTooltip({stationInfo, name, position}){
     const lineMaterial = new THREE.LineBasicMaterial( { color: new THREE.Color('white') } );
     lineMaterial.linewidth = 500
 
-
+    // START (NO ERROR) TOOLTIP DISPLAY
     if (startStatonInfo != null){
         return(
             <>
@@ -307,6 +288,7 @@ export default function RouteTooltip({stationInfo, name, position}){
                 <Line points={[position, tooltipPosition]} lineWidth={2}/>
             </>
         )
+    // END (NO ERROR) TOOLTIP DISPLAY
     } else if ((endStationInfo != null)){
         return(
             <>
@@ -320,9 +302,8 @@ export default function RouteTooltip({stationInfo, name, position}){
                 <Line points={[position, tooltipPosition]} lineWidth={2}/>
             </>
         )
-        // SUCCSESFUL TRANSFER
+        // SUCCSESFUL TRANSFER (NO ERROR) TOOLTIP DISPLAY
     } else if ((transferStationInfo.first_station && transferStationInfo.second_station) && (transferStationInfo.second_station.type != 'errorTransfer')){
-        console.log(transferStationInfo)
         return(
             <>
                 <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={5}>
@@ -335,10 +316,8 @@ export default function RouteTooltip({stationInfo, name, position}){
                 <Line points={[position, tooltipPosition]} lineWidth={2}/>
             </>
         )
-        // TRANSFER WITH ERROR 
+        // TRANSFER WITH ERROR TOOLTIP DISPLAY
     } else if((transferStationInfo.first_station && transferStationInfo.second_station) && (transferStationInfo.second_station.type === 'errorTransfer')){
-        // console.log('trans error', transferStationInfo.first_station.routeIcon)
-        console.log(transferStationInfo)
         return(
             <>
                 <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={5}>
@@ -354,6 +333,7 @@ export default function RouteTooltip({stationInfo, name, position}){
             </>
         )
     } else if (errorInfo){
+        // SPLIT INTO START AND END? works now, handle this during styling
         console.log('si error return', errorInfo)
         return(
             <>
