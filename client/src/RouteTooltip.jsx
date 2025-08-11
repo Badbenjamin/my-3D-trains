@@ -355,5 +355,4 @@ export default function RouteTooltip({stationInfo, name, position}){
         )
 
     }
-    
 }
