@@ -11,6 +11,7 @@ import StationToolTip from './StationTooltip'
 import ComplexTooltip from './ComplexTooltip'
 import RouteTooltip from './RouteTooltip'
 
+
 import { findDistance } from './ModularFunctions'
 
 
@@ -19,8 +20,6 @@ export default function StationsTracksAndText({vectorPosition}) {
     const [stationInfoObjectArray, setStationInfoObjectArray] = useState([])
     const [stationHtmlArray, setStationHtmlArray] = useState([])
     const [complexHtmlArray, setComplexHtmlArray] = useState([])
-    // USE THIS LATER FOR ROUTE HIGHLIGHTING
-    // const [tripInfoHtmlArray, setTripInfoHtmlArray] = useState([])
     const [toolTipArray, setToolTipArray] = useState([].slice(0,2))
     const [routeInfoArray, setRouteInfoArray] = useState([])
     const [versionForKey, setVersionForKey] = useState(0)
@@ -33,18 +32,17 @@ useEffect(()=>{
       .then(stationInfoObjectArray => {setStationInfoObjectArray(stationInfoObjectArray)})
 },[])
 
+
 // CREATE STATION TOOLTIP IF IT DOESN'T ALREADY EXIST
 function handleStationClick(stopId, name, position, daytime_routes){
 
   let newStationTooltip = <StationToolTip key={name + versionForKey} clearTooltip={clearTooltip} retrieveStationId={retrieveStationId} stopId={stopId} position={position} name={name} daytime_routes={daytime_routes}/>;
-  
   
   setVersionForKey((prevVersion)=>{
     return prevVersion += 1
   });
 
   setToolTipArray(prevTooltipArray => {
-    
     let alreadyInArray = false
     prevTooltipArray.map((tooltip)=>{
         if (tooltip.props.stopId == stopId){
@@ -61,7 +59,7 @@ function handleStationClick(stopId, name, position, daytime_routes){
   });
 }
 
-// CREATE COMPLEX TOOLTIP IF ITS NOT ALREADY IN TTARRAY
+// CREATE COMPLEX TOOLTIP IF ITS NOT ALREADY IN TOOLTIPARRAY
 function handleComplexClick(complexStationRouteIdObjs, averagePosition, complexId){
 
   let newComplexTooltip = <ComplexTooltip key={complexId + versionForKey} clearTooltip={clearTooltip} retrieveStationId={retrieveStationId} complexId={complexId} complexStationRouteIdObjs={complexStationRouteIdObjs} averagePosition={averagePosition}/>
@@ -105,13 +103,12 @@ function clearTooltip(id, type){
       })
     })
   }
-  
-}
+};
 
-// executes on planTrip click
-
-
-  // COMBINE station info from DB with location info from map model to display HTML text on map
+  // COMBINE station geometries (stationArray) with stationInfoObjectArray, which is info from stations db table
+  // this will imbue our geometries with info that can be turned into text (map text, tooltips, route tts for trip in prog)
+  // stationInfo prop of station geometry in stationArray contains info about particular station in trip
+  // 
 useEffect(()=>{
   
   if (stationInfoObjectArray && stationArray){
@@ -133,11 +130,15 @@ useEffect(()=>{
     
     // loop through meshes to get position, combine with info from fetch, create Html text overlay
     for (let j = 0 ; j < stationArray.length; j++){
-      // filter out track names for now
+      // filter out track names for now, just stations (eg G22)
       if (stationArray[j].props.name.length < 5){
-        // COULE PUT ROUTE TT PUSH HERE?!?!
-      
-        if(stationArray[j].props.stationInfo && ((stationArray[j].props.stationInfo.type == 'start')||(stationArray[j].props.stationInfo.type == 'end')||(stationArray[j].props.stationInfo.type == 'transfer'))){
+        
+        // ROUTE TOOLTIP CREATION
+        // stationInfo prop contains information about each station in relation to the current trip
+        // tripInfo returned from backend is used to find stations involved in trip
+        // that info is passed to the geometries, then here, it is used to create RouteTooltips
+        // RTTs display trip info in text within the 3D map canvas
+        if(stationArray[j].props.stationInfo && ((stationArray[j].props.stationInfo.type == 'start')||(stationArray[j].props.stationInfo.type == 'end')||(stationArray[j].props.stationInfo.type == 'transfer')||(stationArray[j].props.stationInfo.type == 'errorStart')||(stationArray[j].props.stationInfo.type == 'errorEnd')||(stationArray[j].props.stationInfo.type == 'errorTransfer'))){
 
           let keyforRouteInfo = stationInfoObject[stationArray[j].props.name].name.toString() + versionForKey.toString()
           let newRouteTooltip = <RouteTooltip key={keyforRouteInfo} name={stationInfoObject[stationArray[j].props.name].name} position={stationArray[j].props.mesh.position} stationInfo={stationArray[j].props.stationInfo}/>
@@ -147,10 +148,9 @@ useEffect(()=>{
           })
         }
 
-        
+        // STATION TEXT CREATION
         // if name is in stationInfoObject as key, and is not a complex, create <StationText> and push to stationHtmlArray
         if( stationArray[j].props.name in stationInfoObject && !stationInfoObject[stationArray[j].props.name].complex){
-          // let status = false
           let newPosition = stationArray[j].props.mesh.position
           let newInfoObject = stationInfoObject[stationArray[j].props.name]
           // default size for text and route icons
@@ -182,6 +182,8 @@ useEffect(()=>{
           let newStationText = <StationText handleStationClick={handleStationClick} clearTooltip={clearTooltip} size={size}  wrapperClass="station_label"  index={j} tripInProgress={stationArray[j].props.tripInProgress} stationIntrip={stationArray[j].props.stationInTrip} stationInfo = {stationArray[j].props.stationInfo} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
           newStationHtmlArray.push(newStationText)
 
+          // THIS BRANCH HANDLES STATIONS IN COMPLEXES
+          // STATIONS IN COMPLEXES ARE CONDENSED INTO COMPLEXOBJECT KEY VALUE PAIRS
           // if the station name exists in the stationInfoObject & complex = True, create key in complexObject from complex_id and add values to key
         } else if ( stationArray[j].props.name in stationInfoObject && stationInfoObject[stationArray[j].props.name].complex){
 
@@ -209,9 +211,10 @@ useEffect(()=>{
                   "gtfs_stop_id" :newInfoObject.gtfs_stop_id
                 }]
             } 
-          // if the complexId already exists as a key in the complexObject, we condense the info of the new
+          // if the station's complexId already exists as a key in the complexObject, we condense the info of the new
           // station (part of the complex), into the value of the existing complexId key
           } else {
+            console.log('complex object push')
             complexObject[newInfoObject.complex_id]['daytime_routes'].push([newInfoObject.daytime_routes])
 
             // name route combos, might only need this after all
@@ -284,9 +287,10 @@ useEffect(()=>{
                            names={complexObject[complex].stop_names} 
                            alphaLevel={0} />
 
-        // Where do I put this to condense it into one entity with all the info from two stations? 
+        // If the station is involved in the current trip, we push it to the newRouteInfoHtmlArray
+        // this is used to set the routeInfoArray, or our routetooltips
         if(complexObject[complex].stationInTrip){
-
+          console.log('complex tooltip?')
           // need to modify this to work with complex info
           let newRouteTooltip = <RouteTooltip name={"complex"} position={averagePosition} stationInfo={complexObject[complex].name_arrival_info_combo_array}/>
           newRouteInfoHtmlArray.push(newRouteTooltip)
@@ -318,6 +322,7 @@ useEffect(()=>{
       })
 
       // CONTROL COMPLEX TEXT SIZE BASED ON DISTANCE TO CLOSEST STATIONTEXT OR COMPLEXTEXT
+      // IDEALLY THIS WOULD BE ON A SCALE INSTEAD OF JUST THREE OPTIONS
       if (distToClosestStationComplex >= 1.5){
         return currentComplex;
       } else if (distToClosestStationComplex < 1.5 && distToClosestStationComplex >= 1){
@@ -345,21 +350,23 @@ useEffect(()=>{
     })
     setStationHtmlArray(newStationHtmlArray)
     setComplexHtmlArray(newComplexHtmlArrayWithSize)
-    // set RouteTooltipArray???
-    // local to express transfer handled by stationInfo.secondTransferInfo
-    // how to condense two transfer objects into one for display? 
 
+
+    // CREATE OUR ROUTE TOOLTIPS 
     let routeInfoHtmlArrayObj = {}
     for (let routeInfo of newRouteInfoHtmlArray){
-      // MIGHT NEED TO MAKE THIS COMPLEX ID? OR JUST START END TRANSFER
+      // add key value pair (key = type, value = info). 
+      // start, end, transfer tooltips
       if (Object.keys(routeInfoHtmlArrayObj).length === 0 || !(routeInfo.props.stationInfo.type in routeInfoHtmlArrayObj)){
         routeInfoHtmlArrayObj[routeInfo.props.stationInfo.type] = routeInfo
         
-      } else if ((routeInfo.props.stationInfo.type in routeInfoHtmlArrayObj)) {
-        
+      // if key exists in routeInfoHtmlArray obj (should only be transfer, since there would be 2 per trip)
+      // then the info is pushed to the kv transfer pair that already exists
+      } else if ((routeInfo.props.stationInfo.type in routeInfoHtmlArrayObj) && (routeInfo.props.stationInfo.type === "transfer")) {
         routeInfoHtmlArrayObj[routeInfo.props.stationInfo.type].props.stationInfo.second_transfer_info.push(routeInfo.props.stationInfo)
       }
     }
+    // turn the obj into a list
     let condensedRouteInfoArray = []
     for (let routeInfo in routeInfoHtmlArrayObj){
       condensedRouteInfoArray.push(routeInfoHtmlArrayObj[routeInfo])
@@ -367,7 +374,7 @@ useEffect(()=>{
    
     setRouteInfoArray(condensedRouteInfoArray)
   }
-  // Clear tooltips when trip is in progress
+  // Clear stationTooltips when trip is in progress
   setToolTipArray([])
 },[stationInfoObjectArray, stationArray])
 
@@ -448,6 +455,7 @@ useEffect(()=>{
           {complexHtmlArray}
           {toolTipArray}
           {routeInfoArray}
+          {/* {(errorPopup === null) ? <></> : errorPopup} */}
       </group>
     )
   }

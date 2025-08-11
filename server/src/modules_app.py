@@ -13,10 +13,7 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
     start_station_id = journey_obj.start_station.gtfs_stop_id
     end_station_id = journey_obj.end_station.gtfs_stop_id
     all_possible_ts_pairs = []
-    # EXAMINE THIS FOR FLAWS
-    # start terminal, end origin? looks like it may just be choosing last on list? 
-    # how do i compare all trips and transfers? 
-    # print('tioa', journey_obj.transfer_info_obj_array)
+   
     for transfer_obj in journey_obj.transfer_info_obj_array:
         start_terminus_gtfs_id = transfer_obj['start_term'].gtfs_stop_id
         end_origin_gtfs_id = transfer_obj['end_origin'].gtfs_stop_id
@@ -24,7 +21,7 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
         leg_two_sorted_train_obj_list = []
        
         leg_one_filtered_trains = FilteredTrains(train_data_obj, train_data_obj.start_station_id, start_terminus_gtfs_id, current_time_int)
-        # if the first leg has no trains serving both stations, create and return an error object in the trip seq
+        # if the first leg has no trains serving both stations (error obj), create and return an error object in the trip seq
         # else sort the trains by arrival at destination
         if (leg_one_filtered_trains.trip_error_obj != None):
             all_possible_ts_pairs.append([leg_one_filtered_trains.trip_error_obj])
@@ -33,9 +30,8 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
             leg_one_sorted_train_obj_list = leg_one_filtered_trains.train_objects_sorted_by_dest_arrival
         
         leg_two_filtered_trains = FilteredTrains(train_data_obj, end_origin_gtfs_id, train_data_obj.end_station_id, current_time_int)
-
+        # WHAT IS GOING ON HERE? 
         if (leg_one_sorted_train_obj_list) and (leg_two_filtered_trains.trip_error_obj != None):
-            # DO I NEED TO MAKE A PAIR FOR EVERY TRAIN EVEN THOUGH THE TRIP WONT WORK?
             for leg_one_train in leg_one_sorted_train_obj_list:
                 ts_pair = []
                 leg_one_trip_sequence = TripSequenceElement(leg_one_train['train'], start_station_id, start_terminus_gtfs_id)
@@ -48,7 +44,7 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
 
 
         
-        transfer_time = 180
+        transfer_time = 120
         buffer_for_start_time = 30
         # USEFULL PRINT STATEMENT
         # print('lens', len(leg_one_sorted_train_obj_list), len(leg_one_sorted_train_obj_list))
@@ -79,10 +75,13 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
                             else:
                                 i += 1
 
-    for pair in ts_pairs_for_one_route:
-        all_possible_ts_pairs.append(pair)
+        for pair in ts_pairs_for_one_route:
+            all_possible_ts_pairs.append(pair)
     
     sorted_ts_pairs = sorted(all_possible_ts_pairs, key = lambda ts_pair : ts_pair[1].end_station_arrival)
+    pprint.pp(sorted_ts_pairs)
+    # for pair in sorted_ts_pairs:
+    #     pprint.pprint('sorted tspairs', sorted_ts_pairs)
     return sorted_ts_pairs
 
 
@@ -91,16 +90,18 @@ def build_trip_sequence(journey_obj, train_data_obj):
     # IF TRIP HAS TRANSFER
     
     if (journey_obj.shared_stations):
-        print('jo shared stat', journey_obj.shared_stations)
+        # print('jo shared stat', journey_obj.shared_stations)
         # FILTERED TRAINS PASSED TO FUNCTION
         trip_sequence = build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj)
+
         for ts_pair in trip_sequence:
             trip_sequences.append(ts_pair)
+    
     # IF TRIP REQUIRES TRANSFER AT ANY STATION FROM LOC TO EXP OR EXP TO LOC
     elif (journey_obj.local_express):
        
         local_express_trip = FilteredTrains(train_data_obj, train_data_obj.start_station_id, train_data_obj.end_station_id, current_time_int)
-
+        # EXAMINE OPTION WHERE ONE TRAIN IS FASTER THAN LOCAL EXPRESS TRANSFER
         for pair in local_express_trip.local_express_seq_2:
             trip_sequence = []
             if len(pair) == 2:
@@ -122,6 +123,6 @@ def build_trip_sequence(journey_obj, train_data_obj):
                 tse = TripSequenceElement(train['train'], start_gtfs_id, end_gtfs_id)
                 trip_sequence.append(tse)
                 trip_sequences.append(trip_sequence)
-
+    # print('tseqs', trip_sequences)
     return trip_sequences
 

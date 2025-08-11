@@ -21,14 +21,19 @@ def time_difference(first_time, second_time):
 
 def create_stop_schedule(train):
     stops = []
+    
     # stops list contains each trains stop array. used to determine if start stop is before end stop
     stop_schedule = train.trip_update.stop_time_update
+
+    # direction = stop_schedule[0].stop_id[-1]
+    # print('direction', direction)
     for stop in stop_schedule:
+        # print(stop.stop_id)
         stops.append(stop.stop_id[:-1])
+
     return stops
 
-def create_stop_scheudle_for_frontend():
-     pass
+
 
 def trains_to_objects(filtered_trains):
         train_object_list = []
@@ -74,29 +79,56 @@ def single_train_to_train_class(train):
     return new_train
 
 # could I combine this into filter trains for station direction current?
-def check_for_station_service_on_failed_trip(train_data, start_station_id, end_station_id):
-    
+def check_for_station_service_on_failed_leg(train_data, start_station_id, end_station_id):
+    print('sid eid', start_station_id, end_station_id)
     # there are trains stopping at start station, and at end station, but not at both
     start_service = False
     end_service = False
     start_to_end_service = False
+    # I need to find the direction of the trip
+    # then check if those trains serve the stations
+    start_north_bound_service = False
+    start_south_bound_service = False
+    end_north_bound_service = False
+    end_south_bound_service = False
+
+
     
     for train_feed in train_data:
             
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
                     stops = create_stop_schedule(train)
+                    direction = None
+                    if (len(train.trip_update.stop_time_update)>0):
+                        direction = train.trip_update.stop_time_update[0].stop_id[-1]
+
                     if (start_station_id in stops):
                          start_service = True
                     if (end_station_id in stops):
                          end_service = True
                     if (start_station_id in stops) and (end_station_id in stops):
                          start_to_end_service = True
+                    if (direction):
+                        if ((direction == "N") and (start_station_id in stops)):
+                            start_north_bound_service = True
+                        if ((direction == "S") and (start_station_id in stops)):
+                            start_south_bound_service = True
+                        if ((direction == "N") and (end_station_id in stops)):
+                            end_north_bound_service = True
+                        if ((direction == "S") and (end_station_id in stops)):
+                            end_south_bound_service = True
+                    
     service_obj = {
         'start_station_service' : start_service,
         'end_station_service' : end_service,
         'start_to_end_service' : start_to_end_service,
+        "start_north_bound_service" : start_north_bound_service,
+        "start_south_bound_service" : start_south_bound_service, 
+        "end_north_bound_service" : end_north_bound_service, 
+        "end_south_bound_service" : end_south_bound_service
     }
+    # print('so', service_obj)
     return service_obj
 
 # returns true if the station appears in the schedule of a train
@@ -107,6 +139,15 @@ def check_for_station_service(stops, station_id):
      else:
           service = False
      return service
+
+# check directional service on platforms
+def check_station_direction_service(train_data, stop_id):
+    #  for train in train_data:
+    #     stop_schedule = train.trip_update.stop_time_update
+    #     for stop in stop_schedule:
+    #         #  print('s',stop)
+    #         pass
+    pass
 
 # if start station id is before stop station id in stops (train schedule), then the train is headed in the correct direction.   
 def check_for_correct_direction(stops, start_station_id, end_station_id):
@@ -124,8 +165,8 @@ def check_station_arrival_or_departure(stop, station_id, deptarture_or_arrival):
              deptarture_or_arrival_time = departure_time
         if deptarture_or_arrival == "arrival":
              deptarture_or_arrival_time = arrival_time
-        
-        if (stop.stop_id[:-1] == station_id) and (deptarture_or_arrival_time > current_time_int):
+
+        if ((stop.stop_id[:-1] == station_id) and (deptarture_or_arrival_time > current_time_int)):
             return True
         else:
             return False
@@ -151,6 +192,7 @@ def filter_trains_for_stations_direction_future_arrival(train_data, start_statio
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
                     stops = create_stop_schedule(train)
+                    # need 
                     if ((check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id)) and (check_for_correct_direction(stops, start_station_id, end_station_id))):
                         stop_schedule = train.trip_update.stop_time_update
                         for stop in stop_schedule:

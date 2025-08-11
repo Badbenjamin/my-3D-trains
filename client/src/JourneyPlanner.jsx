@@ -7,13 +7,13 @@ import NextTrains from "./NextTrains";
 
 
 
+
 function JourneyPlanner() {
 
     const {tripInfo, stations, setTripInfo, stationIdStartAndEnd, tripInfoIndex, setTripInfoIndex, clearTripInfo} = useOutletContext()
     const [journeyStations, setJourneyStations] = useState([null, null])
+  
     // stationIdStartAndEnd is from app.jsx and is the tooltip set station
-    
-    // THIS TAKES SELECTION FROM STATIONSEARCH AND USES IT TO SET JOURNEYSTATIONS
     function setStartOrEndStation(stationValue, position){
   
         setJourneyStations((prevJourney)=>{
@@ -52,8 +52,9 @@ function JourneyPlanner() {
             console.log("fetching")
             fetch(`api/plan_trip/${journeyStations[0]}/${journeyStations[1]}`)
             .then(response => response.json())
-            .then(stopData => setTripInfo(stopData))
+            .then(tripInfo => setTripInfo(tripInfo))
         }
+        setTripInfoIndex(0)
     }
 
     function handleClearClick(){
@@ -65,6 +66,10 @@ function JourneyPlanner() {
         
     }
 
+    function handleReverseClick(){
+        setJourneyStations([journeyStations[1], journeyStations[0]])
+    }
+
 
     return (
         <div>
@@ -72,13 +77,13 @@ function JourneyPlanner() {
             <div className='journey-planner'>
                 {/* pass journeyStations down to stationSearch so that it knows when they have been cleared? */}
                 <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
+                <button className="plan-trip-button" onClick={handleReverseClick}>⮂</button>
                 <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
                 <br></br>
                 <button className="plan-trip-button" onClick={planTrip}>Plan Trip</button>
                 <button className="plan-trip-button" onClick={handleClearClick}>Clear Trip</button>
             </div>
             {tripInfo[tripInfoIndex] != undefined ? <TripInfo className='trip-info' tripInfo={tripInfo} tripInfoIndex={tripInfoIndex}/> : ""}
-            
             <NextTrains tripInfo={tripInfo} tripInfoIndex={tripInfoIndex} setTripInfoIndex={setTripInfoIndex}/>
             
         </div>

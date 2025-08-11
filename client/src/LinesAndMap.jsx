@@ -28,7 +28,7 @@ function LinesAndMap(){
             setVectorPositon(newVectorPosition)
         }
     })
-    // console.log('t', ref.current.object)
+
 
     
     return(

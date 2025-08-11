@@ -13,14 +13,27 @@ ct = datetime.now()
 def plan_trip(start_station_id, end_station_id):
     # new_journey contains endpoints for start and end stations, and calculates a transfer if applicable.
     new_journey = Journey(start_station_id, end_station_id)
-    # print('shared', new_journey.shared_stations)
-    # new_train_data takes the info from new_journey and uses it to make requests from the relevant MTA API route endpoints.
-    # it contains the JSON train data from the realtime gtfs feed. 
-    new_train_data = TrainData(new_journey)
-    # trip_sequence is an array that contains either a TripSequenceElement object or a TripError object.
-    trip_sequences = modules_app.build_trip_sequence(new_journey, new_train_data)
-    # FormattedTrainData class takes our trip sequence (one or two trips), and converts the first arriving train to a dict, which is sent to client. 
-    return FormattedTrainData(trip_sequences).trip_sequences_for_react, 200
+    if (len(new_journey.shared_stations)==0 and (new_journey.journey_info_obj['on_same_colored_line'] == False) and (new_journey.journey_info_obj['start_shares_routes_with_end'] == False)):
+        trip_planner_error_obj = {
+            "start_station_name" : new_journey.start_station.stop_name,
+            "start_station_gtfs_id" : new_journey.start_station.gtfs_stop_id,
+            "end_station_name" : new_journey.end_station.stop_name,
+            "end_station_gtfs_id" : new_journey.end_station.gtfs_stop_id,
+            "start_station_routes" : new_journey.start_station.daytime_routes.split(),
+            "end_station_routes" : new_journey.end_station.daytime_routes.split(),
+        }
+        
+        
+        return {"trip_planner_error" : trip_planner_error_obj}
+    # CONTINUE WITH BUILDING TRIP SEQUENCES
+    else :
+        # new_train_data takes the info from new_journey and uses it to make requests from the relevant MTA API route endpoints.
+        # it contains the JSON train data from the realtime gtfs feed. 
+        new_train_data = TrainData(new_journey)
+        # trip_sequence is an array that contains either a TripSequenceElement object or a TripError object.
+        trip_sequences = modules_app.build_trip_sequence(new_journey, new_train_data)
+        # FormattedTrainData class takes our trip sequence (one or two trips), and converts the first arriving train to a dict, which is sent to client. 
+        return FormattedTrainData(trip_sequences).trip_sequences_for_react, 200
 
 # get names and routes (and gtfs id) for react-select search bar in journey planner
 @app.route('/api/stations')

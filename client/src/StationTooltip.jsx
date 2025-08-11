@@ -82,13 +82,14 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
                 <div  className="station-html">
                     <button className="x-button" onClick={()=>{(handleXClick(stopId))}} >X</button>
                     <h2 className="station-html-text">{name}{iconImageArray} </h2>
+                    <hr width="100%" size="2"/>
                     <div className="arrivals-html">
                         {arrivalInfo.north_direction_label}
                         {northArrivals}
                         {arrivalInfo.south_direction_label}
                         {southArrivals}
                     </div>
-                    
+                    <hr width="100%" size="2"/>
                     <button onClick={()=>handleSetStationClick(stopId, "start")}>ORIGIN</button>
                     <button onClick={()=>handleSetStationClick(stopId, "end")}>DESTINATION</button>
                 </div>
