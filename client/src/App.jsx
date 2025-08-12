@@ -167,8 +167,9 @@ function App() {
           } 
           // TURN ERROR INFO INTO SELECTEDSTATIONINFOOBJ INFO
         }   else if ((errorElementObject != null)){
-      
+          console.log('eeo',errorElementObject)
           // if key not in selcectedStationInfoObj and gtfs id matches start id, add start station key value pair to object
+          // START ERROR 
           if (!(errorElementObject.start_station_gtfs in selectedStationInfoObj) && errorElementObject.start_station_gtfs === startStopId){
             selectedStationInfoObj[errorElementObject.start_station_gtfs] ={
               "stopId" : errorElementObject.start_station_gtfs,
@@ -178,13 +179,20 @@ function App() {
               "south_direction_label" : errorElementObject.start_south_direction_label,
               "station_to_station_service" : errorElementObject.station_to_station_service,
               "start_station_routes" : errorElementObject.start_station_routes,
-              "type" : "errorStart"
+              'end_station_routes' : errorElementObject.end_station_routes,
+              "type" : "errorStart",
+
+              "start_station_current_routes_north" : errorElementObject.start_station_current_routes_north,
+              "start_station_current_routes_south" : errorElementObject.start_station_current_routes_south,
+              "end_station_current_routes_north" : errorElementObject.end_station_current_routes_north,
+              "end_station_current_routes_south" : errorElementObject.end_station_current_routes_south,
             };
           };
 
           // if gtfs_stop_id is not start or end gtfs, it must be a transfer
           // find the transfer in the selectedStationINfoObj, and push this to the second_transfer_info array
           // there will only be a transfer if the first leg of the trip is not an error, and the second is
+          // TRANSFER ERROR
           if ((errorElementObject.start_station_gtfs != startStopId || errorElementObject.end_station_gtfs != endStopId)){
             for (let selectedStation in selectedStationInfoObj){
               if (selectedStationInfoObj[selectedStation].type === 'transfer'){
@@ -196,13 +204,20 @@ function App() {
                   "south_direction_label" : errorElementObject.start_south_direction_label,
                   "station_to_station_service" : errorElementObject.station_to_station_service,
                   "start_station_routes" : errorElementObject.start_station_routes,
-                  "type" : "errorTransfer"
+                  'end_station_routes' : errorElementObject.end_station_routes,
+                  "type" : "errorTransfer",
+
+                  "start_station_current_routes_north" : errorElementObject.start_station_current_routes_north,
+                  "start_station_current_routes_south" : errorElementObject.start_station_current_routes_south,
+                  "end_station_current_routes_north" : errorElementObject.end_station_current_routes_north,
+                  "end_station_current_routes_south" : errorElementObject.end_station_current_routes_south,
                 });
               }
             }
             
           }; 
-          // if gtfs_stop_id is not the end, then add this to the selectedStationInfoObj
+          // if gtfs_stop_id == endStopId then add this to the selectedStationInfoObj 
+          // END ERROR
           if (!(errorElementObject.end_station_gtfs in selectedStationInfoObj) && errorElementObject.end_station_gtfs === endStopId){
             selectedStationInfoObj[errorElementObject.end_station_gtfs] ={
               "stopId" : errorElementObject.end_station_gtfs,
@@ -211,20 +226,27 @@ function App() {
               "north_direction_label" : errorElementObject.end_north_direction_label,
               "south_direction_label" : errorElementObject.end_south_direction_label,
               "station_to_station_service" : errorElementObject.station_to_station_service,
+              "start_station_routes" : errorElementObject.start_station_routes,
               "end_station_routes" : errorElementObject.end_station_routes,
-              "type" : "errorEnd"
+              "type" : "errorEnd",
+
+              "start_station_current_routes_north" : errorElementObject.start_station_current_routes_north,
+              "start_station_current_routes_south" : errorElementObject.start_station_current_routes_south,
+              "end_station_current_routes_north" : errorElementObject.end_station_current_routes_north,
+              "end_station_current_routes_south" : errorElementObject.end_station_current_routes_south,
             }
           };
 
           
         }
       }
+      
     } else {
       // NO TRIP INFO RETURNED, NO ERRORS
       console.log('trip info empty')
       return
     }
-  
+    console.log('ssio',selectedStationInfoObj)
     // CREATE NEW STATION ARRAY WITH INFO FROM USER'S TRIP (tripInfo)
     // map through stationArray and change status of stations that are present in ids from tripInfo
     // selcetedStationInfoObj contains info for stations involved in trip, whether, start, end, transfer, passthrough, errorStart, errorEnd, or errorTransfer

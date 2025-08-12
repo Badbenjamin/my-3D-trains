@@ -41,7 +41,7 @@ class Journey:
         
         # This variable contains info for the type of trip. Whether there is a transfer or if it involves local and express trains. 
         self.journey_info_obj = modules_classes.get_journey_info(self.start_station_routes, self.end_station_routes)
-        print('journey info obj', self.journey_info_obj)
+        # print('journey info obj', self.journey_info_obj)
         # if not on same route, and also not on same colored line, the trip requires a transfer btw lines
         if (self.journey_info_obj['start_shares_routes_with_end'] == False) and (self.journey_info_obj['on_same_colored_line'] == False):
             # find complexes on start and end lines
@@ -68,6 +68,7 @@ class Journey:
         # Might not need end station endpoints? Train is leaving from a station that is served by a start station line to get to end station. 
         self.start_station_endpoints = modules_classes.get_endpoints_for_station(self.start_station.station_endpoints)
         self.end_station_endpoints = modules_classes.get_endpoints_for_station(self.end_station.station_endpoints)
+        # print('eps',self.start_station_endpoints, self.end_station_endpoints)
 
     def __repr__(self):
         return f'<Journey {self.start_station.stop_name} to {self.end_station.stop_name} through{self.shared_stations} at {self.time}>'
@@ -83,7 +84,7 @@ class TrainData:
         self.journey_object = journey_object
         self.routes = set(journey_object.start_station_routes + journey_object.end_station_routes)
         self.shared_stations = journey_object.shared_stations
-        print('shared',self.shared_stations)
+        # print('shared',self.shared_stations)
         self.local_express = None
         
         if journey_object.local_express:
@@ -285,15 +286,17 @@ class TripError:
 
         self.end_north_direction_label = end_station.north_direction_label
         self.end_south_direction_label = end_station.south_direction_label
-        station_service_obj = modules_classes.check_for_station_service_on_failed_leg(train_data, start_station_id, end_station_id)
+        station_service_obj = modules_classes.check_for_station_service_on_failed_leg(train_data, start_station_id, self.start_station_routes, end_station_id, self.end_station_routes)
         # HOW DO I FIND DIRECTION IF NO TRAIN DATA? 
-        print('complex', start_station.complex_id, end_station.complex_id)
+        # print('complex', start_station.complex_id, end_station.complex_id)
         # I need the status of direction service on stations (ig. no trains northbound)
         # I need to determine if there is a possible transfer between lines. 
         # self.shared_stations = train_data.shared_stations
         # print('te shared', train_data)
 
-        
+        # START STATION ROUTES
+        # END STATION ROUTES
+        # SHOW IF ROUTES FROM START STATION ARE NOT STOPPING AT END STATION
 
         self.start_station_service = station_service_obj['start_station_service']
         self.end_station_service = station_service_obj['end_station_service']
@@ -303,6 +306,14 @@ class TripError:
         self.start_south_bound_service = station_service_obj['start_south_bound_service']
         self.end_north_bound_service = station_service_obj['end_north_bound_service']
         self.end_south_bound_service = station_service_obj['end_south_bound_service']
+
+        # self.start_station_daytime_routes = station_service_obj['start_station_daytime_routes']
+        # self.end_station_daytime_routes = station_service_obj['end_station_daytime_routes']
+
+        self.start_station_current_routes_north = station_service_obj['start_station_current_routes_north']
+        self.start_station_current_routes_south = station_service_obj['start_station_current_routes_south']
+        self.end_station_current_routes_north = station_service_obj['end_station_current_routes_north']
+        self.end_station_current_routes_south = station_service_obj['end_station_current_routes_south']
 
 
         # self.direction_service_for_platform = modules_classes.check_station_direction_service()
@@ -370,14 +381,24 @@ class FormattedTrainData:
                         "end_station_name" : end_station.stop_name,
                         "end_station_gtfs" : trip_sequence_element.end_station_id,
                         "end_station_service" : trip_sequence_element.end_station_service,
-                        "station_to_station_service" : trip_sequence_element.between_station_service,
 
+                        # "start_station_daytime_routes" : trip_sequence_element.start_station_daytime_routes,
+                        # "end_station_daytime_routes" : trip_sequence_element.end_station_daytime_routes,
+
+                        "station_to_station_service" : trip_sequence_element.between_station_service,
+                    
                         "start_station_routes" : trip_sequence_element.start_station_routes,
                         "end_station_routes" : trip_sequence_element.end_station_routes,
+
+                        'start_station_current_routes_north' : trip_sequence_element.start_station_current_routes_north,
+                        'start_station_current_routes_south' : trip_sequence_element.start_station_current_routes_south,
+                        'end_station_current_routes_north' : trip_sequence_element.end_station_current_routes_north,
+                        'end_station_current_routes_south' : trip_sequence_element.end_station_current_routes_south,
 
                         "start_station_complex_id" : trip_sequence_element.start_station_complex_id,
                         "end_station_complex_id" : trip_sequence_element.end_station_complex_id,
 
+                        # might not need this with route specific info
                         "start_north_bound_service" : trip_sequence_element.start_north_bound_service,
                         "start_south_bound_service" : trip_sequence_element.start_south_bound_service,
                         "end_north_bound_service" : trip_sequence_element.end_north_bound_service,
