@@ -240,7 +240,7 @@ def filter_trains_for_stations_direction_future_arrival(train_data, start_statio
 def check_for_future_arrival_at_station(stops_with_info, gtfs_stop_id):
     result = False
     for stop in stops_with_info:
-         if stop.stop_id[:-1] == gtfs_stop_id and stop.arrival.time >= current_time_int:
+         if ((stop.stop_id[:-1] == gtfs_stop_id) and (stop.arrival.time >= current_time_int)):
               result = True
     return result
 
