@@ -75,6 +75,7 @@ def get_station_name(gtfs_id):
 @app.route('/api/arrivals/<string:gtfs_id>')
 def get_arrivals(gtfs_id):
     stationInfo = ArrivalsForStation(gtfs_id)
+    print(stationInfo.arrivals_for_react)
     return stationInfo.arrivals_for_react
 
 # get train locations DO LATER

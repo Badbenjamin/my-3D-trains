@@ -264,6 +264,9 @@ def get_station_arrival_times(gtfs_trains_for_station, gtfs_stop_id):
                           trains_arriving_at_station_n.append(train_obj)
                      elif (train_obj['direction'] == "S"):
                           trains_arriving_at_station_s.append(train_obj)
+            elif train.HasField('alert'):
+                #  WHAT CAN I DO WITH THIS INFO? 
+                 print('train alert 1', train)
 
     sorted_north_bound_trains = sorted(trains_arriving_at_station_n, key= lambda train : (train['arrival_time']))
     sorted_south_bound_trains = sorted(trains_arriving_at_station_s, key= lambda train : (train['arrival_time']))

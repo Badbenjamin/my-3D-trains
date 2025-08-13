@@ -88,7 +88,7 @@ export default function RouteTooltip({stationInfo, name, position}){
         // construct ordered objects based on arrival and departure times
         
         // BRANCH FOR SUCCESSFUL TRANSFER
-        if (stationInfo.second_transfer_info[0].type != 'errorTransfer'){
+        if (stationInfo.second_transfer_info[0]?.type != 'errorTransfer'){
             console.log('sucsessful transfer')
             setTransferStationInfo((prevInfo)=>{
                 let newInfo = {...prevInfo}
@@ -249,7 +249,11 @@ export default function RouteTooltip({stationInfo, name, position}){
                     sharedRoutes.push(route)
                 }
             }
+            let sharedRouteLogos = sharedRoutes.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
 
+            // START STATION IN SERVICE, END STATION HAS PLATFORM CLOSURE
             let routesNotArrivingAtDestNorth = []
             let routesNotArrivingAtDestSouth = []
             for (let route of sharedRoutes){
@@ -260,7 +264,7 @@ export default function RouteTooltip({stationInfo, name, position}){
                     routesNotArrivingAtDestSouth.push(route)
                 }
             }
-            console.log('rs', routesNotArrivingAtDestNorth, routesNotArrivingAtDestSouth)
+       
             let routesNotArrivingAtDestNorthLogos = routesNotArrivingAtDestNorth.map((route)=>{
                 return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
             })
@@ -273,49 +277,65 @@ export default function RouteTooltip({stationInfo, name, position}){
                 return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
             })
 
-            let errorObject = {
-                "complete_service" : (stationInfo.north_bound_service) && (stationInfo.south_bound_service),
-                "trains_between_stations" : stationInfo.station_to_station_service,
-                "north_bound_service" : stationInfo.north_bound_service,
-                "south_bound_service" : stationInfo.south_bound_service,
-                "type" : stationInfo.type,
-
-                "station_route_logos" : startStationRouteLogos,
-
-                "north_direction_label" : stationInfo.north_direction_label,
-                "south_direction_label" : stationInfo.south_direction_label,
-                "missing_north_destination_arrival_routes": routesNotArrivingAtDestNorth,
-                "missing_south_destination_arrival_routes": routesNotArrivingAtDestSouth,
-                "missing_north_destination_route_logos" : routesNotArrivingAtDestNorthLogos,
-                "missing_south_destination_route_logos" : routesNotArrivingAtDestSouthLogos
-
-                // "north_route_icons" : north_routes_from_start_to_end,
-                // "south_route_icons" : south_routes_from_start_to_end    
+            // START STATION HAS PLATFORM CLOSURE
+            let routesNotLeavingStartNorth = []
+            let routesNotLeavingStartSouth = []
+            for (let route of sharedRoutes){
+                if (!(stationInfo.start_station_current_routes_north.includes(route))){
+                    routesNotLeavingStartNorth.push(route)
+                } 
+                if (!(stationInfo.start_station_current_routes_south.includes(route))){
+                    routesNotLeavingStartSouth.push(route)
+                }
             }
 
-            // north and south start platforms open, trains running between stations, but not in both directions
+            let routesNotLeavingStartNorthLogos = routesNotLeavingStartNorth.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
+
+            let routesNotLeavingStartSouthLogos = routesNotLeavingStartSouth.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
+
+            
+
+            // north and south start platforms open, trains running between stations
+            // error must be that trains are not arriving at destination 
             if (((stationInfo.north_bound_service) && (stationInfo.south_bound_service)) && (stationInfo.station_to_station_service)){
-                console.log('worked')
                 let errorHtml = <div className="route-info-html">
                                     <div>{name}{startStationRouteLogos}</div>
                                     <div>
                                         {(routesNotArrivingAtDestNorth.length > 0)? <>{stationInfo.north_direction_label} {routesNotArrivingAtDestNorthLogos}not serving destination</>  : <></>}
+                                        <br></br>
                                         {(routesNotArrivingAtDestSouth.length > 0)? <>{stationInfo.south_direction_label} {routesNotArrivingAtDestSouthLogos}not serving destination</>  : <></>}
                                     </div>
                                 </div>
                 return errorHtml
             } 
-            // station is out of service in both directions
-            if (!((stationInfo.north_bound_service) && (stationInfo.south_bound_service))){
-                console.log('worked')
+            // station is out of service in one or more directoins, trains from start cant arrive at dest
+            if ((!stationInfo.north_bound_service) || (!stationInfo.south_bound_service)){
                 let errorHtml = <div className="route-info-html">
-                                    <div>{name}{startStationRouteLogos}</div>
+                                    <div>{name}{startStationRouteLogos}PLATFORM CLOSURE</div>
                                     <div>
-                                        OUT OF SERVICE
+                                    {(routesNotLeavingStartNorth.length > 0)? <>NO {stationInfo.north_direction_label} {routesNotLeavingStartNorthLogos} DEPARTURES</>  : <></>}
+                                    <br></br>
+                                    {(routesNotLeavingStartSouth.length > 0)? <>NO {stationInfo.south_direction_label} {routesNotLeavingStartSouthLogos}DEPARTURES</>  : <></>}
                                     </div>
                                 </div>
                 return errorHtml
             }
+            // station in service, but no trains running between stations
+            if (((stationInfo.north_bound_service) && (stationInfo.south_bound_service))&&!(stationInfo.station_to_station_service)){
+                let errorHtml = <div className="route-info-html">
+                                    <div>{name}{startStationRouteLogos}</div>
+                                    <div>
+                                        NO {sharedRouteLogos} SERVICE BETWEEN STATIONS
+                                    </div>
+                                </div>
+                return errorHtml
+            }
+            // station in service, trains between stations, but train from start wont arrive at dest
+            
             
 
 
@@ -326,71 +346,104 @@ export default function RouteTooltip({stationInfo, name, position}){
         console.log('errorEnd')
         setEndErrorInfo(()=>{
 
-            let currentRoutesSouth = []
-            for (let route of stationInfo.end_station_current_routes_south){
+            // FIND TRAINS THAT WONT MAKE IT TO DEST!!!
+            // find shared routes btw start and end
+            let sharedRoutes = []
+            for (let route of stationInfo.start_station_routes){
                 if (stationInfo.end_station_routes.includes(route)){
-                    currentRoutesSouth.push(route)
+                    sharedRoutes.push(route)
                 }
             }
-            let currentRoutesNorth = []
-            for (let route of stationInfo.end_station_current_routes_north){
-                if (stationInfo.end_station_routes.includes(route)){
-                    currentRoutesNorth.push(route)
-                }
-            }
-           
-            console.log(currentRoutesNorth, currentRoutesSouth)
-            // let missingArrivalRoutesSouth = []
-            // for (let route of currentRoutesSouth){
-            //     if (!(stationInfo.end_station_current_routes_south.includes(route))){
-            //         missingArrivalRoutesSouth.push(route)
-            //     }
-            // }
+            
+            let sharedRouteLogos = sharedRoutes.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
 
-            // let missingArrivalRoutesNorth = []
-            // for (let route of currentRoutesSouth){
-            //     if (!(stationInfo.end_station_current_routes_north.includes(route))){
-            //         missingArrivalRoutesNorth.push(route)
-            //     }
-            // }
-            // console.log(currentRoutesSouth, currentRoutesNorth)
+            // START STATION IN SERVICE, END STATION HAS PLATFORM CLOSURE
+            let routesNotArrivingAtDestNorth = []
+            let routesNotArrivingAtDestSouth = []
+            for (let route of sharedRoutes){
+                if (!(stationInfo.end_station_current_routes_north.includes(route))){
+                    routesNotArrivingAtDestNorth.push(route)
+                } 
+                if (!(stationInfo.end_station_current_routes_south.includes(route))){
+                    routesNotArrivingAtDestSouth.push(route)
+                }
+            }
+            console.log(routesNotArrivingAtDestNorth, routesNotArrivingAtDestSouth)
+            let routesNotArrivingAtDestNorthLogos = routesNotArrivingAtDestNorth.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
+
+            let routesNotArrivingAtDestSouthLogos = routesNotArrivingAtDestSouth.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
 
             let endStationRouteLogos = stationInfo.end_station_routes.map((route)=>{
                 return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
             })
 
-            let errorObject = {
-                "complete_service" : (stationInfo.north_bound_service) && (stationInfo.south_bound_service),
-                "trains_between_stations" : stationInfo.station_to_station_service,
-                "north_bound_service" : stationInfo.north_bound_service,
-                "south_bound_service" : stationInfo.south_bound_service,
-                "type" : stationInfo.type,
-
-                "station_route_logos" : endStationRouteLogos,
-
-                "north_direction_label" : stationInfo.north_direction_label,
-                "south_direction_label" : stationInfo.south_direction_label,
-                // "missing_north_arrival_routes" : missingArrivalRoutesNorth,
-                // "missing_south_arrival_routes" : missingArrivalRoutesSouth
-
-                // "north_route_icons" : northRouteIconImages,
-                // "south_route_icons" : southRouteIconImages
+            // START STATION HAS PLATFORM CLOSURE, NO TRAINS ARRIVING AT DEST
+            let routesNotLeavingStartNorth = []
+            let routesNotLeavingStartSouth = []
+            for (let route of sharedRoutes){
+                if (!(stationInfo.start_station_current_routes_north.includes(route))){
+                    routesNotLeavingStartNorth.push(route)
+                } 
+                if (!(stationInfo.start_station_current_routes_south.includes(route))){
+                    routesNotLeavingStartSouth.push(route)
+                }
             }
 
-            // if (!(stationInfo.north_bound_service)){
-            //     errorObject['north_bound_service'] = false
-            // } 
-            // if (!(stationInfo.south_bound_service)){
-            //     errorObject['south_bound_service'] = false
-            // } 
-            // if ((stationInfo.north_bound_service)){
-            //     errorObject['north_bound_service'] = true
-            // } 
-            // if ((stationInfo.south_bound_service)){
-            //     errorObject['south_bound_service'] = true
-            // }
+            let routesNotLeavingStartNorthLogos = routesNotLeavingStartNorth.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
 
-            return(errorObject)
+            let routesNotLeavingStartSouthLogos = routesNotLeavingStartSouth.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
+            console.log(routesNotLeavingStartNorth, routesNotLeavingStartSouth)
+            
+
+            // north and south start platforms open, trains running between stations
+            // error must be occuring in origin station
+            // there must be a closure in the origin
+            if (((stationInfo.north_bound_service) && (stationInfo.south_bound_service)) && (stationInfo.station_to_station_service)){
+                let errorHtml = <div className="route-info-html">
+                                    <div>{name}{endStationRouteLogos}</div>
+                                    <div>
+                                        {(routesNotLeavingStartNorth.length > 0)? <>no {routesNotLeavingStartNorthLogos} trains arriving from origin</>  : <></>}
+                                        <br></br>
+                                        {(routesNotLeavingStartSouth.length > 0)? <>no {routesNotLeavingStartSouthLogos} trains arriving from origin</>  : <></>}
+                                    </div>
+                                </div>
+                return errorHtml
+            } 
+            // if platform has routes not serving north or south, display which routes are not in service
+            if ((routesNotArrivingAtDestNorth.length > 0) || (routesNotArrivingAtDestSouth.length > 0)){
+                // what do i do here
+                let errorHtml = <div className="route-info-html">
+                                    <div>{name}{endStationRouteLogos} SERVICE ALERT</div>
+                                    <div>
+                                    {(routesNotArrivingAtDestNorth.length > 0)? <>{stationInfo.north_direction_label} {routesNotArrivingAtDestNorthLogos} Platform Closed2</>  : <></>}
+                                    {/* {(routesNotLeavingStartNorth.length > 0)? <>no {stationInfo.north_direction_label} {routesNotLeavingStartNorthLogos} trains arriving at station</>  : <></>} */}
+                                    <br></br>
+                                    {(routesNotArrivingAtDestSouth.length > 0)? <>{stationInfo.south_direction_label} {routesNotArrivingAtDestSouthLogos} Platform Closed</>  : <></>}
+                                    {/* {(routesNotLeavingStartSouth.length > 0)? <>no {stationInfo.south_direction_label} {routesNotLeavingStartSouthLogos} trains arriving at station</>  : <></>} */}
+                                    </div>
+                                </div>
+                return errorHtml
+            }
+            // station in service, but no trains running between stations
+            if (((stationInfo.north_bound_service) && (stationInfo.south_bound_service))&&!(stationInfo.station_to_station_service)){
+                let errorHtml = <div className="route-info-html">
+                                    <div>{name}{endStationRouteLogos}</div>
+                                    <div>
+                                        NO {sharedRouteLogos} SERVICE BETWEEN STATIONS
+                                    </div>
+                                </div>
+                return errorHtml
+            }
         })
     } else {
         console.log('error')
@@ -479,18 +532,10 @@ export default function RouteTooltip({stationInfo, name, position}){
         return(
             <>
             <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={5}>
-                <div className="route-info-html">
-                   <div>{name} {endErrorInfo.station_route_logos} </div>
-                   <div>{(endErrorInfo.complete_service) ?  (endErrorInfo.trains_between_stations) ? "TRAINS RUNNING BETWEEN STATIONS" : "NO TRAINS RUNNING BETWEEN STATIONS" : "STATION OUT OF SERVICE"}</div>
-                   <div>{(endErrorInfo.north_bound_service) ? "" : endErrorInfo.north_direction_label + " platform  out of service" }</div>
-                   <div>{(endErrorInfo.south_bound_service) ? "": endErrorInfo.south_direction_label + " platform  out of service" }</div>
-                   {/* <div>{(endErrorInfo.trains_between_stations) ? "trains running between stations" : "no trains running between stations"}</div> */}
-                   {/* <div>{endErrorInfo.missing_north_arrival_routes}</div> */}
-                   {/* <div>{"no "}{endErrorInfo.missing_south_arrival_routes}{stationInfo.south_direction_label}{"  arrivals at destination"}</div> */}
-                </div>
+                {endErrorInfo}
             </Html>
             <Line points={[position, tooltipPosition]} lineWidth={2}/>
-        </>
+            </>
         )
     }
 }

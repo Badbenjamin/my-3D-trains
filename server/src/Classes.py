@@ -493,14 +493,14 @@ class ArrivalsForStation:
         self.north_direction_label = self.station.north_direction_label
         self.south_direction_label = self.station.south_direction_label
         self.station_endpoints = modules_classes.get_endpoints_for_station(self.station.station_endpoints)
-
-        gtfs_trains_for_station = []
+    
+        gtfs_trains_for_station = []    
         for endpoint in self.station_endpoints:
             feed = gtfs_realtime_pb2.FeedMessage()
             response = requests.get(endpoint)
             feed.ParseFromString(response.content)
             gtfs_trains_for_station.append(feed)
-
+        
         self.trains_for_station = modules_classes.get_station_arrival_times(gtfs_trains_for_station, gtfs_stop_id)
         self.n_bound_arrivals = self.trains_for_station['n_bound_arrivals']
         self.s_bound_arrivals = self.trains_for_station['s_bound_arrivals']
