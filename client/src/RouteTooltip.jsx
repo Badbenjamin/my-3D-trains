@@ -10,7 +10,8 @@ export default function RouteTooltip({stationInfo, name, position}){
         "first_station" : null,
         "second_station" : null
     })
-    const [errorInfo, setErrorInfo] = useState({})
+    const [startErrorInfo, setStartErrorInfo] = useState(null)
+    const [endErrorInfo, setEndErrorInfo] = useState(null)
 
     // stationInfo is info passed from server to geometry, then combined with text in stationsTracksAndText
     // types of tooltip info to display are start, end, transfer, errorStart, errorEnd, and errorTransfer
@@ -86,8 +87,8 @@ export default function RouteTooltip({stationInfo, name, position}){
         // construct ordered objects based on arrival and departure times
         
         // BRANCH FOR SUCCESSFUL TRANSFER
-        if (stationInfo.second_transfer_info[0].type != 'errorTransfer'){
-            console.log('sucsessful transfer')
+        if (stationInfo.second_transfer_info[0]?.type != 'errorTransfer'){
+
             setTransferStationInfo((prevInfo)=>{
                 let newInfo = {...prevInfo}
     
@@ -181,11 +182,12 @@ export default function RouteTooltip({stationInfo, name, position}){
             })
             // BRANCH WHEN SECOND LEG IS AN ERROR
             // there shouldnt be a transfer if first leg is an error
+            // SECOND LEG OF ROUTE IS ALWAYS WHERE ERROR WILL BE
         } else  {
             setTransferStationInfo(()=>{
 
                 let firstStationObject = {}
-                let secondStationObject = {}
+                // SECOND LEG IS HTML COMPONENT
 
                 let firstArrivalTime = new Date(stationInfo.arrival * 1000)
                 let firstArrivalTimeString = firstArrivalTime.toLocaleTimeString('en-US', { 
@@ -212,59 +214,267 @@ export default function RouteTooltip({stationInfo, name, position}){
                     "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.route}.png`}/>
                 }
 
-                secondStationObject = {
-                    "north_bound_service" : stationInfo.second_transfer_info[0].north_bound_service,
-                    "south_bound_service" : stationInfo.second_transfer_info[0].south_bound_service,
-                    "station_to_station_service" : stationInfo.second_transfer_info[0].station_to_station_service,
-                    "north_direction_label" : stationInfo.second_transfer_info[0].north_direction_label,
-                    "south_direction_label" : stationInfo.second_transfer_info[0].south_direction_label,
-                    'start_station_routes' : stationInfo.second_transfer_info[0].start_station_routes,
-                    "stopId" : stationInfo.second_transfer_info[0].stopId,
-                    "type" : stationInfo.second_transfer_info[0].type,
-                    // how to find correct route icon for trip? not matching currently just using first
-                    "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.second_transfer_info[0].start_station_routes[0]}.png`}/>
+                // DISPLAY ERROR FOR SECOND LEG
+                // ROUTES (DAYTIME) THAT RUN BETWEEN ORIGIN AND DESINATION
+                let sharedRoutes = []
+                for (let route of stationInfo.second_transfer_info[0].start_station_routes){
+                    if (stationInfo.second_transfer_info[0].end_station_routes.includes(route)){
+                        sharedRoutes.push(route)
+                    }
                 }
 
-                // console.log(firstArrivalTimeString, firstDepartureTimeString)
+                 // START STATION HAS PLATFORM CLOSURE
+                 //  THESE ROUTES ARE NOT LEAVING ORIGIN
+                 let routesNotLeavingStartNorth = []
+                 let routesNotLeavingStartSouth = []
+                 for (let route of sharedRoutes){
+                     if (!(stationInfo.second_transfer_info[0].start_station_current_routes_north.includes(route))){
+                         routesNotLeavingStartNorth.push(route)
+                     } 
+                     if (!(stationInfo.second_transfer_info[0].start_station_current_routes_south.includes(route))){
+                         routesNotLeavingStartSouth.push(route)
+                     }
+                 }
+ 
+                 let routesNotLeavingStartNorthLogos = routesNotLeavingStartNorth.map((route)=>{
+                     return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                 })
+ 
+                 let routesNotLeavingStartSouthLogos = routesNotLeavingStartSouth.map((route)=>{
+                     return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                 })
+
+                // START STATION IN SERVICE, END STATION HAS PLATFORM CLOSURE
+                let routesNotArrivingAtDestNorth = []
+                let routesNotArrivingAtDestSouth = []
+                for (let route of sharedRoutes){
+                    if (!(stationInfo.second_transfer_info[0].end_station_current_routes_north.includes(route))){
+                        routesNotArrivingAtDestNorth.push(route)
+                    } 
+                    if (!(stationInfo.second_transfer_info[0].end_station_current_routes_south.includes(route))){
+                        routesNotArrivingAtDestSouth.push(route)
+                    }
+                }
+        
+                let routesNotArrivingAtDestNorthLogos = routesNotArrivingAtDestNorth.map((route)=>{
+                    return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                })
+
+                let routesNotArrivingAtDestSouthLogos = routesNotArrivingAtDestSouth.map((route)=>{
+                    return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                })
+
+                let secondStationErrorHtml = null
+                // station is out of service in one or more directoins, trains from start cant arrive at dest
+                if ((routesNotLeavingStartNorth.length > 0) || (routesNotLeavingStartSouth.length > 0)){
+                    let errorHtml = <div>
+                                        <div>PLATFORM CLOSURE</div>
+                                        <div>
+                                        {(routesNotLeavingStartNorth.length > 0)? <>NO {stationInfo.second_transfer_info[0].north_direction_label} {routesNotLeavingStartNorthLogos} DEPARTURES</>  : <></>}
+                                        <br></br>
+                                        {(routesNotLeavingStartSouth.length > 0)? <>NO {stationInfo.second_transfer_info[0].south_direction_label} {routesNotLeavingStartSouthLogos} DEPARTURES</>  : <></>}
+                                        </div>
+                                    </div>
+                    secondStationErrorHtml =  errorHtml
+                } else if (((routesNotArrivingAtDestNorth.length > 0) || (routesNotArrivingAtDestSouth.length > 0))){
+                        // Trains belonging to the shared routes between stations do not arrive at one or more platform of desination
+                        let errorHtml = <div>
+                                            <div>STOPS SKIPPED</div>
+                                            <div>
+                                                {(routesNotArrivingAtDestNorth.length > 0)? <>{stationInfo.second_transfer_info[0].north_direction_label} {routesNotArrivingAtDestNorthLogos}not serving destination</>  : <></>}
+                                                <br></br>
+                                                {(routesNotArrivingAtDestSouth.length > 0)? <>{stationInfo.second_transfer_info[0].south_direction_label} {routesNotArrivingAtDestSouthLogos}not serving destination</>  : <></>}
+                                            </div>
+                                        </div>
+                        secondStationErrorHtml =  errorHtml
+                    } 
+                // this is sloppy. maybe convert everything into HTML components in the future
                 return {
                     'first_station' : firstStationObject, 
-                    'second_station' : secondStationObject
+                    'second_station' : {'errorHtml' :secondStationErrorHtml , 'type' : 'errorTransfer'}
                 }
             })
 
         }
         
         // IF ERROR AT START OR END STATION, THESE WILL DISPLAY
-    } else if ((stationInfo.type === "errorStart") || (stationInfo.type === "errorEnd")){
-        setErrorInfo(()=>{
+    } else if ((stationInfo.type === "errorStart")){
+        console.log('errorStart')
+        setStartErrorInfo(()=>{
 
-            let errorObject = {
-                "complete_service" : (stationInfo.north_bound_service) && (stationInfo.south_bound_service),
-                "trains_between_stations" : stationInfo.station_to_station_service,
-                "north_bound_service" : null,
-                "south_bound_service" : null,
-                "type" : stationInfo.type
-            
+            // THESE ARE THE ROUTES SHARED BETWEEN START AND END STATIONS
+            // might have to figure out reroutes and nighttime changes, these are daytime routes
+            let sharedRoutes = []
+            for (let route of stationInfo.start_station_routes){
+                if (stationInfo.end_station_routes.includes(route)){
+                    sharedRoutes.push(route)
+                }
+            }
+            let sharedRouteLogos = sharedRoutes.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
+
+            // START STATION HAS PLATFORM CLOSURE
+            // if sharedRoute NOT IN start_station_current_routes, push to RoutesNotLeavingDirection array
+            let routesNotLeavingStartNorth = []
+            let routesNotLeavingStartSouth = []
+            for (let route of sharedRoutes){
+                if (!(stationInfo.start_station_current_routes_north.includes(route))){
+                    routesNotLeavingStartNorth.push(route)
+                } 
+                if (!(stationInfo.start_station_current_routes_south.includes(route))){
+                    routesNotLeavingStartSouth.push(route)
+                }
             }
 
-            if (!(stationInfo.north_bound_service)){
-                errorObject['north_bound_service'] = false
-            } 
-            if (!(stationInfo.south_bound_service)){
-                errorObject['south_bound_service'] = false
-            } 
-            if ((stationInfo.north_bound_service)){
-                errorObject['north_bound_service'] = true
-            } 
-            if ((stationInfo.south_bound_service)){
-                errorObject['south_bound_service'] = true
-            }
+            let routesNotLeavingStartNorthLogos = routesNotLeavingStartNorth.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
 
-            setErrorInfo(errorObject)
+            let routesNotLeavingStartSouthLogos = routesNotLeavingStartSouth.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
+
+            // WHAT ROUTES FROM START STATION WON'T ARRIVE AT END STATION?
+            let routesNotArrivingAtDestNorth = []
+            let routesNotArrivingAtDestSouth = []
+            for (let route of sharedRoutes){
+                // if shared route NOT IN  end station N or S arrivals, push to routesNotArrivingAtDest N or S
+                if (!(stationInfo.end_station_current_routes_north.includes(route))){
+                    routesNotArrivingAtDestNorth.push(route)
+                } 
+                if (!(stationInfo.end_station_current_routes_south.includes(route))){
+                    routesNotArrivingAtDestSouth.push(route)
+                }
+            }
+       
+            let routesNotArrivingAtDestNorthLogos = routesNotArrivingAtDestNorth.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
+
+            let routesNotArrivingAtDestSouthLogos = routesNotArrivingAtDestSouth.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
+
+            // Normal schedule routes served by start station
+            let startStationRouteLogos = stationInfo.start_station_routes.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
+
+            // station is out of service in one or more directoins, trains from start cant arrive at dest
+            if ((routesNotLeavingStartNorth.length > 0) || (routesNotLeavingStartSouth.length > 0)){
+                let errorHtml = <div className="route-info-html">
+                                    <div>{name}{startStationRouteLogos}PLATFORM CLOSURE</div>
+                                    <div>
+                                    {(routesNotLeavingStartNorth.length > 0)? <>NO {stationInfo.north_direction_label} {routesNotLeavingStartNorthLogos} DEPARTURES</>  : <></>}
+                                    <br></br>
+                                    {(routesNotLeavingStartSouth.length > 0)? <>NO {stationInfo.south_direction_label} {routesNotLeavingStartSouthLogos} DEPARTURES</>  : <></>}
+                                    </div>
+                                </div>
+                return errorHtml
+            } else if (((routesNotArrivingAtDestNorth.length > 0) || (routesNotArrivingAtDestSouth.length > 0))){
+                    // Trains belonging to the shared routes between stations do not arrive at one or more platform of desination
+                    let errorHtml = <div className="route-info-html">
+                                        <div>{name}{startStationRouteLogos}STOPS SKIPPED</div>
+                                        <div>
+                                            {(routesNotArrivingAtDestNorth.length > 0)? <>{stationInfo.north_direction_label} {routesNotArrivingAtDestNorthLogos}not serving destination</>  : <></>}
+                                            <br></br>
+                                            {(routesNotArrivingAtDestSouth.length > 0)? <>{stationInfo.south_direction_label} {routesNotArrivingAtDestSouthLogos}not serving destination</>  : <></>}
+                                        </div>
+                                    </div>
+                    return errorHtml
+                } 
         })
-    } else {
-        console.log('route tooltip error')
-    }
+        // END STATION ERROR
+    } else if ((stationInfo.type === "errorEnd")) {
+        setEndErrorInfo(()=>{
+
+            // ROUTES SHARED BETWEEN START AND END STATION
+            let sharedRoutes = []
+            for (let route of stationInfo.start_station_routes){
+                if (stationInfo.end_station_routes.includes(route)){
+                    sharedRoutes.push(route)
+                }
+            }
+            
+            let sharedRouteLogos = sharedRoutes.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
+
+            // START STATION HAS PLATFORM CLOSURE, NO TRAINS ARRIVING AT DEST
+            let routesNotLeavingStartNorth = []
+            let routesNotLeavingStartSouth = []
+            for (let route of sharedRoutes){
+                if (!(stationInfo.start_station_current_routes_north.includes(route))){
+                    routesNotLeavingStartNorth.push(route)
+                } 
+                if (!(stationInfo.start_station_current_routes_south.includes(route))){
+                    routesNotLeavingStartSouth.push(route)
+                }
+            }
+
+            let routesNotLeavingStartNorthLogos = routesNotLeavingStartNorth.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
+
+            let routesNotLeavingStartSouthLogos = routesNotLeavingStartSouth.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
+
+            // START STATION IN SERVICE, END STATION HAS PLATFORM CLOSURE
+            let routesNotArrivingAtDestNorth = []
+            let routesNotArrivingAtDestSouth = []
+            for (let route of sharedRoutes){
+                if (!(stationInfo.end_station_current_routes_north.includes(route))){
+                    routesNotArrivingAtDestNorth.push(route)
+                } 
+                if (!(stationInfo.end_station_current_routes_south.includes(route))){
+                    routesNotArrivingAtDestSouth.push(route)
+                }
+            }
+            
+            let routesNotArrivingAtDestNorthLogos = routesNotArrivingAtDestNorth.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
+
+            let routesNotArrivingAtDestSouthLogos = routesNotArrivingAtDestSouth.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
+
+            let endStationRouteLogos = stationInfo.end_station_routes.map((route)=>{
+                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+            })
+
+            
+            
+
+            // START STATION HAS CLOSURES, DISPLAY ROUTES NOT SERVING DEST
+            if (((routesNotLeavingStartNorth.length > 0) || (routesNotLeavingStartSouth.length > 0))){
+                let errorHtml = <div className="route-info-html">
+                                    <div>{name}{endStationRouteLogos}</div>
+                                    <div>
+                                        {(routesNotLeavingStartNorth.length > 0)? <>no {routesNotLeavingStartNorthLogos} trains arriving from origin</>  : <></>}
+                                        <br></br>
+                                        {(routesNotLeavingStartSouth.length > 0)? <>no {routesNotLeavingStartSouthLogos} trains arriving from origin</>  : <></>}
+                                    </div>
+                                </div>
+                return errorHtml
+            } else if ((routesNotArrivingAtDestNorth.length > 0) || (routesNotArrivingAtDestSouth.length > 0)){
+                    // ARRIVAL STATION HAS PLATFORM CLOSURE, DISPLAY ROUTES SKIPPING STATION 
+                    let errorHtml = <div className="route-info-html">
+                                        <div>{name}{endStationRouteLogos} SERVICE ALERT</div>
+                                        <div>
+                                        {(routesNotArrivingAtDestNorth.length > 0)? <>{stationInfo.north_direction_label} {routesNotArrivingAtDestNorthLogos} Platform Closed2</>  : <></>}
+                                        {/* {(routesNotLeavingStartNorth.length > 0)? <>no {stationInfo.north_direction_label} {routesNotLeavingStartNorthLogos} trains arriving at station</>  : <></>} */}
+                                        <br></br>
+                                        {(routesNotArrivingAtDestSouth.length > 0)? <>{stationInfo.south_direction_label} {routesNotArrivingAtDestSouthLogos} Platform Closed</>  : <></>}
+                                        {/* {(routesNotLeavingStartSouth.length > 0)? <>no {stationInfo.south_direction_label} {routesNotLeavingStartSouthLogos} trains arriving at station</>  : <></>} */}
+                                        </div>
+                                    </div>
+                    return errorHtml
+                }
+            })
+        }
 
     },[stationInfo])
 
@@ -317,42 +527,37 @@ export default function RouteTooltip({stationInfo, name, position}){
             </>
         )
         // TRANSFER WITH ERROR TOOLTIP DISPLAY
+        // need to make second statin work with new HTML obj? 
     } else if((transferStationInfo.first_station && transferStationInfo.second_station) && (transferStationInfo.second_station.type === 'errorTransfer')){
         return(
             <>
                 <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={5}>
                     <div className="route-info-html">
                        <div> arrive at {name}  platform on {transferStationInfo.first_station.routeIcon} at {transferStationInfo.first_station.arrival_string}</div>
-                       <div> ERROR {transferStationInfo.second_station.routeIcon}</div>
-                       <div>{!(transferStationInfo.station_to_station_service) ? "station  out of service" : ""}</div>
-                       <div>{!(transferStationInfo.north_bound_service) ? "no north  trains" : ""}</div>
-                       <div>{!(transferStationInfo.south_bound_service) ? "no south trains" : ""}</div>
+                       {transferStationInfo.second_station.errorHtml}
                     </div>
                 </Html>
                 <Line points={[position, tooltipPosition]} lineWidth={2}/>
             </>
         )
-    } else if (errorInfo){
-        // SPLIT INTO START AND END? works now, handle this during styling
-        console.log('si error return', errorInfo)
+    } else if (startErrorInfo != null){
         return(
             <>
             <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={5}>
-                <div className="route-info-html">
-                   <div>{name}</div>
-                   <div>
-                        {errorInfo.complete_service ? <>station in service</> : 
-                        !(errorInfo.north_bound_service) ? <>no {stationInfo.north_direction_label} platform {(stationInfo.type === "errorStart") ? "departures" : (stationInfo.type === "errorEnd") ? "arrivals" : ""}</> : 
-                        !(errorInfo.south_bound_service) ? <>no {stationInfo.south_direction_label} platform {(stationInfo.type === "errorStart") ? "departures" : (stationInfo.type === "errorEnd") ? "arrivals" : ""}</> : <></>
-                        // !(errorInfo.trains_between_stations) ? <>no trains running between stations</> : <>trains running between stations</> ? <>NO SERVICE</> : <>IN SERVICE</>
-                        }
-                   </div>
-                   <div>{(errorInfo.station_to_station_service)? "TRAINS RUNNING BTW STATIONS" : "TRAINS NOT RUNNING BTW STATIONS"}</div>
-                </div>
+                {startErrorInfo}
             </Html>
             <Line points={[position, tooltipPosition]} lineWidth={2}/>
-        </>
+            </>
         )
+    } else if (endErrorInfo != null){
 
+        return(
+            <>
+            <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={5}>
+                {endErrorInfo}
+            </Html>
+            <Line points={[position, tooltipPosition]} lineWidth={2}/>
+            </>
+        )
     }
 }

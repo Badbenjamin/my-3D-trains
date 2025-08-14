@@ -79,7 +79,7 @@ def single_train_to_train_class(train):
     return new_train
 
 # could I combine this into filter trains for station direction current?
-def check_for_station_service_on_failed_leg(train_data, start_station_id, end_station_id):
+def check_for_station_service_on_failed_leg(train_data, start_station_id, start_station_routes, end_station_id, end_station_routes):
     print('sid eid', start_station_id, end_station_id)
     # there are trains stopping at start station, and at end station, but not at both
     start_service = False
@@ -92,33 +92,61 @@ def check_for_station_service_on_failed_leg(train_data, start_station_id, end_st
     end_north_bound_service = False
     end_south_bound_service = False
 
+    # start_station_daytimte_routes = start_station_routes
+    # end_station_daytime_routes = end_station_routes
+
+    # HOW DO I FIND SERVICE STATUS FOR EACH ROUTE?
+    start_station_current_routes = []
+    end_station_current_routes = []
+    start_station_current_routes_north = []
+    start_station_current_routes_south = []
+    end_station_current_routes_north = []
+    end_station_current_routes_south = []
+    # print(start_station_daytimte_routes, end_station_daytime_routes)
+
 
     
     for train_feed in train_data:
             
             for train in train_feed.entity: 
+                
                 if train.HasField('trip_update'):
                     stops = create_stop_schedule(train)
                     direction = None
+                    route_id = train.trip_update.trip.route_id
                     if (len(train.trip_update.stop_time_update)>0):
                         direction = train.trip_update.stop_time_update[0].stop_id[-1]
 
                     if (start_station_id in stops):
                          start_service = True
+                         if route_id not in start_station_current_routes:
+                            start_station_current_routes.append(route_id)
                     if (end_station_id in stops):
                          end_service = True
+                         if route_id not in end_station_current_routes:
+                            end_station_current_routes.append(route_id)
                     if (start_station_id in stops) and (end_station_id in stops):
                          start_to_end_service = True
                     if (direction):
                         if ((direction == "N") and (start_station_id in stops)):
                             start_north_bound_service = True
+                            if route_id not in start_station_current_routes_north:
+                                 start_station_current_routes_north.append(route_id)
                         if ((direction == "S") and (start_station_id in stops)):
                             start_south_bound_service = True
+                            if route_id not in start_station_current_routes_south:
+                                 start_station_current_routes_south.append(route_id)
                         if ((direction == "N") and (end_station_id in stops)):
                             end_north_bound_service = True
+                            if route_id not in end_station_current_routes_north:
+                                 end_station_current_routes_north.append(route_id)
                         if ((direction == "S") and (end_station_id in stops)):
                             end_south_bound_service = True
-                    
+                            if route_id not in end_station_current_routes_south:
+                                 end_station_current_routes_south.append(route_id)
+    print(start_station_current_routes, end_station_current_routes) 
+    print(start_station_current_routes_north, start_station_current_routes_south)
+    print(end_station_current_routes_north, end_station_current_routes_south)             
     service_obj = {
         'start_station_service' : start_service,
         'end_station_service' : end_service,
@@ -126,9 +154,18 @@ def check_for_station_service_on_failed_leg(train_data, start_station_id, end_st
         "start_north_bound_service" : start_north_bound_service,
         "start_south_bound_service" : start_south_bound_service, 
         "end_north_bound_service" : end_north_bound_service, 
-        "end_south_bound_service" : end_south_bound_service
+        "end_south_bound_service" : end_south_bound_service,
+
+        # "start_station_daytime_routes" : start_station_daytimte_routes,
+        # "end_station_daytime_routes" : end_station_daytime_routes,
+
+        "start_station_current_routes_north" : start_station_current_routes_north,
+        "start_station_current_routes_south": start_station_current_routes_south,
+        "end_station_current_routes_north" : end_station_current_routes_north,
+        "end_station_current_routes_south" : end_station_current_routes_south,
+
     }
-    # print('so', service_obj)
+    print('so', service_obj)
     return service_obj
 
 # returns true if the station appears in the schedule of a train
@@ -192,18 +229,25 @@ def filter_trains_for_stations_direction_future_arrival(train_data, start_statio
             for train in train_feed.entity: 
                 if train.HasField('trip_update'):
                     stops = create_stop_schedule(train)
-                    # need 
+                    # could this be more performat? do all checks in one loop? 
                     if ((check_for_station_service(stops, start_station_id) and check_for_station_service(stops, end_station_id)) and (check_for_correct_direction(stops, start_station_id, end_station_id))):
                         stop_schedule = train.trip_update.stop_time_update
+                        # HOW DO I CHECK FOR START STATION DEPARTURE IN FUTURE? 
+                        origin_departure_in_future = False
+                        dest_arrival_in_future = False
                         for stop in stop_schedule:
-                            if (check_station_arrival_or_departure(stop, end_station_id, "arrival")):
-                                 filtered_trains.append(train)
+                            if ((check_station_arrival_or_departure(stop, start_station_id, "departure"))):
+                                 origin_departure_in_future = True
+                            if ((check_station_arrival_or_departure(stop, end_station_id, "arrival"))):
+                                 dest_arrival_in_future = True
+                        if (origin_departure_in_future and dest_arrival_in_future):
+                            filtered_trains.append(train)
         return filtered_trains
 
 def check_for_future_arrival_at_station(stops_with_info, gtfs_stop_id):
     result = False
     for stop in stops_with_info:
-         if stop.stop_id[:-1] == gtfs_stop_id and stop.arrival.time >= current_time_int:
+         if ((stop.stop_id[:-1] == gtfs_stop_id) and (stop.arrival.time >= current_time_int)):
               result = True
     return result
 
@@ -227,6 +271,9 @@ def get_station_arrival_times(gtfs_trains_for_station, gtfs_stop_id):
                           trains_arriving_at_station_n.append(train_obj)
                      elif (train_obj['direction'] == "S"):
                           trains_arriving_at_station_s.append(train_obj)
+            elif train.HasField('alert'):
+                #  WHAT CAN I DO WITH THIS INFO? 
+                 print('train alert 1', train)
 
     sorted_north_bound_trains = sorted(trains_arriving_at_station_n, key= lambda train : (train['arrival_time']))
     sorted_south_bound_trains = sorted(trains_arriving_at_station_s, key= lambda train : (train['arrival_time']))
