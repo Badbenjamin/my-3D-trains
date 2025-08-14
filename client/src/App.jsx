@@ -143,7 +143,6 @@ function App() {
                 "route" : tripSequenceElement.route
               }
             } else if ((stop.stop_id.slice(0,3) in selectedStationInfoObj) && ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) == stopsForLeg[0].stop_id.slice(0,3) || stop.stop_id.slice(0,3) == stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3)))){
-              console.log('does this occur in tripError in transfer?')
               selectedStationInfoObj[stop.stop_id.slice(0,3)].second_transfer_info.push({
                 "stopId" : stop.stop_id.slice(0,3),
                 "arrival" : stop.arrival,
@@ -167,7 +166,6 @@ function App() {
           } 
           // TURN ERROR INFO INTO SELECTEDSTATIONINFOOBJ INFO
         }   else if ((errorElementObject != null)){
-          console.log('eeo',errorElementObject)
           // if key not in selcectedStationInfoObj and gtfs id matches start id, add start station key value pair to object
           // START ERROR 
           if (!(errorElementObject.start_station_gtfs in selectedStationInfoObj) && errorElementObject.start_station_gtfs === startStopId){
@@ -242,11 +240,10 @@ function App() {
       }
       
     } else {
-      // NO TRIP INFO RETURNED, NO ERRORS
+      // NO TRIP INFO RETURNED, NO ERRORS, MAYBE CREATE DIALOGE POPUP?
       console.log('trip info empty')
       return
     }
-    console.log('ssio',selectedStationInfoObj)
     // CREATE NEW STATION ARRAY WITH INFO FROM USER'S TRIP (tripInfo)
     // map through stationArray and change status of stations that are present in ids from tripInfo
     // selcetedStationInfoObj contains info for stations involved in trip, whether, start, end, transfer, passthrough, errorStart, errorEnd, or errorTransfer
