@@ -488,7 +488,7 @@ export default function RouteTooltip({stationInfo, name, position}){
     if (startStatonInfo != null){
         return(
             <>
-                <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={5}>
+                <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={10}>
                     <div className="route-info-html">
                        <div>{"depart "}{name}</div>
                        <div>{"on "}{startStatonInfo.direction_label}{startStatonInfo.routeIcon}</div>
@@ -502,7 +502,7 @@ export default function RouteTooltip({stationInfo, name, position}){
     } else if ((endStationInfo != null)){
         return(
             <>
-                <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={5}>
+                <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={10}>
                     <div className="route-info-html">
                         <div>{"arrive at "}{name}</div>
                        {/* <div>{"on "}{endStationInfo.direction_label}{endStationInfo.routeIcon}</div> */}
@@ -516,7 +516,7 @@ export default function RouteTooltip({stationInfo, name, position}){
     } else if ((transferStationInfo.first_station && transferStationInfo.second_station) && (transferStationInfo.second_station.type != 'errorTransfer')){
         return(
             <>
-                <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={5}>
+                <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={10}>
                     <div className="route-info-html">
                         <div>transfer</div>
                        <div> arrive at {name} {transferStationInfo.first_station.routeIcon} platform at {transferStationInfo.first_station.arrival_string}</div>
@@ -531,7 +531,7 @@ export default function RouteTooltip({stationInfo, name, position}){
     } else if((transferStationInfo.first_station && transferStationInfo.second_station) && (transferStationInfo.second_station.type === 'errorTransfer')){
         return(
             <>
-                <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={5}>
+                <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={10}>
                     <div className="route-info-html">
                        <div> arrive at {name}  platform on {transferStationInfo.first_station.routeIcon} at {transferStationInfo.first_station.arrival_string}</div>
                        {transferStationInfo.second_station.errorHtml}
@@ -543,7 +543,7 @@ export default function RouteTooltip({stationInfo, name, position}){
     } else if (startErrorInfo != null){
         return(
             <>
-            <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={5}>
+            <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={10}>
                 {startErrorInfo}
             </Html>
             <Line points={[position, tooltipPosition]} lineWidth={2}/>
@@ -553,7 +553,7 @@ export default function RouteTooltip({stationInfo, name, position}){
 
         return(
             <>
-            <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={5}>
+            <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={10}>
                 {endErrorInfo}
             </Html>
             <Line points={[position, tooltipPosition]} lineWidth={2}/>

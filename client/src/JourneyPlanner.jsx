@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import './Component.css'
+// import './Component.css'
+import './App.css'
 import StationSearch from "./StationSearch";
 import TripInfo from "./TripInfo";
 import NextTrains from "./NextTrains";
@@ -72,7 +73,7 @@ function JourneyPlanner() {
 
 
     return (
-        <div>
+        <div className="journey-planner-and-trip-info-container">
             
             <div className='journey-planner'>
                 {/* pass journeyStations down to stationSearch so that it knows when they have been cleared? */}
@@ -83,8 +84,11 @@ function JourneyPlanner() {
                 <button className="plan-trip-button" onClick={planTrip}>Plan Trip</button>
                 <button className="plan-trip-button" onClick={handleClearClick}>Clear Trip</button>
             </div>
-            {tripInfo[tripInfoIndex] != undefined ? <TripInfo className='trip-info' tripInfo={tripInfo} tripInfoIndex={tripInfoIndex}/> : ""}
-            <NextTrains tripInfo={tripInfo} tripInfoIndex={tripInfoIndex} setTripInfoIndex={setTripInfoIndex}/>
+            <div className="trip-info">
+                {tripInfo[tripInfoIndex] != undefined ? <TripInfo className='trip-info' tripInfo={tripInfo} tripInfoIndex={tripInfoIndex}/> : ""}
+                <NextTrains tripInfo={tripInfo} tripInfoIndex={tripInfoIndex} setTripInfoIndex={setTripInfoIndex}/>
+            </div>
+            
             
         </div>
 

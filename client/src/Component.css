@@ -1,16 +1,15 @@
-.journey-planner {
+/* .journey-planner {
   border-style: dotted;
   padding: 5px;
   display: inline-flex;
-  /* width: 100%; */
-}
+} */
 
  h1{
   border-style: dotted;
   padding: 1px;
  }
 
- .navbar{
+ /* .navbar{
   font-family:Arial, Helvetica, sans-serif;
   font-weight: bold;
   font-size: x-large;
@@ -23,7 +22,7 @@
 a:visited{
   color: grey;
 
- }
+ } */
 
   
 .leg-info-grid-cointainer{
@@ -31,8 +30,8 @@ a:visited{
   display: grid;
   column-gap: 50px;
   row-gap: 50px;
-  border-style: dotted;
-  border-color: whitesmoke;
+  /* border-style: dotted; */
+  /* border-color: whitesmoke; */
 }
 
 .start-station-info{
@@ -80,9 +79,9 @@ a:visited{
   color: black;
 }
 
-.trip-info{
+/* .trip-info{
   border-style: dotted ;
-}
+} */
 
 .leg-info{
   color: blue;

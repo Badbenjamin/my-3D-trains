@@ -9,6 +9,8 @@ import { useOutletContext } from "react-router-dom";
 
 import TripErrorModal from './TripErrorModal'
 
+import './App.css'
+
 function MapExpierience(){
     const {tripInfo} = useOutletContext()
     const [isOpen, setIsOpen] = useState(false)
@@ -28,7 +30,8 @@ function MapExpierience(){
 
 
     return(
-        <div>  
+        <>
+         <div className='map-experience-container'>  
             {/* <TimeDate/> */}
             <JourneyPlanner/>
             <TripErrorModal isOpen={isOpen} closeModal={closeModal}/>
@@ -36,6 +39,8 @@ function MapExpierience(){
                 <SubwayMap />
             </Canvas>
         </div>
+        </>
+       
     )
 }
 
