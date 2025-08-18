@@ -28,14 +28,14 @@ function MapExpierience(){
 
 
     return(
-        <>  
+        <div>  
             {/* <TimeDate/> */}
             <JourneyPlanner/>
             <TripErrorModal isOpen={isOpen} closeModal={closeModal}/>
             <Canvas camera={{ fov: 90, position: [1, -120, .2] }}>
                 <SubwayMap />
             </Canvas>
-        </>
+        </div>
     )
 }
 
