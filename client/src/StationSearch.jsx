@@ -1,7 +1,7 @@
 // import { useOutletContext } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Select from 'react-select'
-import './Component.css'
+import './App.css'
 
 function StationSearch({setStartOrEndStation, position, stations, journeyStations}) {
     // journey stations is passed down

@@ -25,20 +25,37 @@
   z-index: 9;
   display: flex;
   flex-direction: column;
-  min-width: 33vw;
-  background: rgba(253, 251, 251, 0.707);
+  min-width: 30vw;
+  background: rgba(192, 192, 192, 0.707);
   border-style: solid;
   border-radius: 5px;
-  border-color: black;
+  border-color: rgb(68, 68, 68);
+  border-width: 4px;
+}
+
+.m3dt-title{
+ text-align: center;
 }
 
 .journey-planner{
   position: relative;
-  /* top: 0; */
-  /* left: 0; */
   z-index: 9;
-  display: inline-flex;
+  /* display: inline-flex; */
   width: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.journey-planner-button-container{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+.station-search-container{
+  
+}
+.station_search{
+  /* align-items: right; */
 }
 
 .trip-info{

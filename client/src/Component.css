@@ -64,9 +64,7 @@ a:visited{
   grid-row-end: 4;
 }
 
-.station_search{
-  align-items: right;
-}
+
 
 .select{
   /* align-items: flex-end; */
@@ -74,9 +72,11 @@ a:visited{
 }
 
 .plan-trip-button{
-  background-color: grey;
+  background-color: gold;
+  font-weight: bold;
   border: 2px;
-  color: black;
+  border: solid;
+  border-color: black;
 }
 
 /* .trip-info{

@@ -14,9 +14,20 @@ function TripInfo({tripInfo, tripInfoIndex}){
             newDisplayInfo = tripInfo[tripInfoIndex].map((leg) =>{
     
                 if ('schedule' in leg){
-                    return <LegInfo key={leg.start_station}  className='leg-info' leg={leg}/>
+                    return (
+                        <>
+                            <LegInfo key={leg.start_station}  className='leg-info' leg={leg}/>
+                            <hr width="90%" size="2"/>
+                        </>
+                       
+                    )
                 } else if ('start_station_service' in leg){
-                    return <ErrorInfo key={leg.start_station_name} className='error-info' leg={leg}/>
+                    return(
+                        <>
+                            <ErrorInfo key={leg.start_station_name} className='error-info' leg={leg}/>
+                            <hr width="90%" size="2"/>
+                        </>
+                    ) 
                 }
             })
         } else if ("trip_planner_error" in tripInfo){
@@ -32,6 +43,7 @@ function TripInfo({tripInfo, tripInfoIndex}){
   
     return(
         <div className='leg-info-div'>
+             <hr width="90%" size="2"/>
             {tripInfo.length > 0 ? newDisplayInfo : <></> }
         </div>
         

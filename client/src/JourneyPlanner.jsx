@@ -74,16 +74,20 @@ function JourneyPlanner() {
 
     return (
         <div className="journey-planner-and-trip-info-container">
-            
+            <p className="m3dt-title">M3DT</p>
+            <hr width="90%" size="2"/>
             <div className='journey-planner'>
-                {/* pass journeyStations down to stationSearch so that it knows when they have been cleared? */}
-                <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
-                <button className="plan-trip-button" onClick={handleReverseClick}>⮂</button>
-                <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
-                <br></br>
-                <button className="plan-trip-button" onClick={planTrip}>Plan Trip</button>
-                <button className="plan-trip-button" onClick={handleClearClick}>Clear Trip</button>
+                <div className="station-search-container">
+                    <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
+                    <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
+                </div>
+                <div className="journey-planner-button-container">
+                    <button className="plan-trip-button" onClick={planTrip}>Go!</button>
+                    <button className="plan-trip-button" onClick={handleReverseClick}>⮂</button>
+                    <button className="plan-trip-button" onClick={handleClearClick}>Clear</button>
+                </div>
             </div>
+            <hr width="90%" size="2"/>
             <div className="trip-info">
                 {tripInfo[tripInfoIndex] != undefined ? <TripInfo className='trip-info' tripInfo={tripInfo} tripInfoIndex={tripInfoIndex}/> : ""}
                 <NextTrains tripInfo={tripInfo} tripInfoIndex={tripInfoIndex} setTripInfoIndex={setTripInfoIndex}/>
