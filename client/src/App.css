@@ -25,12 +25,16 @@
   z-index: 9;
   display: flex;
   flex-direction: column;
-  min-width: 30vw;
-  background: rgba(192, 192, 192, 0.707);
+  width:325px;
+  min-height: 15vh;
+  max-height: auto;
+  background: rgb(46, 46, 46);
   border-style: solid;
-  border-radius: 5px;
-  border-color: rgb(68, 68, 68);
-  border-width: 4px;
+  border-radius: 10px;
+  border-color: rgb(255, 255, 255);
+  border-width: 2px;
+  color: white;
+  
 }
 
 .m3dt-title{
@@ -41,21 +45,35 @@
   position: relative;
   z-index: 9;
   /* display: inline-flex; */
-  width: auto;
+  width: 35vw;
   display: flex;
-  flex-direction: column;
+  /* flex-direction: row; */
+  text-align: center;
+  padding: 3px;
+  /* border-style: solid;
+  border-color: black; */
 }
 
 .journey-planner-button-container{
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-evenly;
 }
+
+.select{
+  /* align-items: flex-end; */
+  width: 10px;
+}
 .station-search-container{
-  
+  padding: 0px;
+  width: auto;
+  /* border-style: solid;
+  border-color: black; */
+ 
 }
 .station_search{
   /* align-items: right; */
+  margin-top: 0;
 }
 
 .trip-info{
@@ -67,7 +85,6 @@
 
 .station_label{
   color: white;
-
   font-size: 35px;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
@@ -102,14 +119,18 @@ html{
 
 .route-info-html{
   border-style: solid ;
-  background-color: white;
+  background-color: rgb(39, 39, 39);
   border-radius: 15px;
   width: 280px;
   align-items: center;
   user-select: none;
+  color: white;
+  padding: 10px;
 }
 
 .route-html-text{
+  /* color: white; */
+  /* padding: 10px; */
   font-size: 35px;
   user-select: none;
 }
@@ -212,3 +233,17 @@ html{
   overflow: hidden;
 }
 
+.route_icon_search{
+  height: 15px;
+  width: 15px;
+  padding: 2px;
+}
+
+.canvas{
+  z-index: 1;
+}
+
+.route_icon_leg_info{
+  width: 15px;
+  height: 15px
+}

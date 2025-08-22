@@ -27,24 +27,29 @@ a:visited{
   
 .leg-info-grid-cointainer{
   padding: 5px;
-  display: grid;
-  column-gap: 50px;
-  row-gap: 50px;
+  display: flex;
+  justify-content: space-between;
+  width: auto;
+  /* column-gap: 5vh; */
+  /* row-gap: 5vw; */
   /* border-style: dotted; */
   /* border-color: whitesmoke; */
 }
 
 .start-station-info{
+  font-size: 13px;
   grid-column-start: 1;
   grid-column-end: 2;
 }
 
 .middle-info{
+  font-size: 13px;
   grid-column-start: 2;
   grid-column-end: 3;
 }
 
 .end-station-info{
+  font-size: 13px;
   grid-column-start: 3;
   grid-column-end: 4;
 }
@@ -72,11 +77,14 @@ a:visited{
 }
 
 .plan-trip-button{
+  color: black;
   background-color: gold;
   font-weight: bold;
   border: 2px;
   border: solid;
   border-color: black;
+  padding: 3.5px;
+  
 }
 
 /* .trip-info{
@@ -102,9 +110,22 @@ a:visited{
 }
 
 .next-train-button{
-  background-color: grey;
+  font-size: 13px;
+  background-color: rgb(166, 166, 166);
+  font-weight: bold;
+  color: white;
+  border-style: solid;
+  border-color: black;
+  border-width: 2px;
+  padding: 3px;
 }
 
 .next-train-button-selected{
+  font-size: 13px;
   background-color: rgb(255, 225, 58);
+  font-weight: bold;
+  border-style: solid;
+  border-color: black;
+  border-width: 2px;
+  padding: 3px;
 }

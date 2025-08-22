@@ -35,7 +35,7 @@ function MapExpierience(){
             {/* <TimeDate/> */}
             <JourneyPlanner/>
             <TripErrorModal isOpen={isOpen} closeModal={closeModal}/>
-            <Canvas camera={{ fov: 90, position: [1, -120, .2] }}>
+            <Canvas className='canvas' camera={{ fov: 90, position: [1, -120, .2] }}>
                 <SubwayMap />
             </Canvas>
         </div>

@@ -2,12 +2,14 @@ import './Component.css'
 
 
 function LegInfo({leg}){
+    console.log('l', leg)
 
+    let routeIcon = <img className='route_icon_leg_info' src={`../public/ICONS/${leg.route}.png`}/>
     return(
         <div className="leg-info-grid-cointainer">
             <div className="start-station-info">
                 <div className="top">{leg.start_station}</div>
-                <div className="middle">{leg.direction_label} {leg.route}</div>
+                <div className="middle">{leg.direction_label} {routeIcon}</div>
                 <div className="bottom">Departs {leg.start_station_departure}</div><>{leg.first_six_trains}</>
             </div>
             <div className="middle-info">
@@ -17,8 +19,8 @@ function LegInfo({leg}){
             </div>
             <div className="end-station-info">
                 <div className="top">{leg.end_station}</div>
-                <div className="middle">Arrives {leg.end_station_arrival}</div>
-                {/* <div className="bottom">transfer or destination</div> */}
+                <div className="middle">t or d</div>
+                <div className="bottom">Arrives {leg.end_station_arrival}</div>
             </div>
         </div>
     )

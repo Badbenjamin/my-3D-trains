@@ -40,6 +40,13 @@ function StationSearch({setStartOrEndStation, position, stations, journeyStation
             ...provided,
             backgroundColor: 'white',
             fontWeight: 'bold',
+            width: '270px',
+            borderStyle: 'solid',
+            borderColor: 'black',
+            borderWidth: '3px',
+            borderRadius: '5px',
+            fontSize: '15px'
+        
         }),
         option: (provided, state) => ({
             ...provided,
@@ -56,12 +63,24 @@ function StationSearch({setStartOrEndStation, position, stations, journeyStation
         setStartOrEndStation(option.value, position)
     }
 
+    
     // dropdown seach options
     const optionsArray = []
 
     for (const station of stations){
-        const stationObj = { value : station.gtfs_stop_id, label: `${station.name+" "+station.daytime_routes}`, pos: {position}};
+        let routes = station.daytime_routes
+        let routeIcons = routes.split(" ").map((route)=>{
+            return <img className="route_icon_search"  src={`../public/ICONS/${route}.png`}/>
+        })
+        const stationObj = { value : station.gtfs_stop_id, label:`${station.name}`, routeIcons: routeIcons, pos: {position}};
         optionsArray.push(stationObj);
+    }
+
+    let placeholderText = null
+    if (position == 'start'){
+        placeholderText = "Start Station..."
+    } else {
+        placeholderText = "End Station..."
     }
    
     return (
@@ -72,6 +91,14 @@ function StationSearch({setStartOrEndStation, position, stations, journeyStation
                 value={selectedOption}
                 onChange={handleChange}
                 options={optionsArray}
+                placeholder = {placeholderText}
+                formatOptionLabel={option =>(
+                    <div>
+                        <span>{option.label}</span>
+                        <span>{option.routeIcons}</span>
+                    </div>
+                    
+                )}
             />
         </div>
     )

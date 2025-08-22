@@ -42,10 +42,14 @@ function TripInfo({tripInfo, tripInfoIndex}){
     
   
     return(
-        <div className='leg-info-div'>
-             <hr width="90%" size="2"/>
-            {tripInfo.length > 0 ? newDisplayInfo : <></> }
+        <div>
+            <div>Total time</div>
+            <div className='leg-info-div'>
+                 <hr width="90%" size="2"/>
+                {tripInfo.length > 0 ? newDisplayInfo : <></> }
+            </div>
         </div>
+        
         
     )
 }

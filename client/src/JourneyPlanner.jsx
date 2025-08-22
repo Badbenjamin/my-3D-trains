@@ -74,20 +74,20 @@ function JourneyPlanner() {
 
     return (
         <div className="journey-planner-and-trip-info-container">
-            <p className="m3dt-title">M3DT</p>
+            <div className="m3dt-title">M3DT</div>
             <hr width="90%" size="2"/>
             <div className='journey-planner'>
                 <div className="station-search-container">
                     <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
+                    <div>⬇</div>
                     <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
                 </div>
                 <div className="journey-planner-button-container">
-                    <button className="plan-trip-button" onClick={planTrip}>Go!</button>
-                    <button className="plan-trip-button" onClick={handleReverseClick}>⮂</button>
                     <button className="plan-trip-button" onClick={handleClearClick}>Clear</button>
+                    <button className="plan-trip-button" onClick={handleReverseClick}>⇅</button>
+                    <button className="plan-trip-button" onClick={planTrip}>Go!</button>
                 </div>
             </div>
-            <hr width="90%" size="2"/>
             <div className="trip-info">
                 {tripInfo[tripInfoIndex] != undefined ? <TripInfo className='trip-info' tripInfo={tripInfo} tripInfoIndex={tripInfoIndex}/> : ""}
                 <NextTrains tripInfo={tripInfo} tripInfoIndex={tripInfoIndex} setTripInfoIndex={setTripInfoIndex}/>
