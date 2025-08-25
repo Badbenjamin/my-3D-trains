@@ -38,20 +38,20 @@ function StationSearch({setStartOrEndStation, position, stations, journeyStation
     const customStyles = {
         control : (provided) => ({
             ...provided,
-            backgroundColor: 'white',
+            backgroundColor: 'black',
             fontWeight: 'bold',
             width: '270px',
             borderStyle: 'solid',
-            borderColor: 'black',
+            borderColor: 'grey',
             borderWidth: '3px',
             borderRadius: '5px',
-            fontSize: '15px'
-        
+            fontSize: '15px',
+            color: 'white',
         }),
         option: (provided, state) => ({
             ...provided,
-            color: 'black',
-            backgroundColor: state.isSelected ? 'lightblue' : 'white',
+            color: 'white',
+            backgroundColor: state.isSelected ? 'black' : 'black',
         }),
     }
 
@@ -93,8 +93,8 @@ function StationSearch({setStartOrEndStation, position, stations, journeyStation
                 options={optionsArray}
                 placeholder = {placeholderText}
                 formatOptionLabel={option =>(
-                    <div>
-                        <span>{option.label}</span>
+                    <div style={{ color: 'white' }} >
+                        <span >{option.label}</span>
                         <span>{option.routeIcons}</span>
                     </div>
                     

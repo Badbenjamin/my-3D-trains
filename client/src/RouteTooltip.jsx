@@ -1,8 +1,10 @@
 import { Html, Line } from "@react-three/drei"
 import { useState, useEffect } from "react"
 import * as THREE from "three"
+import './App.css'
 
-export default function RouteTooltip({stationInfo, name, position}){
+
+export default function RouteTooltip({stationInfo, name, position, routes}){
 
     const [startStatonInfo, setStartStationInfo] = useState(null)
     const [endStationInfo, setEndStationInfo] = useState(null)
@@ -13,6 +15,7 @@ export default function RouteTooltip({stationInfo, name, position}){
     const [startErrorInfo, setStartErrorInfo] = useState(null)
     const [endErrorInfo, setEndErrorInfo] = useState(null)
 
+    console.log(routes)
     // stationInfo is info passed from server to geometry, then combined with text in stationsTracksAndText
     // types of tooltip info to display are start, end, transfer, errorStart, errorEnd, and errorTransfer
     useEffect(()=>{
@@ -488,11 +491,11 @@ export default function RouteTooltip({stationInfo, name, position}){
     if (startStatonInfo != null){
         return(
             <>
-                <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={10}>
+                <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={15}>
                     <div className="route-info-html">
-                       <div>{"depart "}{name}</div>
-                       <div>{"on "}{startStatonInfo.direction_label}{startStatonInfo.routeIcon}</div>
-                       <div>{"at"}{startStatonInfo.departure_string}</div>
+                        <div>{startStatonInfo.direction_label}{startStatonInfo.routeIcon}</div>
+                        <hr></hr>
+                        <div className="highlight">Depart {startStatonInfo.departure_string}</div>
                     </div>
                 </Html>
                 <Line points={[position, tooltipPosition]} lineWidth={2}/>
@@ -502,11 +505,14 @@ export default function RouteTooltip({stationInfo, name, position}){
     } else if ((endStationInfo != null)){
         return(
             <>
-                <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={10}>
+                <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={15}>
                     <div className="route-info-html">
-                        <div>{"arrive at "}{name}</div>
+                        {/* <div>ARRIVE</div> */}
+                        <div>{name}</div>
+                        <hr></hr>
+                        {/* <div>{name}</div> */}
                        {/* <div>{"on "}{endStationInfo.direction_label}{endStationInfo.routeIcon}</div> */}
-                       <div>{"at"}{endStationInfo.arrival_string}</div>
+                       <div className="highlight">Arrive {endStationInfo.arrival_string}</div>
                     </div>
                 </Html>
                 <Line points={[position, tooltipPosition]} lineWidth={2}/>
@@ -516,11 +522,18 @@ export default function RouteTooltip({stationInfo, name, position}){
     } else if ((transferStationInfo.first_station && transferStationInfo.second_station) && (transferStationInfo.second_station.type != 'errorTransfer')){
         return(
             <>
-                <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={10}>
+                <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={15}>
                     <div className="route-info-html">
-                        <div>transfer</div>
-                       <div> arrive at {name} {transferStationInfo.first_station.routeIcon} platform at {transferStationInfo.first_station.arrival_string}</div>
-                       <div> transfer to {transferStationInfo.second_station.direction_label} {transferStationInfo.second_station.routeIcon} at {transferStationInfo.second_station.departure_string}</div>
+                        <div>Transfer: {name}</div>
+                        {/* <div>{name}</div> */}
+                        <hr></hr>
+                       <div >{name} {transferStationInfo.first_station.routeIcon}</div>
+                       
+                       <div className="highlight">Arrive {transferStationInfo.first_station.arrival_string}</div>
+                       <hr></hr>
+                       {/* <div>TRANSFER</div> */}
+                       <div>{transferStationInfo.second_station.direction_label} {transferStationInfo.second_station.routeIcon}</div>
+                       <div className="highlight">Depart {transferStationInfo.second_station.departure_string}</div>
                     </div>
                 </Html>
                 <Line points={[position, tooltipPosition]} lineWidth={2}/>

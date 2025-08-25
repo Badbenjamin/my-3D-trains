@@ -141,7 +141,7 @@ useEffect(()=>{
         if(stationArray[j].props.stationInfo && ((stationArray[j].props.stationInfo.type == 'start')||(stationArray[j].props.stationInfo.type == 'end')||(stationArray[j].props.stationInfo.type == 'transfer')||(stationArray[j].props.stationInfo.type == 'errorStart')||(stationArray[j].props.stationInfo.type == 'errorEnd')||(stationArray[j].props.stationInfo.type == 'errorTransfer'))){
 
           let keyforRouteInfo = stationInfoObject[stationArray[j].props.name].name.toString() + versionForKey.toString()
-          let newRouteTooltip = <RouteTooltip key={keyforRouteInfo} name={stationInfoObject[stationArray[j].props.name].name} position={stationArray[j].props.mesh.position} stationInfo={stationArray[j].props.stationInfo}/>
+          let newRouteTooltip = <RouteTooltip key={keyforRouteInfo} name={stationInfoObject[stationArray[j].props.name].name} routes={stationInfoObject[stationArray[j].props.name].daytime_routes} position={stationArray[j].props.mesh.position} stationInfo={stationArray[j].props.stationInfo}/>
           newRouteInfoHtmlArray.push(newRouteTooltip)
           setVersionForKey((prevVersion)=>{
             return prevVersion += 1

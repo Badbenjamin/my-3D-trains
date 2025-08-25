@@ -1,9 +1,11 @@
 import {Perf} from 'r3f-perf'
-import {MapControls, Sky, CameraControls} from '@react-three/drei'
+import {MapControls, Sky, CameraControls, Sphere} from '@react-three/drei'
 // import { useThree } from '@react-three/fiber'
 import { useFrame } from '@react-three/fiber'
 // import { Camera } from 'three'
 import { useOutletContext } from 'react-router-dom'
+import * as THREE from "three"
+
 
 // import { mapControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -37,9 +39,10 @@ function LinesAndMap(){
             <MapControls ref={ref} maxDistance={200} minDistance={1} maxPolarAngle={0.99} />
             
              {/* {mapControls} */}
-            <ambientLight intensity={0.7} />
-            <directionalLight position={[1,2,3]} intenstity={1.5}/>
-            <Sky/>
+            <ambientLight intensity={1.6} />
+            <directionalLight position={[1,1,1]} intenstity={1.5}/>
+            {/* <Sky/> */}
+            <Sphere args={[700, 32, 32]}  material={new THREE.MeshStandardMaterial({ color: new THREE.Color('black'), transparent: false, side: THREE.DoubleSide })}/>
             <Map/>
             <StationsTracksAndText  vectorPosition={vectorPosition}/>
         </>

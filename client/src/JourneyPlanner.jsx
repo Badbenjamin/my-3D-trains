@@ -83,8 +83,8 @@ function JourneyPlanner() {
                     <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
                 </div>
                 <div className="journey-planner-button-container">
-                    <button className="plan-trip-button" onClick={handleClearClick}>Clear</button>
-                    <button className="plan-trip-button" onClick={handleReverseClick}>⇅</button>
+                    <button className="reverse-stations-button" onClick={handleClearClick}>Clear</button>
+                    <button className="reverse-stations-button" onClick={handleReverseClick}>⇅</button>
                     <button className="plan-trip-button" onClick={planTrip}>Go!</button>
                 </div>
             </div>

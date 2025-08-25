@@ -38,17 +38,20 @@ a:visited{
 
 .start-station-info{
   font-size: 13px;
+  font-weight: lighter;
   grid-column-start: 1;
   grid-column-end: 2;
 }
 
 .middle-info{
+  font-weight: lighter;
   font-size: 13px;
   grid-column-start: 2;
   grid-column-end: 3;
 }
 
 .end-station-info{
+  font-weight: lighter;
   font-size: 13px;
   grid-column-start: 3;
   grid-column-end: 4;
@@ -67,6 +70,7 @@ a:visited{
 .bottom{
   grid-row-start: 3;
   grid-row-end: 4;
+
 }
 
 
