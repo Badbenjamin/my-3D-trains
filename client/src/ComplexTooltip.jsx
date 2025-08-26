@@ -61,7 +61,7 @@ export default function ComplexTooltip({complexStationRouteIdObjs, averagePositi
             iconImageArray.push(<img className="route_icon_complex" src={`../public/ICONS/${route}.png`}/>)
         })
         
-        let stationInfoButton = <button onClick={()=>{handleClick(stationObj.gtfs_stop_id)}} className="station-routes-button">{stationObj.name}{iconImageArray}</button>
+        let stationInfoButton = <button className="complex-button" onClick={()=>{handleClick(stationObj.gtfs_stop_id)}}>{stationObj.name}{iconImageArray}</button>
         stationAndRoutesButtonArray.push(stationInfoButton)
     })
 
@@ -86,9 +86,8 @@ export default function ComplexTooltip({complexStationRouteIdObjs, averagePositi
                     distanceFactor={5}
                     center={true}
                 >
-                    <button onClick={()=>{handleXClick(complexId)}}>X</button>
-                    
                     <div  className="complex-tooltip-html">
+                    <button className="x-button" onClick={()=>{handleXClick(complexId)}}>X</button>
                        {stationAndRoutesButtonArray}
                     </div>
                 </Html>
@@ -123,8 +122,8 @@ export default function ComplexTooltip({complexStationRouteIdObjs, averagePositi
                     <hr width="100%" size="2"/>
                     <div className="set-as">
                         {/* <div>Set as</div> */}
-                        <button className="origin-dest-btn" onClick={()=>handleSetStationClick(stopId, "start")}>ORIGIN</button>
-                        <button className="origin-dest-btn" onClick={()=>handleSetStationClick(stopId, "end")}>DESTINATION</button>
+                        <button className="origin-dest-btn" onClick={()=>handleSetStationClick(stationInfo.gtfs_stop_id, "start")}>ORIGIN</button>
+                        <button className="origin-dest-btn" onClick={()=>handleSetStationClick(stationInfo.gtfs_stop_id, "end")}>DESTINATION</button>
                     </div>
                 </div>
             </Html>

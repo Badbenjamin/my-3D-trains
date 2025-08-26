@@ -134,8 +134,38 @@ html{
   font-weight: bold;
 }
 
+/* .complex-tooltip{
+  background-color: rgb(39, 39, 39);
+  border-style: solid;
+  border-color: white;
+  border-radius: 15px;
+  width: 200px;
+  height: 200px;
+} */
+.complex-button{
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  background-color: rgb(39, 39, 39);
+  font-weight: bold;
+  color: white;
+  border-style: solid;
+  border-color: white;
+  border-width: 3px;
+}
 
-
+.complex-tooltip-html{
+  background-color: rgb(39, 39, 39);
+  border-style: solid;
+  border-color: white;
+  border-radius: 15px;
+  width: 200px;
+  height: auto;
+  padding-top: 35px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+}
 
 .route-info-tooltip{
   /* display: flex; */
