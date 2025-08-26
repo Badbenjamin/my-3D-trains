@@ -29,9 +29,9 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
         let imgTimePairs =[]
         if (arrivalObjectArray) {
             for (const arrivalObject of arrivalObjectArray){
-                let imgTimePair = <div className="icon-time-pair">
+                let imgTimePair = <div className="icon-time-pair"> 
                                      <img className="tooltip_route_icon" src={`../public/ICONS/${arrivalObject["route"]}.png`} />
-                                     <div>{arrivalObject['time']}</div>
+                                     <div> {arrivalObject['time']}, </div>
                                   </div>
                 imgTimePairs.push(imgTimePair)
             }
@@ -76,22 +76,28 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
                 as="div"
                 wrapperClass="station-tooltip"
                 position={tooltipPosition}
-                distanceFactor={5}
+                distanceFactor={7}
                 center={true}
             >
                 <div  className="station-html">
                     <button className="x-button" onClick={()=>{(handleXClick(stopId))}} >X</button>
                     <h2 className="station-html-text">{name}{iconImageArray} </h2>
                     <hr width="100%" size="2"/>
-                    <div className="arrivals-html">
-                        {arrivalInfo.north_direction_label}
-                        {northArrivals}
-                        {arrivalInfo.south_direction_label}
-                        {southArrivals}
+                    <div >
+                        <div className="arrivals-name">{arrivalInfo.north_direction_label}</div>
+                        <div className="arrivals-html">{northArrivals}</div>
+                        <hr></hr>
+                        <div className="arrivals-name">{arrivalInfo.south_direction_label}</div>
+                        <div className="arrivals-html">{southArrivals}</div>
                     </div>
                     <hr width="100%" size="2"/>
-                    <button onClick={()=>handleSetStationClick(stopId, "start")}>ORIGIN</button>
-                    <button onClick={()=>handleSetStationClick(stopId, "end")}>DESTINATION</button>
+                    <div className="set-as">
+                        {/* <div>Set as</div> */}
+                        <button className="origin-dest-btn" onClick={()=>handleSetStationClick(stopId, "start")}>ORIGIN</button>
+                        <button className="origin-dest-btn" onClick={()=>handleSetStationClick(stopId, "end")}>DESTINATION</button>
+                    </div>
+                    
+                    
                 </div>
             </Html>
             <Line points={[position, tooltipPosition]} lineWidth={2}/>

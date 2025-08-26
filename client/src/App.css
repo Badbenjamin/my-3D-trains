@@ -11,10 +11,21 @@
   overflow: hidden;
 }
 
+.controls-info{
+  position:absolute;
+  top: 0;
+  right:0;
+  z-index: 12;
+  color: white;
+  padding: 5px;
+
+}
+
 .map-experience-container{
  width: 100vw;
  height: 100vh;
  /* position: s; */
+
 }
 
 .journey-planner-and-trip-info-container{
@@ -124,14 +135,7 @@ html{
 }
 
 
-.station-html{
-  border-style: solid ;
-  background-color: white;
-  border-radius: 15px;
-  width: 280px;
-  align-items: center;
-  user-select: none;
-}
+
 
 .route-info-tooltip{
   /* display: flex; */
@@ -163,19 +167,101 @@ html{
   /* padding: 10px; */
   font-size: 35px;
   user-select: none;
+  /* border-width: 4px; */
+}
+  
+
+.station-html{
+  border-style: solid ;
+  background-color: rgb(39, 39, 39);
+  border-radius: 15px;
+  border-width: 5px;
+  padding: 10px;
+  width: 280px;
+  align-items: center;
+  user-select: none;
+  vertical-align: middle;
+}
+.station-tooltip{
+  color:white;
+  text-align: center;
+  border-radius: 15px;
   
 }
-.x-button{
-  font-size: 12px;
+
+.arrivals-html{
+ display: flex;
+ flex-direction: row;
+}
+
+.arrivals-name{
+  font-size: 25px;
+  /* color: yellow; */
+}
+
+.tooltip_route_icon{
+  width: 20px;
+  height: 20px;
+  padding: 3px;
+  pointer-events: none;
+}
+
+.icon-time-pair{
+  display: flex;
+  flex-direction: row;
+  font-size: 20px;
+  /* color: black; */
+  /* background-color: gold; */
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.origin-dest-btn{
+  color: black;
+  background-color: gold;
   font-weight: bold;
-  margin-top: 1px;
-  margin-right: 2px;
+  padding: 4px;
+}
+.x-button{
+  font-size: 13px;
+  font-weight: bolder;
+  padding-top: 8px;
+  padding-bottom: 3px;
+  /* color: white; */
+  /* margin-top: 5px; */
+  /* margin-right: 5px; */
   position:absolute;
   top:0;
   right:0;
+  background-color: rgb(255, 255, 255);
   border-style: solid;
-  border-color: black;
-  border-radius: 3px;
+  border-color: rgb(255, 255, 255);
+  border-radius: 5px;
+  border-width: 4px;
+}
+
+.back-button{
+  font-size: 18px;
+  font-weight: bolder;
+  padding-top: 1px;
+  padding-bottom: 0px;
+  /* color: white; */
+  /* margin-top: 5px; */
+  /* margin-right: 5px; */
+  position:absolute;
+  top:0;
+  left:0;
+  background-color: rgb(255, 255, 255);
+  border-style: solid;
+  border-color: rgb(255, 255, 255);
+  border-radius: 5px;
+  border-width: 4px;
+}
+
+.set-as{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }
 
 .station-html-button-text{
@@ -241,25 +327,7 @@ html{
   pointer-events: none;
 }
 
-.tooltip_route_icon{
-  width: 27px;
-  height: 27px;
-  padding: 3px;
-  pointer-events: none;
-}
 
-/* .arrivals-html{
-  display: flex;
-  flex-direction: row;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: center;
-} */
-
-.icon-time-pair{
-  display: flex;
-    flex-direction: row;
-}
 
 .station-routes-button{
   white-space: nowrap;

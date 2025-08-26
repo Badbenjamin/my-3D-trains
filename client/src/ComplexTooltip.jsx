@@ -109,19 +109,23 @@ export default function ComplexTooltip({complexStationRouteIdObjs, averagePositi
             >
                 <div  className="station-html">
                     {/* <button className="x-button" onClick={()=>{(handleXClick(stopId))}} >X</button> MODIFY FUNCTION TO WORK WITH COMPLEX ID TOO */}
-                    <button onClick={handleBackClick}>BACK</button>
-                    <button onClick={()=>{handleXClick(complexId)}}>X</button>
+                    <button className="back-button" onClick={handleBackClick}>BACK</button>
+                    <button className="x-button" onClick={()=>{handleXClick(complexId)}}>X</button>
                     <h2 className="station-html-text">{stationInfo.stop_name} </h2>
                     <hr width="100%" size="2"/>
-                    <div className="arrivals-html">
-                        {stationInfo.north_direction_label}
-                        {northArrivals}
-                        {stationInfo.south_direction_label}
-                        {southArrivals}
+                    <div >
+                        <div className="arrivals-name">{stationInfo.north_direction_label}</div>
+                        <div className="arrivals-html">{northArrivals}</div>
+                        <hr></hr>
+                        <div className="arrivals-name">{stationInfo.south_direction_label}</div>
+                        <div className="arrivals-html">{southArrivals}</div>
                     </div>
                     <hr width="100%" size="2"/>
-                    <button onClick={()=>handleSetStationClick(stationInfo.gtfs_stop_id, "start")}>ORIGIN</button>
-                    <button onClick={()=>handleSetStationClick(stationInfo.gtfs_stop_id, "end")}>DESTINATION</button>
+                    <div className="set-as">
+                        {/* <div>Set as</div> */}
+                        <button className="origin-dest-btn" onClick={()=>handleSetStationClick(stopId, "start")}>ORIGIN</button>
+                        <button className="origin-dest-btn" onClick={()=>handleSetStationClick(stopId, "end")}>DESTINATION</button>
+                    </div>
                 </div>
             </Html>
             <Line points={[averagePosition, tooltipPosition]} lineWidth={2}/>

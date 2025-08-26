@@ -33,8 +33,13 @@ function MapExpierience(){
         <>
          <div className='map-experience-container'>  
             {/* <TimeDate/> */}
+            
             <JourneyPlanner/>
             <TripErrorModal isOpen={isOpen} closeModal={closeModal}/>
+            <div className='controls-info'>
+                <div>Click + hold to navigate</div>
+                <div>Shift + click to pan & tilt</div>
+            </div>
             <Canvas className='canvas' camera={{ fov: 90, position: [1, -120, .2] }}>
                 <SubwayMap />
             </Canvas>
