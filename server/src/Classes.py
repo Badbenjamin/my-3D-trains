@@ -23,7 +23,7 @@ class Journey:
         # CHANGED TO GTFS STOP ID from ID (6/16)
         self.start_station = Station.query.filter(Station.gtfs_stop_id == start_station_id).first()
         self.end_station = Station.query.filter(Station.gtfs_stop_id == end_station_id).first()
-        print(self.start_station, self.end_station)
+        # print(self.start_station, self.end_station)
         # accounting for stations in complexes, these are the stations that are shared between two lines on a two part trip.
         self.shared_stations = []
 
@@ -216,12 +216,13 @@ class FilteredTrains:
         if train_data.local_express:
             # finds either a pair of trains with a transfer station, a single train (local faster), or no trains. No trains produces TripError object.
             best_trains_and_transfer = modules_classes.find_best_trains_and_transfer_local_express(train_data, start_station_id, end_station_id)
-
+            # print('btandt', best_trains_and_transfer)
             if best_trains_and_transfer:
                 for train_pair in best_trains_and_transfer:
                     # ACCOMODATE SINGLE TRAIN LATER IF THAT IS FASTEST OPTION
                     # print('tp', train_pair)
-                    if (hasattr(train_pair,'start_train_id')):
+                    print('transfer_station_arrival' in train_pair)
+                    if ('transfer_station_arrival' in train_pair):
                         le_pair = [
                             {
                                 'train_id' : train_pair['start_train_id'],
