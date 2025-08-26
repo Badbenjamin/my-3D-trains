@@ -135,6 +135,7 @@ html{
 
 .route-info-tooltip{
   /* display: flex; */
+ 
   text-align: center;
   min-width: 200px;
 }
@@ -147,6 +148,7 @@ html{
   color: white;
   padding: 10px;
   justify-content: center;
+ 
 }
 
 .highlight{
@@ -161,6 +163,7 @@ html{
   /* padding: 10px; */
   font-size: 35px;
   user-select: none;
+  
 }
 .x-button{
   font-size: 12px;
@@ -210,6 +213,7 @@ html{
   /* display: flex;
   flex-wrap: wrap; */
   gap: 5px;
+  
   /* margin-left: auto;
   margin-right: auto; */
   /* justify-content: center; */
@@ -227,6 +231,7 @@ html{
   pointer-events: none;
   max-width: 20px;
   max-height: 20px;
+  vertical-align: middle;
 }
 
 .route_icon_complex{

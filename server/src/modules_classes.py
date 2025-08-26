@@ -551,12 +551,16 @@ def get_trains_serving_start_station_end_station_or_both(train_data, start_stati
                          trains_serving_start_station.append(train)
                     elif check_for_station_service(stops, end_station_id) and (not check_for_station_service(stops, start_station_id)):
                          trains_serving_end_station.append(train)
+
      return {'trains_serving_start_station' : trains_serving_start_station, 'trains_serving_end_station' : trains_serving_end_station, 'trains_traveling_between_stations' : trains_traveling_between_stations}
 
 # WORKS. MIGHT WANT TO OPTIMIZE LATER.
-def find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array):
+# do i need trains traveling between stations?
+def find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array, trains_traveling_between_stations_array):
      # pairs of trains where the start train and end train (each stoping at start or end station), have a shared station in schedules
      train_pairs_with_transfer = []
+    #  sorted_trains_traveling_between_stations = sorted(trains_traveling_between_stations_array, key= lambda train : (train['arrival_time']))
+    #  print(trains_traveling_between_stations_array)
     #  looping throuth all trains that serve the start station
      for start_train in trains_serving_start_station_array:
         start_train_stops = [stop for stop in start_train.trip_update.stop_time_update]
@@ -631,12 +635,13 @@ def find_train_with_soonest_arrival(train_array):
 def find_best_trains_and_transfer_local_express(train_data, start_station_id, end_station_id):
     
      trains_serving_stations_obj = get_trains_serving_start_station_end_station_or_both(train_data, start_station_id, end_station_id)
+    #  print('trainz',len(trains_serving_stations_obj['trains_traveling_between_stations']))
      trains_serving_start_station_array = trains_serving_stations_obj['trains_serving_start_station']
      trains_serving_end_station_array = trains_serving_stations_obj['trains_serving_end_station']
      trains_traveling_between_stations_array = trains_serving_stations_obj['trains_traveling_between_stations']
      
      
-     train_pairs_with_transfer_array = find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array)
+     train_pairs_with_transfer_array = find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array, trains_traveling_between_stations_array)
     # sort for earliest arrival at end station, AND largest gap between transfer station arrival and departure. 
      best_train_pairs_sorted = sorted(train_pairs_with_transfer_array, key= lambda tp : (tp['end_station_arrival'], -tp['transfer_station_time_gap']))
      best_train_pairs_sorted_de_duplicated = []
@@ -659,7 +664,9 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
      elif best_single_trains_sorted and not best_train_pairs_sorted_de_duplicated:
           return best_single_trains_sorted
      else:
+          print('eror')
           return False
+
 
 def get_endpoints_for_station(station_endpoints):
     endpoints = []

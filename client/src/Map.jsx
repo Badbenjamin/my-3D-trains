@@ -110,8 +110,8 @@ function Map(){
             <mesh
             //  ref={stationRef[index]}
              name={newName}
-             castShadow={newCastShadow}
-             receiveShadow={newRecieveShadow}
+             castShadow={true}
+             receiveShadow={true}
              geometry={newGeometry}
              material={gradientMaterial}
              position={newPosition}

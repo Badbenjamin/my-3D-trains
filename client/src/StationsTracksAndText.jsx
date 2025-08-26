@@ -177,7 +177,9 @@ useEffect(()=>{
             size = 15
           } else if (distToClosestStation < 0.3){
             size = 10
-          } 
+          } else {
+            size = 30
+          }
           // pass station geometry stationInfo to stationText for conditional rendering
           let newStationText = <StationText handleStationClick={handleStationClick} clearTooltip={clearTooltip} size={size}  wrapperClass="station_label"  index={j} tripInProgress={stationArray[j].props.tripInProgress} stationIntrip={stationArray[j].props.stationInTrip} stationInfo = {stationArray[j].props.stationInfo} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
           newStationHtmlArray.push(newStationText)
@@ -327,21 +329,21 @@ useEffect(()=>{
         return currentComplex;
       } else if (distToClosestStationComplex < 1.5 && distToClosestStationComplex >= 1){
         let newKey = currentComplex.props.complexId.toString() + " " + versionForKey.toString()
-        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 25, key : newKey});
+        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 30, key : newKey});
         setVersionForKey((prevVersion)=>{
           return prevVersion += 1
         })
         return newComplexHtmlComponent;
       } else if (distToClosestStationComplex < 1 && distToClosestStationComplex >= 0.5) {
         let newKey = currentComplex.props.complexId.toString() + " " + versionForKey.toString()
-        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 20, key : newKey});
+        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 25, key : newKey});
         setVersionForKey((prevVersion)=>{
           return prevVersion += 1
         })
         return newComplexHtmlComponent;
       } else if (distToClosestStationComplex < 0.5){
         let newKey = currentComplex.props.complexId.toString() + " " + versionForKey.toString()
-        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 15, key : newKey});
+        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 20, key : newKey});
         setVersionForKey((prevVersion)=>{
           return prevVersion += 1
         })

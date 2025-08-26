@@ -39,8 +39,8 @@ function LinesAndMap(){
             <MapControls ref={ref} maxDistance={200} minDistance={1} maxPolarAngle={0.99} />
             
              {/* {mapControls} */}
-            <ambientLight intensity={1.6} />
-            <directionalLight position={[1,1,1]} intenstity={1.5}/>
+            <ambientLight intensity={0.6} />
+            <directionalLight position={[1,1,1]} intenstity={2.5}/>
             {/* <Sky/> */}
             <Sphere args={[700, 32, 32]}  material={new THREE.MeshStandardMaterial({ color: new THREE.Color('black'), transparent: false, side: THREE.DoubleSide })}/>
             <Map/>

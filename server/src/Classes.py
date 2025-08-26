@@ -220,26 +220,40 @@ class FilteredTrains:
             if best_trains_and_transfer:
                 for train_pair in best_trains_and_transfer:
                     # ACCOMODATE SINGLE TRAIN LATER IF THAT IS FASTEST OPTION
-                    le_pair = [
-                        {
-                            'train_id' : train_pair['start_train_id'],
-                            'train' : modules_classes.single_train_to_train_class(train_pair['start_train']),
-                            'start_station_id' : start_station_id,
-                            'end_station_id' : train_pair['transfer_station_start_train'],
-                            'start_station_arrival' : train_pair['start_station_arrival'],
-                            'end_station_arrival' : train_pair['transfer_station_arrival'],
-                        },
-                        {
-                            'train_id' : train_pair['end_train_id'],
-                            'train' : modules_classes.single_train_to_train_class(train_pair['end_train']), 
-                            'start_station_id' : train_pair['transfer_station_end_train'],
-                            'end_station_id' : end_station_id,
-                            'start_station_arrival' : train_pair['transfer_station_departure'],
-                            'end_station_arrival' : train_pair['end_station_arrival'],
-                        }
-                    ]
-                    self.local_express_seq_2.append(le_pair)
-       
+                    # print('tp', train_pair)
+                    if (hasattr(train_pair,'start_train_id')):
+                        le_pair = [
+                            {
+                                'train_id' : train_pair['start_train_id'],
+                                'train' : modules_classes.single_train_to_train_class(train_pair['start_train']),
+                                'start_station_id' : start_station_id,
+                                'end_station_id' : train_pair['transfer_station_start_train'],
+                                'start_station_arrival' : train_pair['start_station_arrival'],
+                                'end_station_arrival' : train_pair['transfer_station_arrival'],
+                            },
+                            {
+                                'train_id' : train_pair['end_train_id'],
+                                'train' : modules_classes.single_train_to_train_class(train_pair['end_train']), 
+                                'start_station_id' : train_pair['transfer_station_end_train'],
+                                'end_station_id' : end_station_id,
+                                'start_station_arrival' : train_pair['transfer_station_departure'],
+                                'end_station_arrival' : train_pair['end_station_arrival'],
+                            }
+                        ]
+                        self.local_express_seq_2.append(le_pair)
+                    else:
+                        print('single train?')
+                        single_train = [
+                            {
+                                'train_id' : train_pair['train_id'],
+                                'train' : modules_classes.single_train_to_train_class(train_pair['train']),
+                                'start_station_id' : start_station_id,
+                                'end_station_id' : end_station_id,
+                                'start_station_arrival' : train_pair['start_station_arrival'],
+                                'end_station_arrival' : train_pair['end_station_arrival'],
+                            }
+                        ]
+                        self.local_express_seq_2.append(single_train)
             else:
                 self.trip_error_obj = TripError(self.all_train_data, self.start_station.gtfs_stop_id, self.end_station.gtfs_stop_id)
         else:
