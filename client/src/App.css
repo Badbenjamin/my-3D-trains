@@ -41,11 +41,11 @@
   width:325px;
   min-height: 15vh;
   max-height: auto;
-  background: rgb(0, 0, 0);
+  background: rgb(39, 39, 39);
   border-style: solid;
   border-radius: 10px;
   border-color: rgb(255, 255, 255);
-  border-width: 1px;
+  border-width: 3px;
   color: white;
   
 }

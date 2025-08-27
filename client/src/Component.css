@@ -70,7 +70,10 @@ a:visited{
 .bottom{
   grid-row-start: 3;
   grid-row-end: 4;
-
+  color: black;
+  background-color: gold;
+  padding: 3px;
+  border-radius: 5px;
 }
 
 

@@ -544,8 +544,10 @@ def get_trains_serving_start_station_end_station_or_both(train_data, start_stati
 def find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array, trains_traveling_between_stations_array):
      # pairs of trains where the start train and end train (each stoping at start or end station), have a shared station in schedules
      train_pairs_with_transfer = []
-     sorted_trains_traveling_between_stations = sorted(trains_traveling_between_stations_array, key= lambda train : (train['arrival_time']))
-     print('btw sta',len(sorted_trains_traveling_between_stations))
+     sorted_trains_traveling_between_stations = sorted(trains_traveling_between_stations_array, key= lambda train : (train['end_station_arrival']))
+    #  print('btw sta',len(sorted_trains_traveling_between_stations))
+    # NEED TO 
+
     #  looping throuth all trains that serve the start station
      for start_train in trains_serving_start_station_array:
         start_train_stops = [stop for stop in start_train.trip_update.stop_time_update]
@@ -603,7 +605,7 @@ def find_local_and_express_train_pairs_with_transfer(start_station_id, end_stati
                             else:
                                 train_pairs_with_transfer.append(new_train_pair_obj)
                            
-     print('tpt0',train_pairs_with_transfer[0])
+    #  print('tpt0',train_pairs_with_transfer[0])
      return train_pairs_with_transfer
 
 def find_train_with_soonest_arrival(train_array):
