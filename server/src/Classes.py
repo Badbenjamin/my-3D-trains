@@ -221,7 +221,7 @@ class FilteredTrains:
                 for train_pair in best_trains_and_transfer:
                     # ACCOMODATE SINGLE TRAIN LATER IF THAT IS FASTEST OPTION
                     # print('tp', train_pair)
-                    print('transfer_station_arrival' in train_pair)
+                    # print('transfer_station_arrival' in train_pair)
                     if ('transfer_station_arrival' in train_pair):
                         le_pair = [
                             {

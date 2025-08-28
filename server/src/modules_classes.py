@@ -281,7 +281,7 @@ def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_st
     return trains_with_arrival
 
 # is quick sort efficient for a sorted array?
-# it should be sorted correctly unless an express train arrives at the destination. 
+# it should already be sorted correctly UNLESS an express train arrives at the destination. 
 def quick_sort_trains_by_arrival_time(train_obj_array, sort_by_origin_departure_or_dest_arrival):
     sort_by = ''
     if sort_by_origin_departure_or_dest_arrival == 'destination_arrival':
@@ -544,9 +544,8 @@ def get_trains_serving_start_station_end_station_or_both(train_data, start_stati
 def find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array, trains_traveling_between_stations_array):
      # pairs of trains where the start train and end train (each stoping at start or end station), have a shared station in schedules
      train_pairs_with_transfer = []
-     sorted_trains_traveling_between_stations = sorted(trains_traveling_between_stations_array, key= lambda train : (train['end_station_arrival']))
-    #  print('btw sta',len(sorted_trains_traveling_between_stations))
-    # NEED TO 
+    #  sorted_trains_traveling_between_stations = sorted(trains_traveling_between_stations_array, key= lambda train : (train['end_station_arrival']))
+    
 
     #  looping throuth all trains that serve the start station
      for start_train in trains_serving_start_station_array:
@@ -592,20 +591,25 @@ def find_local_and_express_train_pairs_with_transfer(start_station_id, end_stati
                                 'transfer_station_end_train' : end_train_stop.stop_id[:-1],
                             }   
                             
+                            train_pairs_with_transfer.append(new_train_pair_obj)
+                            # THIS APPEARS TO BE WORKING THE SAME WITHOUT PREVENTING DUPLICATES FROM GETTING IN ARRAY?
+                            # COULD I ADD A HASHMAP TO MAKE THIS BETTER? 
+
                             # make sure duplicates are not in array of train pair objs. Only include unique pairs with unique transfers. 
-                            if train_pairs_with_transfer:
-                                in_array = False
-                                for prev_train_obj in train_pairs_with_transfer:
-                                    if (prev_train_obj['start_train_id'] == new_train_pair_obj['start_train_id']) and (prev_train_obj['end_train_id'] == new_train_pair_obj['end_train_id']) and (prev_train_obj['transfer_station_start_train'] == new_train_pair_obj['transfer_station_start_train']):
-                                        in_array = True
-                                    else:
-                                        in_array = False
-                                if in_array == False:
-                                    train_pairs_with_transfer.append(new_train_pair_obj)
-                            else:
-                                train_pairs_with_transfer.append(new_train_pair_obj)
+                            # COULD I USE A HASHMAP TO MAKE THIS BETTER?
+                            # if train_pairs_with_transfer:
+                            #     in_array = False
+                            #     for prev_train_obj in train_pairs_with_transfer:
+                            #         if (prev_train_obj['start_train_id'] == new_train_pair_obj['start_train_id']) and (prev_train_obj['end_train_id'] == new_train_pair_obj['end_train_id']) and (prev_train_obj['transfer_station_start_train'] == new_train_pair_obj['transfer_station_start_train']):
+                            #             in_array = True
+                            #         else:
+                            #             in_array = False
+                            #     if in_array == False:
+                            #         train_pairs_with_transfer.append(new_train_pair_obj)
+                            # else:
+                            #     train_pairs_with_transfer.append(new_train_pair_obj)
                            
-    #  print('tpt0',train_pairs_with_transfer[0])
+     print('tpt0',len(train_pairs_with_transfer))
      return train_pairs_with_transfer
 
 def find_train_with_soonest_arrival(train_array):
