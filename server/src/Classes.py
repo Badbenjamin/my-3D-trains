@@ -42,6 +42,7 @@ class Journey:
         # This variable contains info for the type of trip. Whether there is a transfer or if it involves local and express trains. 
         self.journey_info_obj = modules_classes.get_journey_info(self.start_station_routes, self.end_station_routes)
         # print('journey info obj', self.journey_info_obj)
+        
         # if not on same route, and also not on same colored line, the trip requires a transfer btw lines
         if (self.journey_info_obj['start_shares_routes_with_end'] == False) and (self.journey_info_obj['on_same_colored_line'] == False):
             # find complexes on start and end lines

@@ -137,8 +137,8 @@ def check_for_station_service_on_failed_leg(train_data, start_station_id, start_
                             if route_id not in end_station_current_routes_south:
                                  end_station_current_routes_south.append(route_id)
     # print(start_station_current_routes, end_station_current_routes) 
-    # print(start_station_current_routes_north, start_station_current_routes_south)
-    # print(end_station_current_routes_north, end_station_current_routes_south)             
+    print(start_station_current_routes_north, start_station_current_routes_south)
+    print(end_station_current_routes_north, end_station_current_routes_south)             
     service_obj = {
         'start_station_service' : start_service,
         'end_station_service' : end_service,
@@ -546,7 +546,7 @@ def find_local_and_express_train_pairs_with_transfer(start_station_id, end_stati
      train_pairs_with_transfer = []
     #  sorted_trains_traveling_between_stations = sorted(trains_traveling_between_stations_array, key= lambda train : (train['end_station_arrival']))
     
-
+     print('lens', len(trains_serving_start_station_array), len(trains_serving_end_station_array))
     #  looping throuth all trains that serve the start station
      for start_train in trains_serving_start_station_array:
         start_train_stops = [stop for stop in start_train.trip_update.stop_time_update]
@@ -558,6 +558,7 @@ def find_local_and_express_train_pairs_with_transfer(start_station_id, end_stati
             end_train_stops_no_direction = [stop.stop_id[:-1] for stop in end_train.trip_update.stop_time_update]
 
             end_station_info = None
+            print('ets', len(end_train_stops))
 
             transfer_station_id = None
             start_train_transfer_station_arrival_time = None
