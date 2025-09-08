@@ -120,3 +120,15 @@ class CommuteTime(db.Model, SerializerMixin):
 
     def __repr__(self):
          return f'<CommuteTime {self.commute.rider.username}, {self.commute.start_station.stop_name}, {self.commute.end_station.stop_name}, {self.commute.name}>'
+    
+
+class TransferTimes(db.Model):
+    __tablename__ = 'transfer_times'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    from_stop_id = db.Column(db.String)
+    to_stop_id = db.Column(db.String)
+    min_transfer_time = db.Column(db.Integer)
+
+    def __repr__(self):
+         return f'<TransferTimes>'

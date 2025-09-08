@@ -369,7 +369,7 @@ html{
 
 .start-station-info{
   /* margin-left: auto; */
-  padding: 5px;
+  padding: 2px;
 }
 .station{
   font-size: 17px;
@@ -377,7 +377,7 @@ html{
 }
 .time{
   font-size: 17px;
-  /* font-weight: bold; */
+  font-weight: bold;
   background-color: gold;
   color: black;
   border-radius: 5px;
@@ -393,7 +393,7 @@ html{
 .middle-info{
   display: flex;
   flex-direction: row;
-  padding: 5px;
+  padding: 2px;
 }
 
 .arrow-icon{
@@ -401,7 +401,7 @@ html{
 }
 
 .end-station-info{
-  padding: 5px;
+  padding: 2px;
 }
 
 .stops-and-time{
