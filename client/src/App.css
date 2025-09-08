@@ -324,22 +324,13 @@ html{
 }
 
 .icon-image-array{
-  /* min-width: 150px; */
   display: inline-block;
-  /* display: flex;
-  flex-wrap: wrap; */
   gap: 5px;
-  
-  /* margin-left: auto;
-  margin-right: auto; */
-  /* justify-content: center; */
 }
 
 .route_icon{
   padding: 3px;
   pointer-events: none;
-  /* max-width: 15px;
-  max-height: 15px; */
 }
 
 .route_icon_route_tt{
@@ -357,8 +348,6 @@ html{
   pointer-events: none;
 }
 
-
-
 .station-routes-button{
   white-space: nowrap;
   overflow: hidden;
@@ -374,11 +363,62 @@ html{
   z-index: 1;
 }
 
-.route_icon_leg_info{
-  width: 15px;
-  height: 15px
+
+/* LEG INFO */
+
+.start-station-info{
+  /* margin-left: auto; */
+  padding: 5px;
+}
+.station{
+  font-size: 17px;
+  font-weight: bold;
+}
+.time{
+  font-size: 17px;
+  font-weight: bold;
+  background-color: gold;
+  color: black;
+  border-radius: 5px;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+.direction{
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.middle-info{
+  display: flex;
+  flex-direction: row;
+  padding: 5px;
 }
 
 .arrow-icon{
-  font-size: 20px;
+  font-size: 30px;
 }
+
+.end-station-info{
+  padding: 5px;
+}
+
+.stops-and-time{
+  font-size: 17px;
+  flex-direction: column;
+  margin-left: 0;
+}
+
+.trip-time{
+  background-color: gold;
+  color: black;
+  border-radius: 5px;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+.route_icon_leg_info{
+  width: 17px;
+  height: 17px
+}
+
