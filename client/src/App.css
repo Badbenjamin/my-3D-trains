@@ -74,12 +74,13 @@
 }
 
 .reverse-stations-button{
-  background-color: white;
+  background-color: rgb(166, 166, 166);
   font-weight: bold;
   border: 2px;
   border: solid;
   border-color: black;
   padding: 3.5px;
+  color: rgb(255, 255, 255);
 }
 
 /* .select{
@@ -376,7 +377,7 @@ html{
 }
 .time{
   font-size: 17px;
-  font-weight: bold;
+  /* font-weight: bold; */
   background-color: gold;
   color: black;
   border-radius: 5px;
@@ -386,7 +387,7 @@ html{
 
 .direction{
   font-size: 17px;
-  font-weight: bold;
+  /* font-weight: bold; */
 }
 
 .middle-info{
@@ -409,12 +410,16 @@ html{
   margin-left: 0;
 }
 
+.transfer-info{
+  padding: 5px;
+}
+
 .trip-time{
-  background-color: gold;
+  /* background-color: gold;
   color: black;
   border-radius: 5px;
   padding-left: 3px;
-  padding-right: 3px;
+  padding-right: 3px; */
 }
 
 .route_icon_leg_info{

@@ -19,7 +19,7 @@ function TripInfo({tripInfo, tripInfoIndex}){
                         return (
                             <>
                                 <LegInfo key={leg.start_station}  className='leg-info' leg={leg} type={'single-leg'}/>
-                                <hr width="90%" size="2"/>
+                                {/* <hr width="90%" size="2"/> */}
                             </>
                         )
                     } else {
@@ -27,14 +27,14 @@ function TripInfo({tripInfo, tripInfoIndex}){
                             return (
                                 <>
                                     <LegInfo key={leg.start_station}  className='leg-info' leg={leg} type={'first-leg'}/>
-                                    <hr width="90%" size="2"/>
+                                    {/* <hr width="90%" size="2"/> */}
                                 </>
                             )
                         } else if (i === 1){
                             return (
                                 <>
                                     <LegInfo key={leg.start_station}  className='leg-info' leg={leg} type={'second-leg'}/>
-                                    <hr width="90%" size="2"/>
+                                    {/* <hr width="90%" size="2"/> */}
                                 </>
                             )
                         }

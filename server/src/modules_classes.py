@@ -308,7 +308,7 @@ def sort_trains_by_arrival_at_destination_or_origin_departure(filtered_train_dat
         # take JSON train array (filtered) and build objects with {train, dest arrival, origin arrival} key value pairs
         trains_with_arrival_objs_array = create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id)
         # use quicksort to sort array of objects by arrival at destination.
-        sorted_trains = [train for train in quick_sort_trains_by_arrival_time(trains_with_arrival_objs_array, departure_or_arrival) if train['origin_departure_time'] >= time]
+        sorted_trains = [train for train in quick_sort_trains_by_arrival_time(trains_with_arrival_objs_array, departure_or_arrival) if train['origin_departure_time'] > time]
         return sorted_trains
 
 # returns True if a route from the start station routes is present in the end station routes
