@@ -42,7 +42,7 @@ class Journey:
         # This variable contains info for the type of trip. Whether there is a transfer or if it involves local and express trains. 
         self.journey_info_obj = modules_classes.get_journey_info(self.start_station_routes, self.end_station_routes)
         # print('journey info obj', self.journey_info_obj)
-        
+
         # if not on same route, and also not on same colored line, the trip requires a transfer btw lines
         if (self.journey_info_obj['start_shares_routes_with_end'] == False) and (self.journey_info_obj['on_same_colored_line'] == False):
             # find complexes on start and end lines
@@ -379,6 +379,7 @@ class FormattedTrainData:
                         "schedule" : first_train_stop_schedule,
                         "number_of_stops" : stop_schedule_ids.index(trip_sequence_element.end_station_id) - stop_schedule_ids.index(trip_sequence_element.start_station_id),
                         "trip_time" : (trip_sequence_element.end_station_arrival - trip_sequence_element.start_station_arrival)//60,
+                        "transfer_time" : trip_sequence_element.transfer_time
 
                         
                     }
@@ -470,15 +471,16 @@ class Stop:
 # This class accepts a BestTrain obj, or info from the local_express_sequence of a LocalExpress object, and saves the info to itself. 
 class TripSequenceElement:
 
-    def __init__(self, trip_info, start_gtfs=None, end_gtfs=None):
+    def __init__(self, trip_info, start_gtfs=None, end_gtfs=None, transfer_time=None):
         self.train_id = None
         self.train = None
         self.start_station_id = start_gtfs
         self.end_station_id = end_gtfs
+        self.transfer_time = transfer_time
         self.start_station_arrival = None
         self.end_station_arrival = None
         self.error = None
-
+        # print('tse ttime', self.transfer_time)
         # TRIP HAS A LOCAL TO EXPRESS OR EXP TO LOC TRANSFER
         if(isinstance(trip_info, Train)):
             self.train_id = trip_info.trip_id
