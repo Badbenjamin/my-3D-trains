@@ -44,7 +44,10 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
 
 
         
-        transfer_time = 120
+        # transfer_time = 120
+        from models import TransferTimes
+        transfer_time = TransferTimes.query.filter(TransferTimes.from_stop_id == start_station_id and TransferTimes.to_stop_id == end_station_id).first().min_transfer_time
+        # print('ntt', new_transfer_time)
         buffer_for_start_time = 30
         # USEFULL PRINT STATEMENT
         # print('lens', len(leg_one_sorted_train_obj_list), len(leg_one_sorted_train_obj_list))
