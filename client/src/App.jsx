@@ -141,7 +141,8 @@ function App() {
                 "type" : "transfer",
                 "second_transfer_info" : [],
                 "direction_label" : tripSequenceElement.direction_label,
-                "route" : tripSequenceElement.route
+                "route" : tripSequenceElement.route,
+                "transfer_time" : tripSequenceElement.transfer_time
               }
             } else if ((stop.stop_id.slice(0,3) in selectedStationInfoObj) && ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) == stopsForLeg[0].stop_id.slice(0,3) || stop.stop_id.slice(0,3) == stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3)))){
               selectedStationInfoObj[stop.stop_id.slice(0,3)].second_transfer_info.push({

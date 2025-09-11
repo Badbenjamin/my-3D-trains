@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 
 function TripInfo({tripInfo, tripInfoIndex}){
     // const [displayInfo, setDisplayInfo] = useState([])
-
+        console.log('tripINfo tripInfo', tripInfo[tripInfoIndex])
   
         let newDisplayInfo = []
         // console.log(tripInfo.length > 0)

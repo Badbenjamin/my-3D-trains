@@ -88,7 +88,7 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
     // it must be re constructed by ordering the transfers by arrival time
     } else if (stationInfo.type === "transfer"){
         // construct ordered objects based on arrival and departure times
-        
+        console.log('rtt stationInfo', stationInfo)
         // BRANCH FOR SUCCESSFUL TRANSFER
         if (stationInfo.second_transfer_info[0]?.type != 'errorTransfer'){
 
@@ -125,7 +125,7 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                     minute: '2-digit',
                     hour12: true 
                 })
-    
+                // if stationInfo(first station) comes first in transfer
                 if (stationInfo.arrival < stationInfo.second_transfer_info[0].arrival){
     
                     firstStationObject =  {
@@ -137,7 +137,8 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                         "route" : stationInfo.route,
                         "stop_id" : stationInfo.stopId,
                         "type" : stationInfo.type,
-                        "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.route}.png`}/>
+                        "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.route}.png`}/>,
+                        "transfer_time" : stationInfo.transfer_time
                     }
     
                     secondStationObject = {
@@ -151,6 +152,7 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                         "type" : stationInfo.second_transfer_info[0].type,
                         "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.second_transfer_info[0].route}.png`}/>
                     }
+                    // if stationInfo.secondTransferInfo[0] is actually the first station in the transfer
                 } else if ((stationInfo.arrival > stationInfo.second_transfer_info[0].arrival)){
    
                     secondStationObject =  {
@@ -174,7 +176,8 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                         "route" : stationInfo.second_transfer_info[0].route,
                         "stop_id" : stationInfo.second_transfer_info[0].stopId,
                         "type" : stationInfo.second_transfer_info[0].type,
-                        "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.second_transfer_info[0].route}.png`}/>
+                        "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.second_transfer_info[0].route}.png`}/>,
+                        "transfer_time" : stationInfo.second_transfer_info[0].transfer_time
                     }
                 }
     
@@ -524,14 +527,15 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
             <>
                 <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={15}>
                     <div className="route-info-html">
-                        <div>Transfer: {name}</div>
+                        {/* <div>Transfer: {name}</div> */}
                         {/* <div>{name}</div> */}
-                        <hr></hr>
+                        {/* <hr></hr> */}
                        <div >{name} {transferStationInfo.first_station.routeIcon}</div>
                        
                        <div className="highlight">Arrive {transferStationInfo.first_station.arrival_string}</div>
                        <hr></hr>
-                       {/* <div>TRANSFER</div> */}
+                       <div >Transfer: {transferStationInfo.first_station.transfer_time / 60} Min</div>
+                       <hr></hr>
                        <div>{transferStationInfo.second_station.direction_label} {transferStationInfo.second_station.routeIcon}</div>
                        <div className="highlight">Depart {transferStationInfo.second_station.departure_string}</div>
                     </div>
