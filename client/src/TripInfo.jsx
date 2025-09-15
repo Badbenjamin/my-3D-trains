@@ -6,7 +6,15 @@ import { useState, useEffect } from 'react'
 function TripInfo({tripInfo, tripInfoIndex}){
     // const [displayInfo, setDisplayInfo] = useState([])
         console.log('tripINfo tripInfo', tripInfo[tripInfoIndex])
-  
+
+        let totalTime = null
+        if (tripInfo[tripInfoIndex].length > 1){
+            totalTime = tripInfo[tripInfoIndex][1].end_station_arrival_ts - tripInfo[tripInfoIndex][0].start_station_departure_ts
+        } else {
+            totalTime = tripInfo[tripInfoIndex][0].end_station_arrival_ts - tripInfo[tripInfoIndex][0].start_station_departure_ts
+        } 
+        let totalTimeDisplay =Math.floor(totalTime / 60)
+
         let newDisplayInfo = []
         // console.log(tripInfo.length > 0)
         if (tripInfo.length > 0){
@@ -63,7 +71,7 @@ function TripInfo({tripInfo, tripInfoIndex}){
   
     return(
         <div>
-            <div>Total time</div>
+            <div>Total time: {totalTimeDisplay} min</div>
             <div className='leg-info-div'>
                  <hr width="100%" size="2"/>
                 {tripInfo.length > 0 ? newDisplayInfo : <></> }

@@ -370,9 +370,11 @@ class FormattedTrainData:
                         "start_station" : start_station.stop_name,
                         "start_station_gtfs" : trip_sequence_element.start_station_id,
                         "start_station_departure" : datetime.fromtimestamp(trip_sequence_element.start_station_arrival).strftime('%-I:%M'),
+                        "start_station_departure_ts": trip_sequence_element.start_station_arrival,
                         "end_station" : end_station.stop_name,
                         "end_station_gtfs" : trip_sequence_element.end_station_id,
                         "end_station_arrival" : datetime.fromtimestamp(trip_sequence_element.end_station_arrival).strftime('%-I:%M'),
+                        "end_station_arrival_ts" : trip_sequence_element.end_station_arrival,
                         "transfer_station" : None,
                         "route" : first_train.route(),
                         "direction_label" : None,
@@ -428,6 +430,7 @@ class FormattedTrainData:
                     }
                     trip_sequence.append(error_for_react)
             self.trip_sequences_for_react.append(trip_sequence)
+            # print(trip_sequence)
     def __repr__(self):
         return f'<FormattedTrainData >'
 
