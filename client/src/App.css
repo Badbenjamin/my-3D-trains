@@ -40,7 +40,7 @@
   flex-direction: column;
   width:325px;
   min-height: 15vh;
-  max-height: auto;
+  /* max-height: 10px; */
   background: rgb(39, 39, 39);
   border-style: solid;
   border-radius: 10px;

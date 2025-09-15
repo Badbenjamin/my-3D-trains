@@ -496,6 +496,8 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
             <>
                 <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={15}>
                     <div className="route-info-html">
+                        <div>{name}</div>
+                        <hr></hr>
                         <div>{startStatonInfo.direction_label}{startStatonInfo.routeIcon}</div>
                         <hr></hr>
                         <div className="highlight">Depart {startStatonInfo.departure_string}</div>

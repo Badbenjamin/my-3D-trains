@@ -36,6 +36,10 @@ function StationSearch({setStartOrEndStation, position, stations, journeyStation
     
     // STYLING FOR SEARCH
     const customStyles = {
+        input: (provided) => ({
+            ...provided,
+            color: 'white'
+        }),
         control : (provided) => ({
             ...provided,
             backgroundColor: 'black',
