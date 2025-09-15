@@ -128,11 +128,17 @@ a:visited{
 }
 
 .next-train-button-selected{
-  font-size: 16px;
+  font-size: 14px;
   background-color: rgb(255, 225, 58);
   font-weight: bold;
   border-style: solid;
   border-color: black;
   border-width: 2px;
   padding: 3px;
+}
+
+.route_icon_next_train{
+  height: 20px;
+  width: 20px;
+  vertical-align: middle;
 }
