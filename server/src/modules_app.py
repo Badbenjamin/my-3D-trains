@@ -44,14 +44,9 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
         else:
             leg_two_sorted_train_obj_list = leg_two_filtered_trains.train_objects_sorted_by_dest_arrival
 
-
-        
-        # transfer_time = 120
         from models import TransferTimes
         transfer_time_obj = TransferTimes.query.filter((TransferTimes.from_stop_id == start_terminus_gtfs_id) & (TransferTimes.to_stop_id == end_origin_gtfs_id)).first()
         transfer_time = transfer_time_obj.min_transfer_time
-        # HOW DO I GET TRANSFER TIME INTO TRIP SEQUENCE ELEMENT?
-        print('tt', start_terminus_gtfs_id, end_origin_gtfs_id, transfer_time_obj.id)
         buffer_for_start_time = 30
         # USEFULL PRINT STATEMENT
         # print('lens', len(leg_one_sorted_train_obj_list), len(leg_one_sorted_train_obj_list))
@@ -86,9 +81,6 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
             all_possible_ts_pairs.append(pair)
     
     sorted_ts_pairs = sorted(all_possible_ts_pairs, key = lambda ts_pair : ts_pair[1].end_station_arrival)
-    # pprint.pp(sorted_ts_pairs)
-    # for pair in sorted_ts_pairs:
-    #     pprint.pprint('sorted tspairs', sorted_ts_pairs)
     return sorted_ts_pairs
 
 
