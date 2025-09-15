@@ -89,7 +89,7 @@ a:visited{
   font-weight: bold;
   border: 2px;
   border: solid;
-  border-color: black;
+  border-color: rgb(0, 0, 0);
   padding: 3.5px;
   
 }
@@ -118,11 +118,11 @@ a:visited{
 
 .next-train-button{
   font-size: 15px;
-  background-color: rgb(166, 166, 166);
+  background-color: rgb(0, 0, 0);
   font-weight: bold;
   color: white;
   border-style: solid;
-  border-color: black;
+  border-color: rgb(255, 255, 255);
   border-width: 2px;
   padding: 3px;
 }

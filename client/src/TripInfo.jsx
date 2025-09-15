@@ -65,7 +65,7 @@ function TripInfo({tripInfo, tripInfoIndex}){
         <div>
             <div>Total time</div>
             <div className='leg-info-div'>
-                 <hr width="90%" size="2"/>
+                 <hr width="100%" size="2"/>
                 {tripInfo.length > 0 ? newDisplayInfo : <></> }
             </div>
         </div>

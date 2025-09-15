@@ -46,11 +46,12 @@ function StationSearch({setStartOrEndStation, position, stations, journeyStation
             fontWeight: 'bold',
             width: '270px',
             borderStyle: 'solid',
-            borderColor: 'grey',
+            borderColor: 'white',
             borderWidth: '3px',
             borderRadius: '5px',
             fontSize: '15px',
             color: 'white',
+            // padding: '2px',
         }),
         option: (provided, state) => ({
             ...provided,

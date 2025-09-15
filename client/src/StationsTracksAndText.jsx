@@ -329,21 +329,21 @@ useEffect(()=>{
         return currentComplex;
       } else if (distToClosestStationComplex < 1.5 && distToClosestStationComplex >= 1){
         let newKey = currentComplex.props.complexId.toString() + " " + versionForKey.toString()
-        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 30, key : newKey});
+        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 20, key : newKey});
         setVersionForKey((prevVersion)=>{
           return prevVersion += 1
         })
         return newComplexHtmlComponent;
       } else if (distToClosestStationComplex < 1 && distToClosestStationComplex >= 0.5) {
         let newKey = currentComplex.props.complexId.toString() + " " + versionForKey.toString()
-        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 25, key : newKey});
+        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 15, key : newKey});
         setVersionForKey((prevVersion)=>{
           return prevVersion += 1
         })
         return newComplexHtmlComponent;
       } else if (distToClosestStationComplex < 0.5){
         let newKey = currentComplex.props.complexId.toString() + " " + versionForKey.toString()
-        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 20, key : newKey});
+        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 10, key : newKey});
         setVersionForKey((prevVersion)=>{
           return prevVersion += 1
         })

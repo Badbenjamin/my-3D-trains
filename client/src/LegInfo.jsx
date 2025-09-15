@@ -24,7 +24,7 @@ function LegInfo({leg, type}){
                     <div className="station">{leg.end_station}</div>
                     <span className="time">Arrives {leg.end_station_arrival}</span>
                 </div>
-                <hr width="90%" size="2"/>
+                <hr width="100%" size="2"/>
             </div>
         )
     } else if (type === 'first-leg'){
@@ -46,12 +46,12 @@ function LegInfo({leg, type}){
                     <div className="station">{leg.end_station}</div>
                     <span className="time">Arrives {leg.end_station_arrival}</span>
                 </div>
-                <hr width="90%" size="2"/>
+                <hr width="100%" size="2"/>
                 <div className="transfer-info">
-                    <div className="station">Transfer</div>
-                    <span >{leg.transfer_time / 60} Minutes</span>
+                    {/* <div className="station">Transfer</div> */}
+                    <span >Transfer: {leg.transfer_time / 60} Minutes</span>
                 </div>
-                <hr width="90%" size="2"/>
+                <hr width="100%" size="2"/>
             </div>
         )
     } else if (type === 'second-leg'){
@@ -73,7 +73,7 @@ function LegInfo({leg, type}){
                     <div className="station">{leg.end_station}</div>
                     <span className="time">Arrives {leg.end_station_arrival}</span>
                 </div>
-                <hr width="90%" size="2"/>
+                <hr width="100%" size="2"/>
             </div>
         )
     }

@@ -75,11 +75,12 @@ function JourneyPlanner() {
     return (
         <div className="journey-planner-and-trip-info-container">
             <div className="m3dt-title">M3DT</div>
-            <hr width="90%" size="2"/>
+            <hr width="100%" size="2"/>
             <div className='journey-planner'>
                 <div className="station-search-container">
                     <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
-                    <div>⬇</div>
+                    {/* <div>⬇</div> */}
+                    <br></br>
                     <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
                 </div>
                 <div className="journey-planner-button-container">
