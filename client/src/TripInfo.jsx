@@ -4,70 +4,57 @@ import ErrorInfo from './ErrorInfo'
 import { useState, useEffect } from 'react'
 
 function TripInfo({tripInfo, tripInfoIndex}){
-    // const [displayInfo, setDisplayInfo] = useState([])
-        console.log('tripINfo tripInfo', tripInfo[tripInfoIndex])
+  
+    let totalTime = null
+    if (tripInfo[tripInfoIndex].length > 1){
+        totalTime = tripInfo[tripInfoIndex][1].end_station_arrival_ts - tripInfo[tripInfoIndex][0].start_station_departure_ts
+    } else {
+        totalTime = tripInfo[tripInfoIndex][0].end_station_arrival_ts - tripInfo[tripInfoIndex][0].start_station_departure_ts
+    } 
+    let totalTimeDisplay =Math.floor(totalTime / 60)
 
-        let totalTime = null
-        if (tripInfo[tripInfoIndex].length > 1){
-            totalTime = tripInfo[tripInfoIndex][1].end_station_arrival_ts - tripInfo[tripInfoIndex][0].start_station_departure_ts
-        } else {
-            totalTime = tripInfo[tripInfoIndex][0].end_station_arrival_ts - tripInfo[tripInfoIndex][0].start_station_departure_ts
-        } 
-        let totalTimeDisplay =Math.floor(totalTime / 60)
-
-        let newDisplayInfo = []
-        // console.log(tripInfo.length > 0)
-        if (tripInfo.length > 0){
-            console.log('tripInfo', tripInfo[tripInfoIndex])
-            newDisplayInfo = tripInfo[tripInfoIndex].map((leg, i) =>{
-                console.log('leg', leg)
-                // this is a train with a scheudle
-                if ('schedule' in leg){
-                    if (tripInfo[tripInfoIndex].length === 1){
+    let newDisplayInfo = []
+    if (tripInfo.length > 0){
+        newDisplayInfo = tripInfo[tripInfoIndex].map((leg, i) =>{
+            // this is a train with a scheudle
+            if ('schedule' in leg){
+                if (tripInfo[tripInfoIndex].length === 1){
+                    return (
+                        <>
+                            <LegInfo key={leg.start_station}  className='leg-info' leg={leg} type={'single-leg'}/>
+                        </>
+                    )
+                } else {
+                    if (i === 0){
                         return (
                             <>
-                                <LegInfo key={leg.start_station}  className='leg-info' leg={leg} type={'single-leg'}/>
-                                {/* <hr width="90%" size="2"/> */}
+                                <LegInfo key={leg.start_station}  className='leg-info' leg={leg} type={'first-leg'}/>
                             </>
                         )
-                    } else {
-                        if (i === 0){
-                            return (
-                                <>
-                                    <LegInfo key={leg.start_station}  className='leg-info' leg={leg} type={'first-leg'}/>
-                                    {/* <hr width="90%" size="2"/> */}
-                                </>
-                            )
-                        } else if (i === 1){
-                            return (
-                                <>
-                                    <LegInfo key={leg.start_station}  className='leg-info' leg={leg} type={'second-leg'}/>
-                                    {/* <hr width="90%" size="2"/> */}
-                                </>
-                            )
-                        }
+                    } else if (i === 1){
+                        return (
+                            <>
+                                <LegInfo key={leg.start_station}  className='leg-info' leg={leg} type={'second-leg'}/>
+                            </>
+                        )
                     }
-                    
-                // this is a tripError 
-                } else if ('start_station_service' in leg){
-                    return(
-                        <>
-                            <ErrorInfo key={leg.start_station_name} className='error-info' leg={leg}/>
-                            <hr width="90%" size="2"/>
-                        </>
-                    ) 
                 }
-            })
-        } else if ("trip_planner_error" in tripInfo){
-            console.log('error info', tripInfo['trip_planner_error'])
-        } else {
-            console.log('other error')
-        }
-  
-    // console.log('ti ti el', tripInfo)
-    
-    
-    
+                
+            // this is a tripError 
+            } else if ('start_station_service' in leg){
+                return(
+                    <>
+                        <ErrorInfo key={leg.start_station_name} className='error-info' leg={leg}/>
+                        <hr width="90%" size="2"/>
+                    </>
+                ) 
+            }
+        })
+    } else if ("trip_planner_error" in tripInfo){
+        console.log('error info', tripInfo['trip_planner_error'])
+    } else {
+        console.log('other error')
+    }
   
     return(
         <div>

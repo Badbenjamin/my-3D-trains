@@ -68,7 +68,6 @@ function App() {
   // then SSInfoObj is used to add stationInfo to the r3F station geometries/components. 
   useEffect(()=>{
     let currentTrip = tripInfo[tripInfoIndex]
-    console.log('ti', tripInfo[tripInfoIndex])
     let selectedStationInfoObj = {}
    
     // are there any instances where an impossible trip returns an empty tripInfo vs one with a TripError? 

@@ -216,7 +216,6 @@ useEffect(()=>{
           // if the station's complexId already exists as a key in the complexObject, we condense the info of the new
           // station (part of the complex), into the value of the existing complexId key
           } else {
-            console.log('complex object push')
             complexObject[newInfoObject.complex_id]['daytime_routes'].push([newInfoObject.daytime_routes])
 
             // name route combos, might only need this after all
@@ -292,7 +291,6 @@ useEffect(()=>{
         // If the station is involved in the current trip, we push it to the newRouteInfoHtmlArray
         // this is used to set the routeInfoArray, or our routetooltips
         if(complexObject[complex].stationInTrip){
-          console.log('complex tooltip?')
           // need to modify this to work with complex info
           let newRouteTooltip = <RouteTooltip name={"complex"} position={averagePosition} stationInfo={complexObject[complex].name_arrival_info_combo_array}/>
           newRouteInfoHtmlArray.push(newRouteTooltip)

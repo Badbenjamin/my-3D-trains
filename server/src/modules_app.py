@@ -60,7 +60,6 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
   
                 if ((leg_one_train_obj['origin_departure_time']) >= (current_time_int + buffer_for_start_time)):
                     ts_pair.append(TripSequenceElement(leg_one_train_obj['train'], start_station_id, start_terminus_gtfs_id, transfer_time))
-                    # print('bts func', transfer_time)
                     if leg_two_sorted_train_obj_list:
                         i = 0
                         found = False
@@ -89,7 +88,6 @@ def build_trip_sequence(journey_obj, train_data_obj):
     # IF TRIP HAS TRANSFER
     
     if (journey_obj.shared_stations):
-        # print('jo shared stat', journey_obj.shared_stations)
         # FILTERED TRAINS PASSED TO FUNCTION
         trip_sequence = build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj)
 
@@ -122,6 +120,5 @@ def build_trip_sequence(journey_obj, train_data_obj):
                 tse = TripSequenceElement(train['train'], start_gtfs_id, end_gtfs_id)
                 trip_sequence.append(tse)
                 trip_sequences.append(trip_sequence)
-    # print('tseqs', trip_sequences)
     return trip_sequences
 

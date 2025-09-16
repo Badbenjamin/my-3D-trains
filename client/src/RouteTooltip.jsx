@@ -15,7 +15,6 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
     const [startErrorInfo, setStartErrorInfo] = useState(null)
     const [endErrorInfo, setEndErrorInfo] = useState(null)
 
-    console.log(routes)
     // stationInfo is info passed from server to geometry, then combined with text in stationsTracksAndText
     // types of tooltip info to display are start, end, transfer, errorStart, errorEnd, and errorTransfer
     useEffect(()=>{
@@ -88,7 +87,6 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
     // it must be re constructed by ordering the transfers by arrival time
     } else if (stationInfo.type === "transfer"){
         // construct ordered objects based on arrival and departure times
-        console.log('rtt stationInfo', stationInfo)
         // BRANCH FOR SUCCESSFUL TRANSFER
         if (stationInfo.second_transfer_info[0]?.type != 'errorTransfer'){
 
@@ -111,7 +109,8 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                     minute: '2-digit',
                     hour12: true 
                 })
-                
+                // bug from astoria ditmars to grand central 456
+                // console.log('bug',stationInfo.second_transfer_info[0])
                 let secondArrivalTime = new Date(stationInfo.second_transfer_info[0].arrival * 1000)
                 let secondArrivalTimeString = secondArrivalTime.toLocaleTimeString('en-US', { 
                     hour: 'numeric', 
@@ -305,7 +304,6 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
         
         // IF ERROR AT START OR END STATION, THESE WILL DISPLAY
     } else if ((stationInfo.type === "errorStart")){
-        console.log('errorStart')
         setStartErrorInfo(()=>{
 
             // THESE ARE THE ROUTES SHARED BETWEEN START AND END STATIONS
@@ -316,10 +314,6 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                     sharedRoutes.push(route)
                 }
             }
-            let sharedRouteLogos = sharedRoutes.map((route)=>{
-                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
-            })
-
             // START STATION HAS PLATFORM CLOSURE
             // if sharedRoute NOT IN start_station_current_routes, push to RoutesNotLeavingDirection array
             let routesNotLeavingStartNorth = []

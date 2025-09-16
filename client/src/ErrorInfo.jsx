@@ -4,9 +4,6 @@ import TripInfo from './TripInfo'
 
 function ErrorInfo({leg}){
 
-        // console.log('leg error',leg)
-        // ON SAME LINE, TRANSFER? TRANSFER POSSIBLE? 
-
     return(
         <div className="leg-info-grid-cointainer">
             <div className="start-station-info">
