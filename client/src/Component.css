@@ -117,7 +117,7 @@ a:visited{
 }
 
 .next-train-button{
-  font-size: 15px;
+  font-size: 14px;
   background-color: rgb(0, 0, 0);
   font-weight: bold;
   color: white;
@@ -128,7 +128,7 @@ a:visited{
 }
 
 .next-train-button-selected{
-  font-size: 14px;
+  font-size: 13px;
   background-color: rgb(255, 225, 58);
   font-weight: bold;
   border-style: solid;
@@ -138,7 +138,7 @@ a:visited{
 }
 
 .route_icon_next_train{
-  height: 20px;
-  width: 20px;
+  height: 15px;
+  width: 15px;
   vertical-align: middle;
 }
