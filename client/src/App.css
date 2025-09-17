@@ -15,6 +15,8 @@
   position:absolute;
   top: 0;
   right:0;
+  margin-top: 5px;
+  margin-right: 5px;
   z-index: 12;
   color: white;
   padding: 5px;
@@ -230,6 +232,7 @@ html{
 .arrivals-html{
  display: flex;
  flex-direction: row;
+ justify-content: center;
 }
 
 .arrivals-name{
@@ -434,3 +437,22 @@ html{
   height: 17px
 }
 
+/* .route-info-html-error{
+  border-style: solid ;
+  background-color: rgb(39, 39, 39);
+  border-color: rgb(255, 19, 19);
+  border-radius: 15px;
+  min-width: 150px;
+  user-select: none;
+  color: white;
+  padding: 10px;
+  justify-content: center;
+} */
+
+.error-highlight{
+  background-color: rgb(255, 19, 19);
+  color: rgb(255, 255, 255);
+  border-radius: 5px;
+  padding: 3px;
+
+}

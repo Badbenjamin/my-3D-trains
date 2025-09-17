@@ -85,10 +85,10 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
                     <hr width="100%" size="2"/>
                     <div >
                         <div className="arrivals-name">{arrivalInfo.north_direction_label}</div>
-                        <div className="arrivals-html">{northArrivals}</div>
+                        <div className="arrivals-html">{northArrivals.length > 0 ? northArrivals : <div className="error-highlight">PLATFORM CLOSED</div>}</div>
                         <hr></hr>
                         <div className="arrivals-name">{arrivalInfo.south_direction_label}</div>
-                        <div className="arrivals-html">{southArrivals}</div>
+                        <div className="arrivals-html">{southArrivals.length > 0 ? southArrivals : <div className="error-highlight">PLATFORM CLOSED</div>}</div>
                     </div>
                     <hr width="100%" size="2"/>
                     <div className="set-as">

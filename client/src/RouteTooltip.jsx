@@ -364,22 +364,24 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
             // station is out of service in one or more directoins, trains from start cant arrive at dest
             if ((routesNotLeavingStartNorth.length > 0) || (routesNotLeavingStartSouth.length > 0)){
                 let errorHtml = <div className="route-info-html">
-                                    <div>{name}{startStationRouteLogos}PLATFORM CLOSURE</div>
+                                   
+                                    <div>{name} {startStationRouteLogos}</div>
+                                    <hr width="100%" size="2"/>
                                     <div>
-                                    {(routesNotLeavingStartNorth.length > 0)? <>NO {stationInfo.north_direction_label} {routesNotLeavingStartNorthLogos} DEPARTURES</>  : <></>}
-                                    <br></br>
-                                    {(routesNotLeavingStartSouth.length > 0)? <>NO {stationInfo.south_direction_label} {routesNotLeavingStartSouthLogos} DEPARTURES</>  : <></>}
+                                        {(routesNotLeavingStartNorth.length > 0)? <>{stationInfo.north_direction_label} {routesNotLeavingStartNorthLogos}</>  : <></>}
+                                        {(routesNotLeavingStartSouth.length > 0)? <>{stationInfo.south_direction_label} {routesNotLeavingStartSouthLogos}</>  : <></>}
                                     </div>
+                                    <div className="error-highlight">Platform closed.</div>
                                 </div>
                 return errorHtml
             } else if (((routesNotArrivingAtDestNorth.length > 0) || (routesNotArrivingAtDestSouth.length > 0))){
                     // Trains belonging to the shared routes between stations do not arrive at one or more platform of desination
                     let errorHtml = <div className="route-info-html">
-                                        <div>{name}{startStationRouteLogos}STOPS SKIPPED</div>
+                                        <div>{name}{startStationRouteLogos}</div>
+                                         <hr width="100%" size="2"/>
                                         <div>
-                                            {(routesNotArrivingAtDestNorth.length > 0)? <>{stationInfo.north_direction_label} {routesNotArrivingAtDestNorthLogos}not serving destination</>  : <></>}
-                                            <br></br>
-                                            {(routesNotArrivingAtDestSouth.length > 0)? <>{stationInfo.south_direction_label} {routesNotArrivingAtDestSouthLogos}not serving destination</>  : <></>}
+                                            {(routesNotArrivingAtDestNorth.length > 0)? <>{stationInfo.north_direction_label} {routesNotArrivingAtDestNorthLogos}not serving destination.</>  : <></>}
+                                            {(routesNotArrivingAtDestSouth.length > 0)? <>{stationInfo.south_direction_label} {routesNotArrivingAtDestSouthLogos}not serving destination.</>  : <></>}
                                         </div>
                                     </div>
                     return errorHtml
@@ -452,24 +454,23 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
             if (((routesNotLeavingStartNorth.length > 0) || (routesNotLeavingStartSouth.length > 0))){
                 let errorHtml = <div className="route-info-html">
                                     <div>{name}{endStationRouteLogos}</div>
+                                     <hr width="100%" size="2"/>
                                     <div>
-                                        {(routesNotLeavingStartNorth.length > 0)? <>no {routesNotLeavingStartNorthLogos} trains arriving from origin</>  : <></>}
-                                        <br></br>
-                                        {(routesNotLeavingStartSouth.length > 0)? <>no {routesNotLeavingStartSouthLogos} trains arriving from origin</>  : <></>}
+                                        {(routesNotLeavingStartNorth.length > 0)? <>No {routesNotLeavingStartNorthLogos} trains arriving from origin.</>  : <></>}
+                                        {(routesNotLeavingStartSouth.length > 0)? <>No {routesNotLeavingStartSouthLogos} trains arriving from origin.</>  : <></>}
                                     </div>
                                 </div>
                 return errorHtml
             } else if ((routesNotArrivingAtDestNorth.length > 0) || (routesNotArrivingAtDestSouth.length > 0)){
                     // ARRIVAL STATION HAS PLATFORM CLOSURE, DISPLAY ROUTES SKIPPING STATION 
                     let errorHtml = <div className="route-info-html">
-                                        <div>{name}{endStationRouteLogos} SERVICE ALERT</div>
+                                        <div>{name}{endStationRouteLogos}</div>
+                                        <hr width="100%" size="2"/>
                                         <div>
-                                        {(routesNotArrivingAtDestNorth.length > 0)? <>{stationInfo.north_direction_label} {routesNotArrivingAtDestNorthLogos} Platform Closed2</>  : <></>}
-                                        {/* {(routesNotLeavingStartNorth.length > 0)? <>no {stationInfo.north_direction_label} {routesNotLeavingStartNorthLogos} trains arriving at station</>  : <></>} */}
-                                        <br></br>
-                                        {(routesNotArrivingAtDestSouth.length > 0)? <>{stationInfo.south_direction_label} {routesNotArrivingAtDestSouthLogos} Platform Closed</>  : <></>}
-                                        {/* {(routesNotLeavingStartSouth.length > 0)? <>no {stationInfo.south_direction_label} {routesNotLeavingStartSouthLogos} trains arriving at station</>  : <></>} */}
+                                            {(routesNotArrivingAtDestNorth.length > 0)? <>{stationInfo.north_direction_label} {routesNotArrivingAtDestNorthLogos}</>  : <></>}
+                                            {(routesNotArrivingAtDestSouth.length > 0)? <>{stationInfo.south_direction_label} {routesNotArrivingAtDestSouthLogos}</>  : <></>}
                                         </div>
+                                        <div className="error-highlight">Platform closed.</div>
                                     </div>
                     return errorHtml
                 }
