@@ -60,11 +60,17 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
         retrieveStationId(id, startOrEnd)
     }
 
-    if (!arrivalInfo){
+    if (Object.keys(arrivalInfo).length === 0){
         return(
-            <Html position={position}>
-                <div className="station-tooltip">
-                    LOADIN!!!
+            <Html wrapperClass="station-tooltip" position={tooltipPosition} distanceFactor={7} center={true}>
+                <div className="station-html">
+                    <h2 className="station-html-text">{name}{iconImageArray} </h2>
+                </div>
+                <hr width="100%" size="2"/>
+                <div className="set-as">
+                    {/* <div>Set as</div> */}
+                    <button className="origin-dest-btn" onClick={()=>handleSetStationClick(stopId, "start")}>ORIGIN</button>
+                    <button className="origin-dest-btn" onClick={()=>handleSetStationClick(stopId, "end")}>DESTINATION</button>
                 </div>
             </Html>
         )
@@ -106,6 +112,6 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
          
         
         )
-    }
+    } 
 
 }

@@ -48,7 +48,6 @@ function JourneyPlanner() {
 
     function planTrip(e){
         if (journeyStations[0] == null || journeyStations[1] == null){
-            console.log('enter start and end stations')
         } else{
             console.log("fetching")
             fetch(`api/plan_trip/${journeyStations[0]}/${journeyStations[1]}`)
