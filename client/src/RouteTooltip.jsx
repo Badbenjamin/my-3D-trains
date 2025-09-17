@@ -3,6 +3,7 @@ import { useState, useEffect } from "react"
 import * as THREE from "three"
 import './App.css'
 
+import { findSharedRoutes, findPlatformClosure } from "./ModularFunctions"
 
 export default function RouteTooltip({stationInfo, name, position, routes}){
 
@@ -221,25 +222,13 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
 
                 // DISPLAY ERROR FOR SECOND LEG
                 // ROUTES (DAYTIME) THAT RUN BETWEEN ORIGIN AND DESINATION
-                let sharedRoutes = []
-                for (let route of stationInfo.second_transfer_info[0].start_station_routes){
-                    if (stationInfo.second_transfer_info[0].end_station_routes.includes(route)){
-                        sharedRoutes.push(route)
-                    }
-                }
+                let sharedRoutes = findSharedRoutes(stationInfo)
 
                  // START STATION HAS PLATFORM CLOSURE
                  //  THESE ROUTES ARE NOT LEAVING ORIGIN
-                 let routesNotLeavingStartNorth = []
-                 let routesNotLeavingStartSouth = []
-                 for (let route of sharedRoutes){
-                     if (!(stationInfo.second_transfer_info[0].start_station_current_routes_north.includes(route))){
-                         routesNotLeavingStartNorth.push(route)
-                     } 
-                     if (!(stationInfo.second_transfer_info[0].start_station_current_routes_south.includes(route))){
-                         routesNotLeavingStartSouth.push(route)
-                     }
-                 }
+                 let routesNotLeavingStartNorth = findPlatformClosure(stationInfo, sharedRoutes, 'start', 'north')
+                 let routesNotLeavingStartSouth = findPlatformClosure(stationInfo, sharedRoutes, 'start', 'south')
+                 
  
                  let routesNotLeavingStartNorthLogos = routesNotLeavingStartNorth.map((route)=>{
                      return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
@@ -250,16 +239,8 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                  })
 
                 // START STATION IN SERVICE, END STATION HAS PLATFORM CLOSURE
-                let routesNotArrivingAtDestNorth = []
-                let routesNotArrivingAtDestSouth = []
-                for (let route of sharedRoutes){
-                    if (!(stationInfo.second_transfer_info[0].end_station_current_routes_north.includes(route))){
-                        routesNotArrivingAtDestNorth.push(route)
-                    } 
-                    if (!(stationInfo.second_transfer_info[0].end_station_current_routes_south.includes(route))){
-                        routesNotArrivingAtDestSouth.push(route)
-                    }
-                }
+                let routesNotArrivingAtDestNorth = findPlatformClosure(stationInfo, sharedRoutes, 'end', 'north')
+                let routesNotArrivingAtDestSouth = findPlatformClosure(stationInfo, sharedRoutes, 'end', 'south')
         
                 let routesNotArrivingAtDestNorthLogos = routesNotArrivingAtDestNorth.map((route)=>{
                     return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
@@ -307,25 +288,12 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
         setStartErrorInfo(()=>{
 
             // THESE ARE THE ROUTES SHARED BETWEEN START AND END STATIONS
-            // might have to figure out reroutes and nighttime changes, these are daytime routes
-            let sharedRoutes = []
-            for (let route of stationInfo.start_station_routes){
-                if (stationInfo.end_station_routes.includes(route)){
-                    sharedRoutes.push(route)
-                }
-            }
+            let sharedRoutes = findSharedRoutes(stationInfo)
+            
             // START STATION HAS PLATFORM CLOSURE
             // if sharedRoute NOT IN start_station_current_routes, push to RoutesNotLeavingDirection array
-            let routesNotLeavingStartNorth = []
-            let routesNotLeavingStartSouth = []
-            for (let route of sharedRoutes){
-                if (!(stationInfo.start_station_current_routes_north.includes(route))){
-                    routesNotLeavingStartNorth.push(route)
-                } 
-                if (!(stationInfo.start_station_current_routes_south.includes(route))){
-                    routesNotLeavingStartSouth.push(route)
-                }
-            }
+            let routesNotLeavingStartNorth = findPlatformClosure(stationInfo, sharedRoutes, 'start', 'north')
+            let routesNotLeavingStartSouth = findPlatformClosure(stationInfo, sharedRoutes, 'start', 'south')
 
             let routesNotLeavingStartNorthLogos = routesNotLeavingStartNorth.map((route)=>{
                 return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
@@ -336,17 +304,9 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
             })
 
             // WHAT ROUTES FROM START STATION WON'T ARRIVE AT END STATION?
-            let routesNotArrivingAtDestNorth = []
-            let routesNotArrivingAtDestSouth = []
-            for (let route of sharedRoutes){
-                // if shared route NOT IN  end station N or S arrivals, push to routesNotArrivingAtDest N or S
-                if (!(stationInfo.end_station_current_routes_north.includes(route))){
-                    routesNotArrivingAtDestNorth.push(route)
-                } 
-                if (!(stationInfo.end_station_current_routes_south.includes(route))){
-                    routesNotArrivingAtDestSouth.push(route)
-                }
-            }
+            let routesNotArrivingAtDestNorth = findPlatformClosure(stationInfo, sharedRoutes, 'end', 'north')
+            let routesNotArrivingAtDestSouth = findPlatformClosure(stationInfo, sharedRoutes, 'end', 'south')
+            
        
             let routesNotArrivingAtDestNorthLogos = routesNotArrivingAtDestNorth.map((route)=>{
                 return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
@@ -392,28 +352,16 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
         setEndErrorInfo(()=>{
 
             // ROUTES SHARED BETWEEN START AND END STATION
-            let sharedRoutes = []
-            for (let route of stationInfo.start_station_routes){
-                if (stationInfo.end_station_routes.includes(route)){
-                    sharedRoutes.push(route)
-                }
-            }
+            let sharedRoutes = findSharedRoutes(stationInfo)
             
             let sharedRouteLogos = sharedRoutes.map((route)=>{
                 return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
             })
 
             // START STATION HAS PLATFORM CLOSURE, NO TRAINS ARRIVING AT DEST
-            let routesNotLeavingStartNorth = []
-            let routesNotLeavingStartSouth = []
-            for (let route of sharedRoutes){
-                if (!(stationInfo.start_station_current_routes_north.includes(route))){
-                    routesNotLeavingStartNorth.push(route)
-                } 
-                if (!(stationInfo.start_station_current_routes_south.includes(route))){
-                    routesNotLeavingStartSouth.push(route)
-                }
-            }
+            let routesNotLeavingStartNorth = findPlatformClosure(stationInfo, sharedRoutes, 'start', 'north')
+            let routesNotLeavingStartSouth = findPlatformClosure(stationInfo, sharedRoutes, 'start', 'south')
+            
 
             let routesNotLeavingStartNorthLogos = routesNotLeavingStartNorth.map((route)=>{
                 return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
@@ -424,16 +372,9 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
             })
 
             // START STATION IN SERVICE, END STATION HAS PLATFORM CLOSURE
-            let routesNotArrivingAtDestNorth = []
-            let routesNotArrivingAtDestSouth = []
-            for (let route of sharedRoutes){
-                if (!(stationInfo.end_station_current_routes_north.includes(route))){
-                    routesNotArrivingAtDestNorth.push(route)
-                } 
-                if (!(stationInfo.end_station_current_routes_south.includes(route))){
-                    routesNotArrivingAtDestSouth.push(route)
-                }
-            }
+            let routesNotArrivingAtDestNorth = findPlatformClosure(stationInfo, sharedRoutes, 'end', 'north')
+            let routesNotArrivingAtDestSouth = findPlatformClosure(stationInfo, sharedRoutes, 'end', 'south')
+            
             
             let routesNotArrivingAtDestNorthLogos = routesNotArrivingAtDestNorth.map((route)=>{
                 return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
