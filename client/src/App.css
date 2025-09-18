@@ -454,5 +454,12 @@ html{
   color: rgb(255, 255, 255);
   border-radius: 5px;
   padding: 3px;
+  font-weight: bold;
+  font-size: 15px;
+}
 
+.x-icon{
+  color: red;
+  font-weight: bold;
+  font-size: 40px;
 }

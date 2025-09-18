@@ -19,6 +19,7 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
     // stationInfo is info passed from server to geometry, then combined with text in stationsTracksAndText
     // types of tooltip info to display are start, end, transfer, errorStart, errorEnd, and errorTransfer
     useEffect(()=>{
+        console.log('si rtt', stationInfo)
         // create start info to display
         if(stationInfo.type == "start"){
             setStartStationInfo((prevInfo)=>{
@@ -353,10 +354,6 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
 
             // ROUTES SHARED BETWEEN START AND END STATION
             let sharedRoutes = findSharedRoutes(stationInfo)
-            
-            let sharedRouteLogos = sharedRoutes.map((route)=>{
-                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
-            })
 
             // START STATION HAS PLATFORM CLOSURE, NO TRAINS ARRIVING AT DEST
             let routesNotLeavingStartNorth = findPlatformClosure(stationInfo, sharedRoutes, 'start', 'north')
