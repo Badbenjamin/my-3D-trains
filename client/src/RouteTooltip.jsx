@@ -317,6 +317,7 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                 return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
             })
 
+            console.log('bug here',stationInfo)
             // Normal schedule routes served by start station
             let startStationRouteLogos = stationInfo.start_station_routes.map((route)=>{
                 return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>

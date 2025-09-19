@@ -370,6 +370,7 @@ class FormattedTrainData:
                     start_station = Station.query.filter(Station.gtfs_stop_id == trip_sequence_element.start_station_id).first()
                     end_station = Station.query.filter(Station.gtfs_stop_id == trip_sequence_element.end_station_id).first()
                     error_for_react = {
+                        "trip_error" : True,
                         "start_station_name" : start_station.stop_name,
                         "start_station_gtfs" : trip_sequence_element.start_station_id,
                         "start_station_service" : trip_sequence_element.start_station_service,

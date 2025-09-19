@@ -4,15 +4,37 @@ import ErrorInfo from './ErrorInfo'
 import { useState, useEffect } from 'react'
 
 function TripInfo({tripInfo, tripInfoIndex}){
-  
-    let totalTime = null
-    if (tripInfo[tripInfoIndex].length > 1){
-        totalTime = tripInfo[tripInfoIndex][1].end_station_arrival_ts - tripInfo[tripInfoIndex][0].start_station_departure_ts
-    } else {
-        totalTime = tripInfo[tripInfoIndex][0].end_station_arrival_ts - tripInfo[tripInfoIndex][0].start_station_departure_ts
-    } 
-    let totalTimeDisplay =Math.floor(totalTime / 60)
+    // const [totalTimeDisplay, setTotalTimeDisplay] = useState(null)
+    
+    // COME BACK TO THIS WHACKY BULLSHIT LATER!!!!
+    
+    // console.log(tripInfo[tripInfoIndex], tripInfo)
 
+    // look for tripError in tripinfo[tripInfoIndex]
+    let tripError = false
+    for (let leg of tripInfo[tripInfoIndex]){
+        if ('trip_error' in leg){
+            tripError = true
+        } else {
+            tripError = false
+        }
+    }
+    console.log(tripError)
+
+    let totalTimeDisplay = null
+    if (tripError === true){
+        totalTimeDisplay = <span className='error-highlight'>No trains between stations.</span>
+    } else if (tripError === false){
+        let totalTime = null
+        if (tripInfo[tripInfoIndex].length > 1){
+            totalTime = tripInfo[tripInfoIndex][1].end_station_arrival_ts - tripInfo[tripInfoIndex][0].start_station_departure_ts
+        } else if (tripInfo[tripInfoIndex].length === 1){
+            totalTime = tripInfo[tripInfoIndex][0].end_station_arrival_ts - tripInfo[tripInfoIndex][0].start_station_departure_ts
+        }
+        let totalTimeDisplayInt = Math.floor(totalTime / 60)
+        totalTimeDisplay = <span>Total time: {totalTimeDisplayInt} min </span>
+    }
+    
     let newDisplayInfo = []
     if (tripInfo.length > 0){
         newDisplayInfo = tripInfo[tripInfoIndex].map((leg, i) =>{
@@ -45,20 +67,17 @@ function TripInfo({tripInfo, tripInfoIndex}){
                 return(
                     <>
                         <ErrorInfo key={leg.start_station_name} className='error-info' leg={leg}/>
-                        <hr width="90%" size="2"/>
+                        <hr width="100%" size="2"/>
                     </>
                 ) 
             }
         })
-    } else if ("trip_planner_error" in tripInfo){
-        console.log('error info', tripInfo['trip_planner_error'])
-    } else {
-        console.log('other error')
-    }
-  
+    } 
+
+    // console.log(totalTimeDisplay !== NaN)
     return(
         <div>
-            <div>Total time: {totalTimeDisplay} min</div>
+            <div>{totalTimeDisplay}</div>
             <div className='leg-info-div'>
                  <hr width="100%" size="2"/>
                 {tripInfo.length > 0 ? newDisplayInfo : <></> }
