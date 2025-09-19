@@ -4,13 +4,7 @@ import ErrorInfo from './ErrorInfo'
 import { useState, useEffect } from 'react'
 
 function TripInfo({tripInfo, tripInfoIndex}){
-    // const [totalTimeDisplay, setTotalTimeDisplay] = useState(null)
-    
-    // COME BACK TO THIS WHACKY BULLSHIT LATER!!!!
-    
-    // console.log(tripInfo[tripInfoIndex], tripInfo)
-
-    // look for tripError in tripinfo[tripInfoIndex]
+   
     let tripError = false
     for (let leg of tripInfo[tripInfoIndex]){
         if ('trip_error' in leg){
@@ -19,7 +13,6 @@ function TripInfo({tripInfo, tripInfoIndex}){
             tripError = false
         }
     }
-    console.log(tripError)
 
     let totalTimeDisplay = null
     if (tripError === true){

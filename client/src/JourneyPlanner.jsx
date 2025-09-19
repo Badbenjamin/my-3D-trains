@@ -70,7 +70,15 @@ function JourneyPlanner() {
         setJourneyStations([journeyStations[1], journeyStations[0]])
     }
 
-
+    let tripError = false
+    for (let leg of tripInfo[tripInfoIndex]){
+        if ('trip_error' in leg){
+            tripError = true
+        } else {
+            tripError = false
+        }
+    }
+    console.log(tripError)
     return (
         <div className="journey-planner-and-trip-info-container">
             <div className="m3dt-title">M3DT</div>
@@ -90,7 +98,7 @@ function JourneyPlanner() {
             </div>
             <div className="trip-info">
                 {tripInfo[tripInfoIndex] != undefined ? <TripInfo className='trip-info' tripInfo={tripInfo} tripInfoIndex={tripInfoIndex}/> : ""}
-                <NextTrains tripInfo={tripInfo} tripInfoIndex={tripInfoIndex} setTripInfoIndex={setTripInfoIndex}/>
+                {tripError ? <></>:<NextTrains tripInfo={tripInfo} tripInfoIndex={tripInfoIndex} setTripInfoIndex={setTripInfoIndex}/>}
             </div>
             
             
