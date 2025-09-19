@@ -437,17 +437,11 @@ useEffect(()=>{
 }, [cameraPosition])
   
 // RETURN COMPONENT 
-  if (stationArray == []){
+  if (stationArray.lenght == 0){
     return(
         <>loading</>
     )
-  } else if (stationArray && !stationHtmlArray){
-    return (
-      <group  dispose={null}>
-          {stationArray}
-      </group>
-    )
-  }else if (stationArray && stationHtmlArray && complexHtmlArray){
+  } else if (stationArray.length != 0 && stationHtmlArray.length != 0 && complexHtmlArray.length != 0){
     return (
       <group  dispose={null}>
           {stationArray}

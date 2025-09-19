@@ -69,15 +69,18 @@ function JourneyPlanner() {
     function handleReverseClick(){
         setJourneyStations([journeyStations[1], journeyStations[0]])
     }
-
+    console.log(tripInfo[tripInfoIndex])
     let tripError = false
-    for (let leg of tripInfo[tripInfoIndex]){
-        if ('trip_error' in leg){
-            tripError = true
-        } else {
-            tripError = false
+    if (tripInfo[tripInfoIndex] != undefined){
+        for (let leg of tripInfo[tripInfoIndex]){
+            if ('trip_error' in leg){
+                tripError = true
+            } else {
+                tripError = false
+            }
         }
     }
+    
     console.log(tripError)
     return (
         <div className="journey-planner-and-trip-info-container">
