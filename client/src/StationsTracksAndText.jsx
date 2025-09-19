@@ -16,7 +16,7 @@ import { findDistance } from './ModularFunctions'
 
 
 export default function StationsTracksAndText({vectorPosition}) {
-    const {stationArray, retrieveStationId} = useOutletContext()
+    const {stationArray, retrieveStationId, stations} = useOutletContext()
     const [stationInfoObjectArray, setStationInfoObjectArray] = useState([])
     const [stationHtmlArray, setStationHtmlArray] = useState([])
     const [complexHtmlArray, setComplexHtmlArray] = useState([])
@@ -25,12 +25,9 @@ export default function StationsTracksAndText({vectorPosition}) {
     const [versionForKey, setVersionForKey] = useState(0)
     const [cameraPosition, setCameraPosition] = useState({"x": 0, "y" : 0, "z" : 0})
 
-// Fetch to get data for stations, array of objects with info
 useEffect(()=>{
-      fetch(`http://127.0.0.1:5555/api/stations`)
-      .then(response => response.json())
-      .then(stationInfoObjectArray => {setStationInfoObjectArray(stationInfoObjectArray)})
-},[])
+      setStationInfoObjectArray(stations)
+},[stations])
 
 
 // CREATE STATION TOOLTIP IF IT DOESN'T ALREADY EXIST
