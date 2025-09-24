@@ -256,23 +256,25 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                 // station is out of service in one or more directoins, trains from start cant arrive at dest
                 if ((routesNotLeavingStartNorth.length > 0) || (routesNotLeavingStartSouth.length > 0)){
                     let errorHtml = <div>
-                                        <div>PLATFORM CLOSURE</div>
+                                        {/* <div>PLATFORM CLOSURE</div> */}
                                         <div>
-                                        {(routesNotLeavingStartNorth.length > 0)? <>NO {stationInfo.second_transfer_info[0].north_direction_label} {routesNotLeavingStartNorthLogos} DEPARTURES</>  : <></>}
-                                        <br></br>
-                                        {(routesNotLeavingStartSouth.length > 0)? <>NO {stationInfo.second_transfer_info[0].south_direction_label} {routesNotLeavingStartSouthLogos} DEPARTURES</>  : <></>}
+                                        {(routesNotLeavingStartNorth.length > 0)? <>{stationInfo.second_transfer_info[0].north_direction_label} {routesNotLeavingStartNorthLogos}</>  : <></>}
+                                        {/* <br></br> */}
+                                        {(routesNotLeavingStartSouth.length > 0)? <>{stationInfo.second_transfer_info[0].south_direction_label} {routesNotLeavingStartSouthLogos}</>  : <></>}
                                         </div>
+                                        <div className="error-highlight">No departures.</div>
                                     </div>
                     secondStationErrorHtml =  errorHtml
                 } else if (((routesNotArrivingAtDestNorth.length > 0) || (routesNotArrivingAtDestSouth.length > 0))){
                         // Trains belonging to the shared routes between stations do not arrive at one or more platform of desination
                         let errorHtml = <div>
-                                            <div>STOPS SKIPPED</div>
+                                            {/* <div>STOPS SKIPPED</div> */}
                                             <div>
-                                                {(routesNotArrivingAtDestNorth.length > 0)? <>{stationInfo.second_transfer_info[0].north_direction_label} {routesNotArrivingAtDestNorthLogos}not serving destination</>  : <></>}
-                                                <br></br>
-                                                {(routesNotArrivingAtDestSouth.length > 0)? <>{stationInfo.second_transfer_info[0].south_direction_label} {routesNotArrivingAtDestSouthLogos}not serving destination</>  : <></>}
+                                                {(routesNotArrivingAtDestNorth.length > 0)? <>{stationInfo.second_transfer_info[0].north_direction_label} {routesNotArrivingAtDestNorthLogos}</>  : <></>}
+                                                {/* <br></br> */}
+                                                {(routesNotArrivingAtDestSouth.length > 0)? <>{stationInfo.second_transfer_info[0].south_direction_label} {routesNotArrivingAtDestSouthLogos}</>  : <></>}
                                             </div>
+                                            <div className="error-highlight">Trains not serving destination.</div>
                                         </div>
                         secondStationErrorHtml =  errorHtml
                     } 
@@ -487,8 +489,13 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
             <>
                 <Html wrapperClass="route-info-tooltip" position={tooltipPosition} center={true} distanceFactor={10}>
                     <div className="route-info-html">
-                       <div> arrive at {name}  platform on {transferStationInfo.first_station.routeIcon} at {transferStationInfo.first_station.arrival_string}</div>
-                       {transferStationInfo.second_station.errorHtml}
+                       {/* <div> arrive at {name}  platform on {transferStationInfo.first_station.routeIcon} at {transferStationInfo.first_station.arrival_string}</div> */}
+                       <div>{name}{transferStationInfo.first_station.routeIcon}</div>
+                       <div className="highlight">{transferStationInfo.first_station.arrival_string}</div>
+                       <hr></hr>
+                       <div>{transferStationInfo.second_station.errorHtml}</div>
+                       <hr></hr>
+                       
                     </div>
                 </Html>
                 <Line points={[position, tooltipPosition]} lineWidth={2}/>
