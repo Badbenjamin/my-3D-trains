@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import './Component.css'
+// import './Component.css'
+import './App.css'
 import StationSearch from "./StationSearch";
 import TripInfo from "./TripInfo";
 import NextTrains from "./NextTrains";
@@ -47,7 +48,6 @@ function JourneyPlanner() {
 
     function planTrip(e){
         if (journeyStations[0] == null || journeyStations[1] == null){
-            console.log('enter start and end stations')
         } else{
             console.log("fetching")
             fetch(`api/plan_trip/${journeyStations[0]}/${journeyStations[1]}`)
@@ -69,22 +69,41 @@ function JourneyPlanner() {
     function handleReverseClick(){
         setJourneyStations([journeyStations[1], journeyStations[0]])
     }
-
-
+    console.log(tripInfo[tripInfoIndex])
+    let tripError = false
+    if (tripInfo[tripInfoIndex] != undefined){
+        for (let leg of tripInfo[tripInfoIndex]){
+            if ('trip_error' in leg){
+                tripError = true
+            } else {
+                tripError = false
+            }
+        }
+    }
+    
+    console.log(tripError)
     return (
-        <div>
-            
+        <div className="journey-planner-and-trip-info-container">
+            <div className="m3dt-title">M3DT</div>
+            <hr width="100%" size="2"/>
             <div className='journey-planner'>
-                {/* pass journeyStations down to stationSearch so that it knows when they have been cleared? */}
-                <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
-                <button className="plan-trip-button" onClick={handleReverseClick}>⮂</button>
-                <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
-                <br></br>
-                <button className="plan-trip-button" onClick={planTrip}>Plan Trip</button>
-                <button className="plan-trip-button" onClick={handleClearClick}>Clear Trip</button>
+                <div className="station-search-container">
+                    <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
+                    {/* <div>⬇</div> */}
+                    <br></br>
+                    <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
+                </div>
+                <div className="journey-planner-button-container">
+                    <button className="reverse-stations-button" onClick={handleClearClick}>Clear</button>
+                    <button className="reverse-stations-button" onClick={handleReverseClick}>⇅</button>
+                    <button className="plan-trip-button" onClick={planTrip}>Go!</button>
+                </div>
             </div>
-            {tripInfo[tripInfoIndex] != undefined ? <TripInfo className='trip-info' tripInfo={tripInfo} tripInfoIndex={tripInfoIndex}/> : ""}
-            <NextTrains tripInfo={tripInfo} tripInfoIndex={tripInfoIndex} setTripInfoIndex={setTripInfoIndex}/>
+            <div className="trip-info">
+                {tripInfo[tripInfoIndex] != undefined ? <TripInfo className='trip-info' tripInfo={tripInfo} tripInfoIndex={tripInfoIndex}/> : ""}
+                {tripError ? <></>:<NextTrains tripInfo={tripInfo} tripInfoIndex={tripInfoIndex} setTripInfoIndex={setTripInfoIndex}/>}
+            </div>
+            
             
         </div>
 

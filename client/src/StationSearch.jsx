@@ -1,7 +1,7 @@
 // import { useOutletContext } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Select from 'react-select'
-import './Component.css'
+import './App.css'
 
 function StationSearch({setStartOrEndStation, position, stations, journeyStations}) {
     // journey stations is passed down
@@ -36,15 +36,27 @@ function StationSearch({setStartOrEndStation, position, stations, journeyStation
     
     // STYLING FOR SEARCH
     const customStyles = {
+        input: (provided) => ({
+            ...provided,
+            color: 'white'
+        }),
         control : (provided) => ({
             ...provided,
-            backgroundColor: 'white',
+            backgroundColor: 'black',
             fontWeight: 'bold',
+            width: '270px',
+            borderStyle: 'solid',
+            borderColor: 'white',
+            borderWidth: '3px',
+            borderRadius: '5px',
+            fontSize: '15px',
+            color: 'white',
+            // padding: '2px',
         }),
         option: (provided, state) => ({
             ...provided,
-            color: 'black',
-            backgroundColor: state.isSelected ? 'lightblue' : 'white',
+            color: 'white',
+            backgroundColor: state.isSelected ? 'black' : 'black',
         }),
     }
 
@@ -56,12 +68,24 @@ function StationSearch({setStartOrEndStation, position, stations, journeyStation
         setStartOrEndStation(option.value, position)
     }
 
+    
     // dropdown seach options
     const optionsArray = []
 
     for (const station of stations){
-        const stationObj = { value : station.gtfs_stop_id, label: `${station.name+" "+station.daytime_routes}`, pos: {position}};
+        let routes = station.daytime_routes
+        let routeIcons = routes.split(" ").map((route)=>{
+            return <img className="route_icon_search"  src={`../public/ICONS/${route}.png`}/>
+        })
+        const stationObj = { value : station.gtfs_stop_id, label:`${station.name}`, routeIcons: routeIcons, pos: {position}};
         optionsArray.push(stationObj);
+    }
+
+    let placeholderText = null
+    if (position == 'start'){
+        placeholderText = "Start Station..."
+    } else {
+        placeholderText = "End Station..."
     }
    
     return (
@@ -72,6 +96,14 @@ function StationSearch({setStartOrEndStation, position, stations, journeyStation
                 value={selectedOption}
                 onChange={handleChange}
                 options={optionsArray}
+                placeholder = {placeholderText}
+                formatOptionLabel={option =>(
+                    <div style={{ color: 'white' }} >
+                        <span >{option.label}</span>
+                        <span>{option.routeIcons}</span>
+                    </div>
+                    
+                )}
             />
         </div>
     )

@@ -93,3 +93,28 @@ export function findDistance(point1, point2){
   let result = Math.sqrt(((x2-x1)**2) + ((y2-y1)**2) + ((z2-z1)**2))
   return result
 }
+
+export function findSharedRoutes(stationInfo){
+    let sharedRoutes = []
+    // bug here with transfer, probably from second_transfer_info []
+    for (let route of stationInfo.start_station_routes){
+        if (stationInfo.end_station_routes.includes(route)){
+            sharedRoutes.push(route)
+    }
+    return sharedRoutes
+  }
+}
+
+export function findPlatformClosure(stationInfo, sharedRoutes, startOrEnd, direction){
+    let missingRoutes = []
+    console.log('stationInfo',stationInfo, startOrEnd, direction)
+   
+    const stationRoutes = stationInfo[`${startOrEnd}_station_current_routes_${direction}`]
+    console.log('stationRoutes', stationRoutes)
+    for (let route of sharedRoutes){
+        if (!(stationRoutes.includes(route))){
+            missingRoutes.push(route)
+        } 
+    }
+    return missingRoutes
+}

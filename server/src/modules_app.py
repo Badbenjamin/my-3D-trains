@@ -21,6 +21,7 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
         leg_two_sorted_train_obj_list = []
        
         leg_one_filtered_trains = FilteredTrains(train_data_obj, train_data_obj.start_station_id, start_terminus_gtfs_id, current_time_int)
+        # ERROR BRANCH WITH EARLY RETURN
         # if the first leg has no trains serving both stations (error obj), create and return an error object in the trip seq
         # else sort the trains by arrival at destination
         if (leg_one_filtered_trains.trip_error_obj != None):
@@ -30,6 +31,7 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
             leg_one_sorted_train_obj_list = leg_one_filtered_trains.train_objects_sorted_by_dest_arrival
         
         leg_two_filtered_trains = FilteredTrains(train_data_obj, end_origin_gtfs_id, train_data_obj.end_station_id, current_time_int)
+
         # WHAT IS GOING ON HERE? 
         if (leg_one_sorted_train_obj_list) and (leg_two_filtered_trains.trip_error_obj != None):
             for leg_one_train in leg_one_sorted_train_obj_list:
@@ -42,9 +44,9 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
         else:
             leg_two_sorted_train_obj_list = leg_two_filtered_trains.train_objects_sorted_by_dest_arrival
 
-
-        
-        transfer_time = 120
+        from models import TransferTimes
+        transfer_time_obj = TransferTimes.query.filter((TransferTimes.from_stop_id == start_terminus_gtfs_id) & (TransferTimes.to_stop_id == end_origin_gtfs_id)).first()
+        transfer_time = transfer_time_obj.min_transfer_time
         buffer_for_start_time = 30
         # USEFULL PRINT STATEMENT
         # print('lens', len(leg_one_sorted_train_obj_list), len(leg_one_sorted_train_obj_list))
@@ -57,15 +59,14 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
                 ts_pair = []
   
                 if ((leg_one_train_obj['origin_departure_time']) >= (current_time_int + buffer_for_start_time)):
-                    ts_pair.append(TripSequenceElement(leg_one_train_obj['train'], start_station_id, start_terminus_gtfs_id))
-                    
+                    ts_pair.append(TripSequenceElement(leg_one_train_obj['train'], start_station_id, start_terminus_gtfs_id, transfer_time))
                     if leg_two_sorted_train_obj_list:
                         i = 0
                         found = False
                         while ((found == False) and i < (len(leg_two_sorted_train_obj_list))):
                             
                             leg_two_train_obj = leg_two_sorted_train_obj_list[i]
-                            
+                            # need to get transfer time in here?
                             if ((leg_one_train_obj['dest_arrival_time'] + transfer_time) <= (leg_two_train_obj['origin_departure_time'])):
                                 ts_pair.append(TripSequenceElement(leg_two_train_obj['train'], end_origin_gtfs_id, end_station_id))
                                 count += 1
@@ -79,9 +80,6 @@ def build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj):
             all_possible_ts_pairs.append(pair)
     
     sorted_ts_pairs = sorted(all_possible_ts_pairs, key = lambda ts_pair : ts_pair[1].end_station_arrival)
-    # pprint.pp(sorted_ts_pairs)
-    # for pair in sorted_ts_pairs:
-    #     pprint.pprint('sorted tspairs', sorted_ts_pairs)
     return sorted_ts_pairs
 
 
@@ -90,7 +88,6 @@ def build_trip_sequence(journey_obj, train_data_obj):
     # IF TRIP HAS TRANSFER
     
     if (journey_obj.shared_stations):
-        # print('jo shared stat', journey_obj.shared_stations)
         # FILTERED TRAINS PASSED TO FUNCTION
         trip_sequence = build_sequences_with_transfer_btw_lines(train_data_obj, journey_obj)
 
@@ -123,6 +120,5 @@ def build_trip_sequence(journey_obj, train_data_obj):
                 tse = TripSequenceElement(train['train'], start_gtfs_id, end_gtfs_id)
                 trip_sequence.append(tse)
                 trip_sequences.append(trip_sequence)
-    # print('tseqs', trip_sequences)
     return trip_sequences
 

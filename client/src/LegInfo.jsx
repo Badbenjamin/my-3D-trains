@@ -1,27 +1,81 @@
 import './Component.css'
 
 
-function LegInfo({leg}){
-
-    return(
-        <div className="leg-info-grid-cointainer">
-            <div className="start-station-info">
-                <div className="top">{leg.start_station}</div>
-                <div className="middle">{leg.direction_label} {leg.route}</div>
-                <div className="bottom">Departs {leg.start_station_departure}</div><>{leg.first_six_trains}</>
+function LegInfo({leg, type}){
+ 
+    let routeIcon = <img className='route_icon_leg_info' src={`../public/ICONS/${leg.route}.png`}/>
+    if (type == 'single-leg'){
+        return(
+            <div>
+                <div className="start-station-info">
+                    <div className="station">{leg.start_station}</div>
+                    <div className="direction">{leg.direction_label} {routeIcon}</div>
+                    <span className="time">Departs {leg.start_station_departure}</span>
+                </div>
+                <div className="middle-info">
+                    <div className='arrow-icon'>⬇</div>
+                    <div className='stops-and-time'>
+                        <div className="number-of-stops">{leg.number_of_stops} Stops</div>
+                        <div className="trip-time">{leg.trip_time} Minutes</div>
+                    </div>
+                </div>
+                <div className="end-station-info">
+                    <div className="station">{leg.end_station}</div>
+                    <span className="time">Arrives {leg.end_station_arrival}</span>
+                </div>
+                <hr width="100%" size="2"/>
             </div>
-            <div className="middle-info">
-                <div className="top">{leg.number_of_stops} Stops</div>
-                <div className="middle">→</div>
-                <div className="bottom">{leg.trip_time} Minutes</div>
+        )
+    } else if (type === 'first-leg'){
+        return(
+            <div>
+                <div className="start-station-info">
+                    <div className="station">{leg.start_station}</div>
+                    <div className="direction">{leg.direction_label} {routeIcon}</div>
+                    <span className="time">Departs {leg.start_station_departure}</span>
+                </div>
+                <div className="middle-info">
+                    <div className='arrow-icon'>⬇</div>
+                    <div className='stops-and-time'>
+                        <div className="number-of-stops">{leg.number_of_stops} Stops</div>
+                        <div className="trip-time">{leg.trip_time} Minutes</div>
+                    </div>
+                </div>
+                <div className="end-station-info">
+                    <div className="station">{leg.end_station}</div>
+                    <span className="time">Arrives {leg.end_station_arrival}</span>
+                </div>
+                <hr width="100%" size="2"/>
+                <div className="transfer-info">
+                    <span >Transfer: {leg.transfer_time / 60} Minutes</span>
+                </div>
+                <hr width="100%" size="2"/>
             </div>
-            <div className="end-station-info">
-                <div className="top">{leg.end_station}</div>
-                <div className="middle">Arrives {leg.end_station_arrival}</div>
-                {/* <div className="bottom">transfer or destination</div> */}
+        )
+    } else if (type === 'second-leg'){
+        return(
+            <div>
+                <div className="start-station-info">
+                    <div className="station">{leg.start_station}</div>
+                    <div className="direction">{leg.direction_label} {routeIcon}</div>
+                    <span className="time">Departs {leg.start_station_departure}</span>
+                </div>
+                <div className="middle-info">
+                    <div className='arrow-icon'>⬇</div>
+                    <div className='stops-and-time'>
+                        <div className="number-of-stops">{leg.number_of_stops} Stops</div>
+                        <div className="trip-time">{leg.trip_time} Minutes</div>
+                    </div>
+                </div>
+                <div className="end-station-info">
+                    <div className="station">{leg.end_station}</div>
+                    <span className="time">Arrives {leg.end_station_arrival}</span>
+                </div>
+                <hr width="100%" size="2"/>
             </div>
-        </div>
-    )
+        )
+    }
+    
 }
 
 export default LegInfo

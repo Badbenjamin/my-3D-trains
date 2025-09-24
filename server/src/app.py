@@ -13,6 +13,7 @@ ct = datetime.now()
 def plan_trip(start_station_id, end_station_id):
     # new_journey contains endpoints for start and end stations, and calculates a transfer if applicable.
     new_journey = Journey(start_station_id, end_station_id)
+    # show error if more than one transfer is needed
     if (len(new_journey.shared_stations)==0 and (new_journey.journey_info_obj['on_same_colored_line'] == False) and (new_journey.journey_info_obj['start_shares_routes_with_end'] == False)):
         trip_planner_error_obj = {
             "start_station_name" : new_journey.start_station.stop_name,
@@ -22,8 +23,6 @@ def plan_trip(start_station_id, end_station_id):
             "start_station_routes" : new_journey.start_station.daytime_routes.split(),
             "end_station_routes" : new_journey.end_station.daytime_routes.split(),
         }
-        
-        
         return {"trip_planner_error" : trip_planner_error_obj}
     # CONTINUE WITH BUILDING TRIP SEQUENCES
     else :
@@ -82,3 +81,5 @@ def get_arrivals(gtfs_id):
 def get_train_locations():
     pass
 
+# if __name__ == '__main__':
+#     app.run(debug=True)

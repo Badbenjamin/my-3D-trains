@@ -6,9 +6,9 @@ export default function NextTrains({tripInfoIndex, tripInfo, setTripInfoIndex}){
     if (tripInfo.length > 0){
         arrivalsButtons = tripInfo.map((trip, index)=>{
             if (index != tripInfoIndex){
-                return <button className='next-train-button' onClick={()=>{handleButtonClick(index)}}>{trip[0].route + " " + trip[0].start_station_departure + " "}</button>
+                return <button className='next-train-button' onClick={()=>{handleButtonClick(index)}}>{<img className="route_icon_next_train" src={`../public/ICONS/${trip[0].route}.png`}/>}{" " + trip[0].start_station_departure + " "}</button>
             } else {
-                return <button className='next-train-button-selected' onClick={()=>{handleButtonClick(index)}}>{trip[0].route + " " + trip[0].start_station_departure + " "}</button>
+                return <button className='next-train-button-selected' onClick={()=>{handleButtonClick(index)}}>{<img className="route_icon_next_train" src={`../public/ICONS/${trip[0].route}.png`}/>}{" " + trip[0].start_station_departure + " "}</button>
             }  
         })
     }

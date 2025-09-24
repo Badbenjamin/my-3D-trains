@@ -24,11 +24,7 @@ def create_stop_schedule(train):
     
     # stops list contains each trains stop array. used to determine if start stop is before end stop
     stop_schedule = train.trip_update.stop_time_update
-
-    # direction = stop_schedule[0].stop_id[-1]
-    # print('direction', direction)
     for stop in stop_schedule:
-        # print(stop.stop_id)
         stops.append(stop.stop_id[:-1])
 
     return stops
@@ -80,7 +76,6 @@ def single_train_to_train_class(train):
 
 # could I combine this into filter trains for station direction current?
 def check_for_station_service_on_failed_leg(train_data, start_station_id, start_station_routes, end_station_id, end_station_routes):
-    print('sid eid', start_station_id, end_station_id)
     # there are trains stopping at start station, and at end station, but not at both
     start_service = False
     end_service = False
@@ -102,10 +97,7 @@ def check_for_station_service_on_failed_leg(train_data, start_station_id, start_
     start_station_current_routes_south = []
     end_station_current_routes_north = []
     end_station_current_routes_south = []
-    # print(start_station_daytimte_routes, end_station_daytime_routes)
 
-
-    
     for train_feed in train_data:
             
             for train in train_feed.entity: 
@@ -144,7 +136,7 @@ def check_for_station_service_on_failed_leg(train_data, start_station_id, start_
                             end_south_bound_service = True
                             if route_id not in end_station_current_routes_south:
                                  end_station_current_routes_south.append(route_id)
-    print(start_station_current_routes, end_station_current_routes) 
+    # print(start_station_current_routes, end_station_current_routes) 
     print(start_station_current_routes_north, start_station_current_routes_south)
     print(end_station_current_routes_north, end_station_current_routes_south)             
     service_obj = {
@@ -165,7 +157,7 @@ def check_for_station_service_on_failed_leg(train_data, start_station_id, start_
         "end_station_current_routes_south" : end_station_current_routes_south,
 
     }
-    print('so', service_obj)
+    # print('so', service_obj)
     return service_obj
 
 # returns true if the station appears in the schedule of a train
@@ -177,14 +169,6 @@ def check_for_station_service(stops, station_id):
           service = False
      return service
 
-# check directional service on platforms
-def check_station_direction_service(train_data, stop_id):
-    #  for train in train_data:
-    #     stop_schedule = train.trip_update.stop_time_update
-    #     for stop in stop_schedule:
-    #         #  print('s',stop)
-    #         pass
-    pass
 
 # if start station id is before stop station id in stops (train schedule), then the train is headed in the correct direction.   
 def check_for_correct_direction(stops, start_station_id, end_station_id):
@@ -273,7 +257,8 @@ def get_station_arrival_times(gtfs_trains_for_station, gtfs_stop_id):
                           trains_arriving_at_station_s.append(train_obj)
             elif train.HasField('alert'):
                 #  WHAT CAN I DO WITH THIS INFO? 
-                 print('train alert 1', train)
+                #  print('train alert 1', train)
+                pass
 
     sorted_north_bound_trains = sorted(trains_arriving_at_station_n, key= lambda train : (train['arrival_time']))
     sorted_south_bound_trains = sorted(trains_arriving_at_station_s, key= lambda train : (train['arrival_time']))
@@ -296,7 +281,7 @@ def create_obj_array_with_train_and_arrival(filtered_train_data_object, start_st
     return trains_with_arrival
 
 # is quick sort efficient for a sorted array?
-# it should be sorted correctly unless an express train arrives at the destination. 
+# it should already be sorted correctly UNLESS an express train arrives at the destination. 
 def quick_sort_trains_by_arrival_time(train_obj_array, sort_by_origin_departure_or_dest_arrival):
     sort_by = ''
     if sort_by_origin_departure_or_dest_arrival == 'destination_arrival':
@@ -323,7 +308,7 @@ def sort_trains_by_arrival_at_destination_or_origin_departure(filtered_train_dat
         # take JSON train array (filtered) and build objects with {train, dest arrival, origin arrival} key value pairs
         trains_with_arrival_objs_array = create_obj_array_with_train_and_arrival(filtered_train_data_object, start_station_id, dest_station_id)
         # use quicksort to sort array of objects by arrival at destination.
-        sorted_trains = [train for train in quick_sort_trains_by_arrival_time(trains_with_arrival_objs_array, departure_or_arrival) if train['origin_departure_time'] >= time]
+        sorted_trains = [train for train in quick_sort_trains_by_arrival_time(trains_with_arrival_objs_array, departure_or_arrival) if train['origin_departure_time'] > time]
         return sorted_trains
 
 # returns True if a route from the start station routes is present in the end station routes
@@ -551,12 +536,17 @@ def get_trains_serving_start_station_end_station_or_both(train_data, start_stati
                          trains_serving_start_station.append(train)
                     elif check_for_station_service(stops, end_station_id) and (not check_for_station_service(stops, start_station_id)):
                          trains_serving_end_station.append(train)
+
      return {'trains_serving_start_station' : trains_serving_start_station, 'trains_serving_end_station' : trains_serving_end_station, 'trains_traveling_between_stations' : trains_traveling_between_stations}
 
 # WORKS. MIGHT WANT TO OPTIMIZE LATER.
-def find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array):
+# do i need trains traveling between stations?
+def find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array, trains_traveling_between_stations_array):
      # pairs of trains where the start train and end train (each stoping at start or end station), have a shared station in schedules
      train_pairs_with_transfer = []
+    #  sorted_trains_traveling_between_stations = sorted(trains_traveling_between_stations_array, key= lambda train : (train['end_station_arrival']))
+    
+     print('lens', len(trains_serving_start_station_array), len(trains_serving_end_station_array))
     #  looping throuth all trains that serve the start station
      for start_train in trains_serving_start_station_array:
         start_train_stops = [stop for stop in start_train.trip_update.stop_time_update]
@@ -568,6 +558,7 @@ def find_local_and_express_train_pairs_with_transfer(start_station_id, end_stati
             end_train_stops_no_direction = [stop.stop_id[:-1] for stop in end_train.trip_update.stop_time_update]
 
             end_station_info = None
+            print('ets', len(end_train_stops))
 
             transfer_station_id = None
             start_train_transfer_station_arrival_time = None
@@ -586,7 +577,7 @@ def find_local_and_express_train_pairs_with_transfer(start_station_id, end_stati
                             start_train_transfer_station_arrival_time = start_train_stop.arrival.time
                             end_train_transfer_station_departure_time = end_train_stop.arrival.time
                             
-                        if (start_train_stop.stop_id[:-1] == end_train_stop.stop_id[:-1]) and (start_station_info) and (end_station_info) and (transfer_station_id) and (start_station_info.arrival.time > current_time_int) and (start_train_transfer_station_arrival_time + 60 < end_train_transfer_station_departure_time) and (end_train_transfer_station_departure_time - start_train_transfer_station_arrival_time <= 1200) and (start_train_stops_no_direction.index(start_station_id) < start_train_stops_no_direction.index(transfer_station_id) and (end_train_stops_no_direction.index(transfer_station_id) < end_train_stops_no_direction.index(end_station_id))):
+                        if (start_train_stop.stop_id[:-1] == end_train_stop.stop_id[:-1]) and (start_station_info) and (end_station_info) and (transfer_station_id) and (start_station_info.departure.time > current_time_int) and (start_train_transfer_station_arrival_time + 60 < end_train_transfer_station_departure_time) and (end_train_transfer_station_departure_time - start_train_transfer_station_arrival_time <= 1200) and (start_train_stops_no_direction.index(start_station_id) < start_train_stops_no_direction.index(transfer_station_id) and (end_train_stops_no_direction.index(transfer_station_id) < end_train_stops_no_direction.index(end_station_id))):
                             new_train_pair_obj = {
                                 'start_train_id' : start_train.id,
                                 'end_train_id' : end_train.id,
@@ -601,20 +592,25 @@ def find_local_and_express_train_pairs_with_transfer(start_station_id, end_stati
                                 'transfer_station_end_train' : end_train_stop.stop_id[:-1],
                             }   
                             
+                            train_pairs_with_transfer.append(new_train_pair_obj)
+                            # THIS APPEARS TO BE WORKING THE SAME WITHOUT PREVENTING DUPLICATES FROM GETTING IN ARRAY?
+                            # COULD I ADD A HASHMAP TO MAKE THIS BETTER? 
+
                             # make sure duplicates are not in array of train pair objs. Only include unique pairs with unique transfers. 
-                            if train_pairs_with_transfer:
-                                in_array = False
-                                for prev_train_obj in train_pairs_with_transfer:
-                                    if (prev_train_obj['start_train_id'] == new_train_pair_obj['start_train_id']) and (prev_train_obj['end_train_id'] == new_train_pair_obj['end_train_id']) and (prev_train_obj['transfer_station_start_train'] == new_train_pair_obj['transfer_station_start_train']):
-                                        in_array = True
-                                    else:
-                                        in_array = False
-                                if in_array == False:
-                                    train_pairs_with_transfer.append(new_train_pair_obj)
-                            else:
-                                train_pairs_with_transfer.append(new_train_pair_obj)
+                            # COULD I USE A HASHMAP TO MAKE THIS BETTER?
+                            # if train_pairs_with_transfer:
+                            #     in_array = False
+                            #     for prev_train_obj in train_pairs_with_transfer:
+                            #         if (prev_train_obj['start_train_id'] == new_train_pair_obj['start_train_id']) and (prev_train_obj['end_train_id'] == new_train_pair_obj['end_train_id']) and (prev_train_obj['transfer_station_start_train'] == new_train_pair_obj['transfer_station_start_train']):
+                            #             in_array = True
+                            #         else:
+                            #             in_array = False
+                            #     if in_array == False:
+                            #         train_pairs_with_transfer.append(new_train_pair_obj)
+                            # else:
+                            #     train_pairs_with_transfer.append(new_train_pair_obj)
                            
-     
+     print('tpt0',len(train_pairs_with_transfer))
      return train_pairs_with_transfer
 
 def find_train_with_soonest_arrival(train_array):
@@ -634,9 +630,9 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
      trains_serving_start_station_array = trains_serving_stations_obj['trains_serving_start_station']
      trains_serving_end_station_array = trains_serving_stations_obj['trains_serving_end_station']
      trains_traveling_between_stations_array = trains_serving_stations_obj['trains_traveling_between_stations']
+     print('st', len(trains_serving_start_station_array), 'en', len(trains_serving_end_station_array), 'both', len(trains_traveling_between_stations_array))
      
-     
-     train_pairs_with_transfer_array = find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array)
+     train_pairs_with_transfer_array = find_local_and_express_train_pairs_with_transfer(start_station_id, end_station_id, trains_serving_start_station_array, trains_serving_end_station_array, trains_traveling_between_stations_array)
     # sort for earliest arrival at end station, AND largest gap between transfer station arrival and departure. 
      best_train_pairs_sorted = sorted(train_pairs_with_transfer_array, key= lambda tp : (tp['end_station_arrival'], -tp['transfer_station_time_gap']))
      best_train_pairs_sorted_de_duplicated = []
@@ -649,17 +645,20 @@ def find_best_trains_and_transfer_local_express(train_data, start_station_id, en
     # LOOK INTO THIS SINCE IT HAS PROBLEMS WITH A TRAIN ON NIGHT SCHEDULE
      best_single_trains_sorted = sorted(trains_traveling_between_stations_array, key = lambda bst: bst['end_station_arrival'])
   
-     if best_train_pairs_sorted and best_single_trains_sorted:
+     print('btps', len(best_train_pairs_sorted_de_duplicated), 'bsts', len(best_single_trains_sorted) )
+     if (len(best_train_pairs_sorted)>0) and (len(best_single_trains_sorted) > 0):
           if best_train_pairs_sorted_de_duplicated[0]['end_station_arrival'] < best_single_trains_sorted[0]['end_station_arrival']:
                return best_train_pairs_sorted_de_duplicated
           else: 
                return best_single_trains_sorted
-     elif best_train_pairs_sorted_de_duplicated and not best_single_trains_sorted:
+     elif (len(best_train_pairs_sorted_de_duplicated) > 0) and not (len(best_single_trains_sorted) > 0):
           return best_train_pairs_sorted_de_duplicated
-     elif best_single_trains_sorted and not best_train_pairs_sorted_de_duplicated:
+     elif (len(best_single_trains_sorted) > 0) and not (len(best_train_pairs_sorted_de_duplicated) > 0):
           return best_single_trains_sorted
      else:
+          print('error')
           return False
+
 
 def get_endpoints_for_station(station_endpoints):
     endpoints = []

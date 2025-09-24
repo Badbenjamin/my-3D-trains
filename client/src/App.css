@@ -1,24 +1,108 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.controls-info{
+  position:absolute;
+  top: 0;
+  right:0;
+  margin-top: 5px;
+  margin-right: 5px;
+  z-index: 12;
+  color: white;
+  padding: 5px;
+
+}
+
+.map-experience-container{
+ width: 100vw;
+ height: 100vh;
+}
+
+.trip-info{
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.journey-planner-and-trip-info-container{
+  padding: 5px;
+  position: absolute;
+  margin-top: 10px;
+  margin-left: 10px;
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  width:342px;
+  min-height: 150px;
+  background: rgb(10, 10, 10);
+  border-style: solid;
+  border-radius: 10px;
+  border-color: rgb(255, 255, 255);
+  border-width: 3px;
+  color: white;
+}
+
+.m3dt-title{
+ text-align: center;
+}
+
+.journey-planner{
+  position: relative;
+  z-index: 9;
+  width: 35vw;
+  display: flex;
   text-align: center;
+  padding: 3px;
+}
+
+.journey-planner-button-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.reverse-stations-button{
+  background-color: rgb(0, 0, 0);
+  font-weight: bold;
+  border: 1px;
+  border: solid;
+  border-color: rgb(255, 255, 255);
+  padding: 3.5px;
+  color: rgb(255, 255, 255);
+}
+
+
+.station-search-container{
+  padding: 5px;
+  width: auto;
+}
+
+.station_search{
+  padding: 5px;
+  margin-top: 0;
+}
+
+.trip-info{
+  position: relative;
+  z-index: 8;
+  width: auto;
 }
 
 .station_label{
   color: white;
-
   font-size: 35px;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   user-select: none;
-  /* -webkit-text-stroke-width: 2px;
-  -webkit-text-stroke-color: black; */
 }
 
 .complex_label{
   color: rgb(255, 255, 255);
-  
   font-size: 55px;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
@@ -30,46 +114,146 @@ html{
   font-weight: bold;
 }
 
+.complex-button{
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  background-color: rgb(39, 39, 39);
+  font-weight: bold;
+  color: white;
+  border-style: solid;
+  border-color: white;
+  border-width: 3px;
+}
 
-.station-html{
-  border-style: solid ;
-  background-color: white;
+.complex-tooltip-html{
+  background-color: rgb(39, 39, 39);
+  border-style: solid;
+  border-color: white;
   border-radius: 15px;
-  width: 280px;
-  align-items: center;
-  user-select: none;
+  width: 200px;
+  height: auto;
+  padding-top: 35px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+}
+
+.route-info-tooltip{
+  text-align: center;
+  min-width: 200px;
 }
 
 .route-info-html{
   border-style: solid ;
-  background-color: white;
+  background-color: rgb(39, 39, 39);
   border-radius: 15px;
-  width: 280px;
-  align-items: center;
+  min-width: 150px;
   user-select: none;
+  color: white;
+  padding: 10px;
+  justify-content: center;
+}
+
+.highlight{
+  background-color: gold;
+  color: black;
+  border-radius: 5px;
+  padding: 3px;
 }
 
 .route-html-text{
   font-size: 35px;
   user-select: none;
 }
-.x-button{
-  font-size: 12px;
+  
+.station-html{
+  border-style: solid ;
+  background-color: rgb(39, 39, 39);
+  border-radius: 15px;
+  border-width: 5px;
+  padding: 10px;
+  width: 280px;
+  align-items: center;
+  user-select: none;
+  vertical-align: middle;
+}
+.station-tooltip{
+  color:white;
+  text-align: center;
+  border-radius: 15px;
+}
+
+.arrivals-html{
+ display: flex;
+ flex-direction: row;
+ justify-content: center;
+}
+
+.arrivals-name{
+  font-size: 25px;
+}
+
+.tooltip_route_icon{
+  width: 20px;
+  height: 20px;
+  padding: 3px;
+  pointer-events: none;
+}
+
+.icon-time-pair{
+  display: flex;
+  flex-direction: row;
+  font-size: 20px;
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.origin-dest-btn{
+  color: black;
+  background-color: gold;
   font-weight: bold;
-  margin-top: 1px;
-  margin-right: 2px;
+  padding: 4px;
+}
+.x-button{
+  font-size: 13px;
+  font-weight: bolder;
+  padding-top: 8px;
+  padding-bottom: 3px;
   position:absolute;
   top:0;
   right:0;
+  background-color: rgb(255, 255, 255);
   border-style: solid;
-  border-color: black;
-  border-radius: 3px;
+  border-color: rgb(255, 255, 255);
+  border-radius: 5px;
+  border-width: 4px;
+}
+
+.back-button{
+  font-size: 18px;
+  font-weight: bolder;
+  padding-top: 1px;
+  padding-bottom: 0px;
+  position:absolute;
+  top:0;
+  left:0;
+  background-color: rgb(255, 255, 255);
+  border-style: solid;
+  border-color: rgb(255, 255, 255);
+  border-radius: 5px;
+  border-width: 4px;
+}
+
+.set-as{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }
 
 .station-html-button-text{
   border: none;
   color: white;
-  /* font-size: 30px; */
   font-weight: bold;
   background-color: rgba(0,0,0,0);
   justify-content: center;
@@ -80,15 +264,10 @@ html{
   color: white;
   font-weight: bold;
   background-color: rgba(0,0,0,0);
-  /* max-width: 700px; */
   text-align: center;
-  /* margin-left: auto;
-  margin-right: auto; */
-  /* justify-content: center; */
 }
 
 .station-text-name{
-  /* max-width: 600px; */
   max-height: 250px; 
   word-wrap:break-word;
   justify-content: center;
@@ -96,21 +275,13 @@ html{
 }
 
 .icon-image-array{
-  /* min-width: 150px; */
   display: inline-block;
-  /* display: flex;
-  flex-wrap: wrap; */
   gap: 5px;
-  /* margin-left: auto;
-  margin-right: auto; */
-  /* justify-content: center; */
 }
 
 .route_icon{
   padding: 3px;
   pointer-events: none;
-  /* max-width: 15px;
-  max-height: 15px; */
 }
 
 .route_icon_route_tt{
@@ -118,6 +289,7 @@ html{
   pointer-events: none;
   max-width: 20px;
   max-height: 20px;
+  vertical-align: middle;
 }
 
 .route_icon_complex{
@@ -127,28 +299,86 @@ html{
   pointer-events: none;
 }
 
-.tooltip_route_icon{
-  width: 27px;
-  height: 27px;
-  padding: 3px;
-  pointer-events: none;
-}
-
-/* .arrivals-html{
-  display: flex;
-  flex-direction: row;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: center;
-} */
-
-.icon-time-pair{
-  display: flex;
-    flex-direction: row;
-}
-
 .station-routes-button{
   white-space: nowrap;
   overflow: hidden;
 }
 
+.route_icon_search{
+  height: 15px;
+  width: 15px;
+  padding: 2px;
+}
+
+.canvas{
+  z-index: 1;
+}
+
+
+/* LEG INFO */
+
+.start-station-info{
+  padding: 2px;
+}
+.station{
+  font-size: 17px;
+  font-weight: bold;
+}
+.time{
+  font-size: 17px;
+  font-weight: bold;
+  background-color: gold;
+  color: black;
+  border-radius: 5px;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+.direction{
+  font-size: 17px;
+}
+
+.middle-info{
+  display: flex;
+  flex-direction: row;
+  padding: 2px;
+}
+
+.arrow-icon{
+  font-size: 30px;
+}
+
+.end-station-info{
+  padding: 2px;
+}
+
+.stops-and-time{
+  font-size: 17px;
+  flex-direction: column;
+  margin-left: 0;
+}
+
+.transfer-info{
+  padding: 5px;
+}
+
+
+.route_icon_leg_info{
+  width: 17px;
+  height: 17px
+}
+
+.error-highlight{
+  background-color: rgb(255, 19, 19);
+  color: rgb(255, 255, 255);
+  border-radius: 5px;
+  padding: 3px;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.x-icon{
+  color: red;
+  font-weight: bold;
+  font-size: 40px;
+}

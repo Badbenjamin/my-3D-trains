@@ -16,7 +16,7 @@ function App() {
   // load station and track model. destructure to nodes and materials to create Station component
   // nodes correspond to each geometry in the model
   // each node contains a mesh, which has the properties for that geometry 
-  const { nodes, materials } = useGLTF('./subway_map_Map_stations_7_24.glb')
+  const { nodes, materials } = useGLTF('./subway_map_TRACK_STATIONS_ONLY_8.25.glb')
 
   const [stations, setStations] = useState([])
   const [stationArray, setStationArray] = useState([])
@@ -140,7 +140,8 @@ function App() {
                 "type" : "transfer",
                 "second_transfer_info" : [],
                 "direction_label" : tripSequenceElement.direction_label,
-                "route" : tripSequenceElement.route
+                "route" : tripSequenceElement.route,
+                "transfer_time" : tripSequenceElement.transfer_time
               }
             } else if ((stop.stop_id.slice(0,3) in selectedStationInfoObj) && ((stop.stop_id.slice(0,3) != startStopId || stop.stop_id.slice(0,3) != endStopId) && (stop.stop_id.slice(0,3) == stopsForLeg[0].stop_id.slice(0,3) || stop.stop_id.slice(0,3) == stopsForLeg[stopsForLeg.length -1].stop_id.slice(0,3)))){
               selectedStationInfoObj[stop.stop_id.slice(0,3)].second_transfer_info.push({

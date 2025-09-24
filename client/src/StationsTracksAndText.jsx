@@ -16,7 +16,7 @@ import { findDistance } from './ModularFunctions'
 
 
 export default function StationsTracksAndText({vectorPosition}) {
-    const {stationArray, retrieveStationId} = useOutletContext()
+    const {stationArray, retrieveStationId, stations} = useOutletContext()
     const [stationInfoObjectArray, setStationInfoObjectArray] = useState([])
     const [stationHtmlArray, setStationHtmlArray] = useState([])
     const [complexHtmlArray, setComplexHtmlArray] = useState([])
@@ -25,12 +25,9 @@ export default function StationsTracksAndText({vectorPosition}) {
     const [versionForKey, setVersionForKey] = useState(0)
     const [cameraPosition, setCameraPosition] = useState({"x": 0, "y" : 0, "z" : 0})
 
-// Fetch to get data for stations, array of objects with info
 useEffect(()=>{
-      fetch(`http://127.0.0.1:5555/api/stations`)
-      .then(response => response.json())
-      .then(stationInfoObjectArray => {setStationInfoObjectArray(stationInfoObjectArray)})
-},[])
+      setStationInfoObjectArray(stations)
+},[stations])
 
 
 // CREATE STATION TOOLTIP IF IT DOESN'T ALREADY EXIST
@@ -141,7 +138,7 @@ useEffect(()=>{
         if(stationArray[j].props.stationInfo && ((stationArray[j].props.stationInfo.type == 'start')||(stationArray[j].props.stationInfo.type == 'end')||(stationArray[j].props.stationInfo.type == 'transfer')||(stationArray[j].props.stationInfo.type == 'errorStart')||(stationArray[j].props.stationInfo.type == 'errorEnd')||(stationArray[j].props.stationInfo.type == 'errorTransfer'))){
 
           let keyforRouteInfo = stationInfoObject[stationArray[j].props.name].name.toString() + versionForKey.toString()
-          let newRouteTooltip = <RouteTooltip key={keyforRouteInfo} name={stationInfoObject[stationArray[j].props.name].name} position={stationArray[j].props.mesh.position} stationInfo={stationArray[j].props.stationInfo}/>
+          let newRouteTooltip = <RouteTooltip key={keyforRouteInfo} name={stationInfoObject[stationArray[j].props.name].name} routes={stationInfoObject[stationArray[j].props.name].daytime_routes} position={stationArray[j].props.mesh.position} stationInfo={stationArray[j].props.stationInfo}/>
           newRouteInfoHtmlArray.push(newRouteTooltip)
           setVersionForKey((prevVersion)=>{
             return prevVersion += 1
@@ -177,7 +174,9 @@ useEffect(()=>{
             size = 15
           } else if (distToClosestStation < 0.3){
             size = 10
-          } 
+          } else {
+            size = 30
+          }
           // pass station geometry stationInfo to stationText for conditional rendering
           let newStationText = <StationText handleStationClick={handleStationClick} clearTooltip={clearTooltip} size={size}  wrapperClass="station_label"  index={j} tripInProgress={stationArray[j].props.tripInProgress} stationIntrip={stationArray[j].props.stationInTrip} stationInfo = {stationArray[j].props.stationInfo} key={stationArray[j].props.name}  distanceFactor={8} center={true} position={newPosition} name={newInfoObject.name} daytime_routes={newInfoObject.daytime_routes} gtfs_stop_id={newInfoObject.gtfs_stop_id} alphaLevel={1}/>
           newStationHtmlArray.push(newStationText)
@@ -214,7 +213,6 @@ useEffect(()=>{
           // if the station's complexId already exists as a key in the complexObject, we condense the info of the new
           // station (part of the complex), into the value of the existing complexId key
           } else {
-            console.log('complex object push')
             complexObject[newInfoObject.complex_id]['daytime_routes'].push([newInfoObject.daytime_routes])
 
             // name route combos, might only need this after all
@@ -290,7 +288,6 @@ useEffect(()=>{
         // If the station is involved in the current trip, we push it to the newRouteInfoHtmlArray
         // this is used to set the routeInfoArray, or our routetooltips
         if(complexObject[complex].stationInTrip){
-          console.log('complex tooltip?')
           // need to modify this to work with complex info
           let newRouteTooltip = <RouteTooltip name={"complex"} position={averagePosition} stationInfo={complexObject[complex].name_arrival_info_combo_array}/>
           newRouteInfoHtmlArray.push(newRouteTooltip)
@@ -327,21 +324,21 @@ useEffect(()=>{
         return currentComplex;
       } else if (distToClosestStationComplex < 1.5 && distToClosestStationComplex >= 1){
         let newKey = currentComplex.props.complexId.toString() + " " + versionForKey.toString()
-        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 25, key : newKey});
+        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 20, key : newKey});
         setVersionForKey((prevVersion)=>{
           return prevVersion += 1
         })
         return newComplexHtmlComponent;
       } else if (distToClosestStationComplex < 1 && distToClosestStationComplex >= 0.5) {
         let newKey = currentComplex.props.complexId.toString() + " " + versionForKey.toString()
-        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 20, key : newKey});
+        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 15, key : newKey});
         setVersionForKey((prevVersion)=>{
           return prevVersion += 1
         })
         return newComplexHtmlComponent;
       } else if (distToClosestStationComplex < 0.5){
         let newKey = currentComplex.props.complexId.toString() + " " + versionForKey.toString()
-        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 15, key : newKey});
+        let newComplexHtmlComponent = React.cloneElement(currentComplex, {size : 10, key : newKey});
         setVersionForKey((prevVersion)=>{
           return prevVersion += 1
         })
@@ -437,17 +434,11 @@ useEffect(()=>{
 }, [cameraPosition])
   
 // RETURN COMPONENT 
-  if (stationArray == []){
+  if (stationArray.lenght == 0){
     return(
         <>loading</>
     )
-  } else if (stationArray && !stationHtmlArray){
-    return (
-      <group  dispose={null}>
-          {stationArray}
-      </group>
-    )
-  }else if (stationArray && stationHtmlArray && complexHtmlArray){
+  } else if (stationArray.length != 0 && stationHtmlArray.length != 0 && complexHtmlArray.length != 0){
     return (
       <group  dispose={null}>
           {stationArray}

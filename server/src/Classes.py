@@ -23,7 +23,7 @@ class Journey:
         # CHANGED TO GTFS STOP ID from ID (6/16)
         self.start_station = Station.query.filter(Station.gtfs_stop_id == start_station_id).first()
         self.end_station = Station.query.filter(Station.gtfs_stop_id == end_station_id).first()
-        print(self.start_station, self.end_station)
+
         # accounting for stations in complexes, these are the stations that are shared between two lines on a two part trip.
         self.shared_stations = []
 
@@ -41,7 +41,7 @@ class Journey:
         
         # This variable contains info for the type of trip. Whether there is a transfer or if it involves local and express trains. 
         self.journey_info_obj = modules_classes.get_journey_info(self.start_station_routes, self.end_station_routes)
-        # print('journey info obj', self.journey_info_obj)
+
         # if not on same route, and also not on same colored line, the trip requires a transfer btw lines
         if (self.journey_info_obj['start_shares_routes_with_end'] == False) and (self.journey_info_obj['on_same_colored_line'] == False):
             # find complexes on start and end lines
@@ -68,7 +68,6 @@ class Journey:
         # Might not need end station endpoints? Train is leaving from a station that is served by a start station line to get to end station. 
         self.start_station_endpoints = modules_classes.get_endpoints_for_station(self.start_station.station_endpoints)
         self.end_station_endpoints = modules_classes.get_endpoints_for_station(self.end_station.station_endpoints)
-        # print('eps',self.start_station_endpoints, self.end_station_endpoints)
 
     def __repr__(self):
         return f'<Journey {self.start_station.stop_name} to {self.end_station.stop_name} through{self.shared_stations} at {self.time}>'
@@ -84,7 +83,6 @@ class TrainData:
         self.journey_object = journey_object
         self.routes = set(journey_object.start_station_routes + journey_object.end_station_routes)
         self.shared_stations = journey_object.shared_stations
-        # print('shared',self.shared_stations)
         self.local_express = None
         
         if journey_object.local_express:
@@ -216,30 +214,41 @@ class FilteredTrains:
         if train_data.local_express:
             # finds either a pair of trains with a transfer station, a single train (local faster), or no trains. No trains produces TripError object.
             best_trains_and_transfer = modules_classes.find_best_trains_and_transfer_local_express(train_data, start_station_id, end_station_id)
-
             if best_trains_and_transfer:
                 for train_pair in best_trains_and_transfer:
                     # ACCOMODATE SINGLE TRAIN LATER IF THAT IS FASTEST OPTION
-                    le_pair = [
-                        {
-                            'train_id' : train_pair['start_train_id'],
-                            'train' : modules_classes.single_train_to_train_class(train_pair['start_train']),
-                            'start_station_id' : start_station_id,
-                            'end_station_id' : train_pair['transfer_station_start_train'],
-                            'start_station_arrival' : train_pair['start_station_arrival'],
-                            'end_station_arrival' : train_pair['transfer_station_arrival'],
-                        },
-                        {
-                            'train_id' : train_pair['end_train_id'],
-                            'train' : modules_classes.single_train_to_train_class(train_pair['end_train']), 
-                            'start_station_id' : train_pair['transfer_station_end_train'],
-                            'end_station_id' : end_station_id,
-                            'start_station_arrival' : train_pair['transfer_station_departure'],
-                            'end_station_arrival' : train_pair['end_station_arrival'],
-                        }
-                    ]
-                    self.local_express_seq_2.append(le_pair)
-       
+                    if ('transfer_station_arrival' in train_pair):
+                        le_pair = [
+                            {
+                                'train_id' : train_pair['start_train_id'],
+                                'train' : modules_classes.single_train_to_train_class(train_pair['start_train']),
+                                'start_station_id' : start_station_id,
+                                'end_station_id' : train_pair['transfer_station_start_train'],
+                                'start_station_arrival' : train_pair['start_station_arrival'],
+                                'end_station_arrival' : train_pair['transfer_station_arrival'],
+                            },
+                            {
+                                'train_id' : train_pair['end_train_id'],
+                                'train' : modules_classes.single_train_to_train_class(train_pair['end_train']), 
+                                'start_station_id' : train_pair['transfer_station_end_train'],
+                                'end_station_id' : end_station_id,
+                                'start_station_arrival' : train_pair['transfer_station_departure'],
+                                'end_station_arrival' : train_pair['end_station_arrival'],
+                            }
+                        ]
+                        self.local_express_seq_2.append(le_pair)
+                    else:
+                        single_train = [
+                            {
+                                'train_id' : train_pair['train_id'],
+                                'train' : modules_classes.single_train_to_train_class(train_pair['train']),
+                                'start_station_id' : start_station_id,
+                                'end_station_id' : end_station_id,
+                                'start_station_arrival' : train_pair['start_station_arrival'],
+                                'end_station_arrival' : train_pair['end_station_arrival'],
+                            }
+                        ]
+                        self.local_express_seq_2.append(single_train)
             else:
                 self.trip_error_obj = TripError(self.all_train_data, self.start_station.gtfs_stop_id, self.end_station.gtfs_stop_id)
         else:
@@ -287,17 +296,6 @@ class TripError:
         self.end_north_direction_label = end_station.north_direction_label
         self.end_south_direction_label = end_station.south_direction_label
         station_service_obj = modules_classes.check_for_station_service_on_failed_leg(train_data, start_station_id, self.start_station_routes, end_station_id, self.end_station_routes)
-        # HOW DO I FIND DIRECTION IF NO TRAIN DATA? 
-        # print('complex', start_station.complex_id, end_station.complex_id)
-        # I need the status of direction service on stations (ig. no trains northbound)
-        # I need to determine if there is a possible transfer between lines. 
-        # self.shared_stations = train_data.shared_stations
-        # print('te shared', train_data)
-
-        # START STATION ROUTES
-        # END STATION ROUTES
-        # SHOW IF ROUTES FROM START STATION ARE NOT STOPPING AT END STATION
-
         self.start_station_service = station_service_obj['start_station_service']
         self.end_station_service = station_service_obj['end_station_service']
         self.between_station_service = station_service_obj['start_to_end_service']
@@ -307,16 +305,10 @@ class TripError:
         self.end_north_bound_service = station_service_obj['end_north_bound_service']
         self.end_south_bound_service = station_service_obj['end_south_bound_service']
 
-        # self.start_station_daytime_routes = station_service_obj['start_station_daytime_routes']
-        # self.end_station_daytime_routes = station_service_obj['end_station_daytime_routes']
-
         self.start_station_current_routes_north = station_service_obj['start_station_current_routes_north']
         self.start_station_current_routes_south = station_service_obj['start_station_current_routes_south']
         self.end_station_current_routes_north = station_service_obj['end_station_current_routes_north']
         self.end_station_current_routes_south = station_service_obj['end_station_current_routes_south']
-
-
-        # self.direction_service_for_platform = modules_classes.check_station_direction_service()
         
     def __repr__(self):
         return f'<TripError {self.start_station_id} {self.start_station_service} {self.end_station_id} {self.end_station_service} trains between: {self.between_station_service}>'
@@ -354,15 +346,18 @@ class FormattedTrainData:
                         "start_station" : start_station.stop_name,
                         "start_station_gtfs" : trip_sequence_element.start_station_id,
                         "start_station_departure" : datetime.fromtimestamp(trip_sequence_element.start_station_arrival).strftime('%-I:%M'),
+                        "start_station_departure_ts": trip_sequence_element.start_station_arrival,
                         "end_station" : end_station.stop_name,
                         "end_station_gtfs" : trip_sequence_element.end_station_id,
                         "end_station_arrival" : datetime.fromtimestamp(trip_sequence_element.end_station_arrival).strftime('%-I:%M'),
+                        "end_station_arrival_ts" : trip_sequence_element.end_station_arrival,
                         "transfer_station" : None,
                         "route" : first_train.route(),
                         "direction_label" : None,
                         "schedule" : first_train_stop_schedule,
                         "number_of_stops" : stop_schedule_ids.index(trip_sequence_element.end_station_id) - stop_schedule_ids.index(trip_sequence_element.start_station_id),
                         "trip_time" : (trip_sequence_element.end_station_arrival - trip_sequence_element.start_station_arrival)//60,
+                        "transfer_time" : trip_sequence_element.transfer_time
 
                         
                     }
@@ -375,6 +370,7 @@ class FormattedTrainData:
                     start_station = Station.query.filter(Station.gtfs_stop_id == trip_sequence_element.start_station_id).first()
                     end_station = Station.query.filter(Station.gtfs_stop_id == trip_sequence_element.end_station_id).first()
                     error_for_react = {
+                        "trip_error" : True,
                         "start_station_name" : start_station.stop_name,
                         "start_station_gtfs" : trip_sequence_element.start_station_id,
                         "start_station_service" : trip_sequence_element.start_station_service,
@@ -454,15 +450,16 @@ class Stop:
 # This class accepts a BestTrain obj, or info from the local_express_sequence of a LocalExpress object, and saves the info to itself. 
 class TripSequenceElement:
 
-    def __init__(self, trip_info, start_gtfs=None, end_gtfs=None):
+    def __init__(self, trip_info, start_gtfs=None, end_gtfs=None, transfer_time=None):
         self.train_id = None
         self.train = None
         self.start_station_id = start_gtfs
         self.end_station_id = end_gtfs
+        self.transfer_time = transfer_time
         self.start_station_arrival = None
         self.end_station_arrival = None
         self.error = None
-
+   
         # TRIP HAS A LOCAL TO EXPRESS OR EXP TO LOC TRANSFER
         if(isinstance(trip_info, Train)):
             self.train_id = trip_info.trip_id

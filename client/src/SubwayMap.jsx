@@ -9,22 +9,7 @@ import PlaceHolder from "./Placeholder"
 import LinesAndMap from "./LinesAndMap"
 
 function SubwayMap(){
-
     
-    const torusRef = useRef()
-    const cubeRef = useRef()
-
-    const clock = new THREE.Clock()
-    
-    
-
-    // useFrame((state, delta) => {
-    //     // const elapsedTime = clock.getElapsedTime()
-    //     // // console.log(elapsedTime)
-    //     // torusRef.current.rotation.y += delta
-    //     // cubeRef.current.position.y = Math.sin(elapsedTime) * 4
-    // })
-
     return( 
         <>
             <Suspense fallback={<PlaceHolder position-y={0.5} scale = {[1,1,1]}/>}>

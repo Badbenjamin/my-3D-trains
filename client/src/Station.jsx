@@ -10,24 +10,21 @@ import './App.css'
 import { useFrame } from "@react-three/fiber"
 
 function Station( { tripInProgress, stationInTrip, stationInfo, mesh, index}){
-    if (stationInfo){
-        // console.log('si', stationInfo)
-    }
-        
-        const [geometryDisplay, setGeometryDisplay] = useState(false)
-        let stationRef = useRef()
+  
+    const [geometryDisplay, setGeometryDisplay] = useState(false)
+    let stationRef = useRef()
 
-        let selectedMaterial = new THREE.MeshStandardMaterial()
-        selectedMaterial.color =  new THREE.Color('white')
-        
-        const newName = mesh.name
-        const newGeometry = mesh.geometry
-        let newMaterial =  mesh.material;
-        const newCastShadow = true
-        const newRecieveShadow = true
-        const newPosition = mesh.position
-        const newRotation = mesh.rotation
-        const newScale = mesh.scale
+    let selectedMaterial = new THREE.MeshStandardMaterial()
+    selectedMaterial.color =  new THREE.Color('white')
+    
+    const newName = mesh.name
+    const newGeometry = mesh.geometry
+    let newMaterial =  mesh.material;
+    const newCastShadow = true
+    const newRecieveShadow = true
+    const newPosition = mesh.position
+    const newRotation = mesh.rotation
+    const newScale = mesh.scale
 
     useEffect(()=>{
         if (tripInProgress && stationInTrip && stationInfo != null){

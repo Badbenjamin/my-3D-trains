@@ -1,16 +1,15 @@
-.journey-planner {
+/* .journey-planner {
   border-style: dotted;
   padding: 5px;
   display: inline-flex;
-  /* width: 100%; */
-}
+} */
 
  h1{
   border-style: dotted;
   padding: 1px;
  }
 
- .navbar{
+ /* .navbar{
   font-family:Arial, Helvetica, sans-serif;
   font-weight: bold;
   font-size: x-large;
@@ -23,29 +22,37 @@
 a:visited{
   color: grey;
 
- }
+ } */
 
   
 .leg-info-grid-cointainer{
   padding: 5px;
-  display: grid;
-  column-gap: 50px;
-  row-gap: 50px;
-  border-style: dotted;
-  border-color: whitesmoke;
+  display: flex;
+  justify-content: space-between;
+  width: auto;
+  /* column-gap: 5vh; */
+  /* row-gap: 5vw; */
+  /* border-style: dotted; */
+  /* border-color: whitesmoke; */
 }
 
 .start-station-info{
+  font-size: 13px;
+  font-weight: lighter;
   grid-column-start: 1;
   grid-column-end: 2;
 }
 
 .middle-info{
+  font-weight: lighter;
+  font-size: 13px;
   grid-column-start: 2;
   grid-column-end: 3;
 }
 
 .end-station-info{
+  font-weight: lighter;
+  font-size: 13px;
   grid-column-start: 3;
   grid-column-end: 4;
 }
@@ -63,11 +70,13 @@ a:visited{
 .bottom{
   grid-row-start: 3;
   grid-row-end: 4;
+  color: black;
+  background-color: gold;
+  padding: 3px;
+  border-radius: 5px;
 }
 
-.station_search{
-  align-items: right;
-}
+
 
 .select{
   /* align-items: flex-end; */
@@ -75,14 +84,19 @@ a:visited{
 }
 
 .plan-trip-button{
-  background-color: grey;
-  border: 2px;
   color: black;
+  background-color: gold;
+  font-weight: bold;
+  border: 2px;
+  border: solid;
+  border-color: rgb(0, 0, 0);
+  padding: 3.5px;
+  
 }
 
-.trip-info{
+/* .trip-info{
   border-style: dotted ;
-}
+} */
 
 .leg-info{
   color: blue;
@@ -103,9 +117,32 @@ a:visited{
 }
 
 .next-train-button{
-  background-color: grey;
+  font-size: 14px;
+  background-color: rgb(0, 0, 0);
+  font-weight: bold;
+  color: white;
+  border-style: solid;
+  border-color: rgb(255, 255, 255);
+  border-width: 2px;
+  padding: 3px;
 }
 
 .next-train-button-selected{
+  font-size: 13px;
   background-color: rgb(255, 225, 58);
+  font-weight: bold;
+  border-style: solid;
+  border-color: black;
+  border-width: 2px;
+  padding: 3px;
+}
+
+.route_icon_next_train{
+  height: 15px;
+  width: 15px;
+  vertical-align: middle;
+  /* border-style: solid;
+  border-color: rgb(0, 0, 0);
+  border-radius: 15px;
+  border-width: 2px; */
 }
