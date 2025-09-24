@@ -47,7 +47,6 @@ function LegInfo({leg, type}){
                 </div>
                 <hr width="100%" size="2"/>
                 <div className="transfer-info">
-                    {/* <div className="station">Transfer</div> */}
                     <span >Transfer: {leg.transfer_time / 60} Minutes</span>
                 </div>
                 <hr width="100%" size="2"/>
