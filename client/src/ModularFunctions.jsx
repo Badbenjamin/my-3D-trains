@@ -107,8 +107,10 @@ export function findSharedRoutes(stationInfo){
 
 export function findPlatformClosure(stationInfo, sharedRoutes, startOrEnd, direction){
     let missingRoutes = []
+    console.log('stationInfo',stationInfo, startOrEnd, direction)
+   
     const stationRoutes = stationInfo[`${startOrEnd}_station_current_routes_${direction}`]
-    
+    console.log('stationRoutes', stationRoutes)
     for (let route of sharedRoutes){
         if (!(stationRoutes.includes(route))){
             missingRoutes.push(route)

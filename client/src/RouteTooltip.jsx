@@ -223,12 +223,13 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
 
                 // DISPLAY ERROR FOR SECOND LEG
                 // ROUTES (DAYTIME) THAT RUN BETWEEN ORIGIN AND DESINATION
-                let sharedRoutes = findSharedRoutes(stationInfo)
-
+                console.log('si rtt bug', stationInfo)
+                let sharedRoutes = findSharedRoutes(stationInfo.second_transfer_info[0])
+                console.log('shared routes', sharedRoutes)
                  // START STATION HAS PLATFORM CLOSURE
                  //  THESE ROUTES ARE NOT LEAVING ORIGIN
-                 let routesNotLeavingStartNorth = findPlatformClosure(stationInfo, sharedRoutes, 'start', 'north')
-                 let routesNotLeavingStartSouth = findPlatformClosure(stationInfo, sharedRoutes, 'start', 'south')
+                 let routesNotLeavingStartNorth = findPlatformClosure(stationInfo.second_transfer_info[0], sharedRoutes, 'start', 'north')
+                 let routesNotLeavingStartSouth = findPlatformClosure(stationInfo.second_transfer_info[0], sharedRoutes, 'start', 'south')
                  
  
                  let routesNotLeavingStartNorthLogos = routesNotLeavingStartNorth.map((route)=>{
@@ -240,8 +241,8 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                  })
 
                 // START STATION IN SERVICE, END STATION HAS PLATFORM CLOSURE
-                let routesNotArrivingAtDestNorth = findPlatformClosure(stationInfo, sharedRoutes, 'end', 'north')
-                let routesNotArrivingAtDestSouth = findPlatformClosure(stationInfo, sharedRoutes, 'end', 'south')
+                let routesNotArrivingAtDestNorth = findPlatformClosure(stationInfo.second_transfer_info[0], sharedRoutes, 'end', 'north')
+                let routesNotArrivingAtDestSouth = findPlatformClosure(stationInfo.second_transfer_info[0], sharedRoutes, 'end', 'south')
         
                 let routesNotArrivingAtDestNorthLogos = routesNotArrivingAtDestNorth.map((route)=>{
                     return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
