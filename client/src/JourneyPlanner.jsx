@@ -84,7 +84,7 @@ function JourneyPlanner() {
     console.log(tripError)
     return (
         <div className="journey-planner-and-trip-info-container">
-            <div className="m3dt-title">M3DT</div>
+            <div className="m3dt-title">CANVAS HERE</div>
             <hr width="100%" size="2"/>
             <div className='journey-planner'>
                 <div className="station-search-container">
