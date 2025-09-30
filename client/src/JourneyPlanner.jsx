@@ -5,7 +5,11 @@ import './App.css'
 import StationSearch from "./StationSearch";
 import TripInfo from "./TripInfo";
 import NextTrains from "./NextTrains";
-
+import LogoScene from "./M3dtLogo";
+import M3dtLogo from "./M3dtLogo";
+import {Canvas} from '@react-three/fiber'
+// import { AmbientLight } from "three";
+import { useFrame } from "@react-three/fiber";
 
 
 
@@ -82,9 +86,15 @@ function JourneyPlanner() {
     }
     
     console.log(tripError)
+
+    
     return (
         <div className="journey-planner-and-trip-info-container">
-            <div className="m3dt-title">CANVAS HERE</div>
+            <div className="m3dt-title">
+                <Canvas className="logo-canvas" >
+                    <LogoScene/>
+                </Canvas>
+            </div>
             <hr width="100%" size="2"/>
             <div className='journey-planner'>
                 <div className="station-search-container">
