@@ -386,11 +386,12 @@ html{
 
 .logo-canvas{
   z-index: 1;
+  /* border-color: white; */
+  /* border-style: solid; */
 }
 
 .m3dt-title{
   height: 75px;
   width: 200px;
   z-index: 1;
-  
 }

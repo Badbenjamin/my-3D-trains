@@ -1,19 +1,45 @@
-import React, { useRef } from 'react'
-import { useGLTF } from '@react-three/drei'
+import React from 'react'
+import {useRef} from 'react'
+import { Sphere, useGLTF} from '@react-three/drei'
+import { useFrame } from '@react-three/fiber'
 
 export default function M3dtLogo(props) {
-  const { nodes, materials } = useGLTF('/M3DT_LOGO_V2_9.24.glb')
 
+    const { nodes, materials } = useGLTF('/M3DT_LOGO_V2_9.24.glb')
+    
+    const redLightRef = useRef()
+    const blueLightRef = useRef()
+    const greenLightRef2 = useRef()
+
+    const orbitRadius = 10;
+
+    useFrame((state, delta) =>
+        {
+            const angle = state.clock.elapsedTime
+            state.camera.position.x = Math.sin(angle) /5
+            state.camera.position.y = Math.cos(angle) /5
+            state.camera.lookAt(0, 0, 0)
+
+            redLightRef.current.position.x = Math.sin(angle) * orbitRadius 
+            redLightRef.current.position.y = Math.cos(angle) * orbitRadius 
+
+            blueLightRef.current.position.z = Math.sin(angle) * orbitRadius
+            blueLightRef.current.position.x = Math.cos(angle) * orbitRadius
+
+            greenLightRef2.current.intensity = Math.sin(angle) + 50
+  
+        })
 
   return (
     <>
-        <pointLight intensity={40} color={'red'} position={[-1,0,5]} />
-        <pointLight intensity={40} color={'blue'} position={[0,0,5]} />
-        <pointLight intensity={40} color={'green'} position={[1,0,5]} />
+        <pointLight ref={redLightRef} intensity={70} color={'red'} position={[-1,0,7]} />
+        <pointLight ref={blueLightRef} intensity={60} color={'blue'} position={[0,0,5]} />
+        <pointLight ref={greenLightRef2} intensity={20} color={'green'} position={[1,0,5]} />
+   
         <group {...props} dispose={null}
         // rotation={[90, 90, 90]}
         position={[-3,-.2,2.2]}
-        rotation-x={ 1.5}
+        rotation-x={ 1.55}
         >
       <mesh
         castShadow

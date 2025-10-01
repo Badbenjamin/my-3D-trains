@@ -91,8 +91,8 @@ function JourneyPlanner() {
     return (
         <div className="journey-planner-and-trip-info-container">
             <div className="m3dt-title">
-                <Canvas className="logo-canvas" >
-                    <LogoScene/>
+                <Canvas className="logo-canvas" camera={{fov: 80}}>
+                    <M3dtLogo/>
                 </Canvas>
             </div>
             <hr width="100%" size="2"/>
