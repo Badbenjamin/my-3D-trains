@@ -32,7 +32,7 @@ export default function M3dtLogo(props) {
 
   return (
     <>
-        <pointLight ref={redLightRef} intensity={70} color={'red'} position={[-1,0,7]} />
+        <pointLight ref={redLightRef} intensity={70} color={'red'} position={[-1,0,9]} />
         <pointLight ref={blueLightRef} intensity={60} color={'blue'} position={[0,0,5]} />
         <pointLight ref={greenLightRef2} intensity={20} color={'green'} position={[1,0,5]} />
    

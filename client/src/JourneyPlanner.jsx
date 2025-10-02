@@ -5,11 +5,9 @@ import './App.css'
 import StationSearch from "./StationSearch";
 import TripInfo from "./TripInfo";
 import NextTrains from "./NextTrains";
-import LogoScene from "./M3dtLogo";
 import M3dtLogo from "./M3dtLogo";
 import {Canvas} from '@react-three/fiber'
-// import { AmbientLight } from "three";
-import { useFrame } from "@react-three/fiber";
+
 
 
 
@@ -85,9 +83,6 @@ function JourneyPlanner() {
         }
     }
     
-    console.log(tripError)
-
-    
     return (
         <div className="journey-planner-and-trip-info-container">
             <div className="m3dt-title">
@@ -99,7 +94,6 @@ function JourneyPlanner() {
             <div className='journey-planner'>
                 <div className="station-search-container">
                     <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['startId']} position={"start"}/>
-                    {/* <div>⬇</div> */}
                     <br></br>
                     <StationSearch className='station_search' journeyStations={journeyStations} stations={stations} setStartOrEndStation={setStartOrEndStation} stationId={stationIdStartAndEnd['endId']} position={"end"}/>
                 </div>
