@@ -96,7 +96,6 @@ export function findDistance(point1, point2){
 
 export function findSharedRoutes(stationInfo){
     let sharedRoutes = []
-    // bug here with transfer, probably from second_transfer_info []
     for (let route of stationInfo.start_station_routes){
         if (stationInfo.end_station_routes.includes(route)){
             sharedRoutes.push(route)
