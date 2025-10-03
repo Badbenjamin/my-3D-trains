@@ -48,7 +48,8 @@
 }
 
 .m3dt-title{
- text-align: center;
+ margin-left: auto;
+ margin-right: auto;
 }
 
 .journey-planner{
@@ -381,4 +382,16 @@ html{
   color: red;
   font-weight: bold;
   font-size: 40px;
+}
+
+.logo-canvas{
+  z-index: 1;
+  /* border-color: white; */
+  /* border-style: solid; */
+}
+
+.m3dt-title{
+  height: 75px;
+  width: 200px;
+  z-index: 1;
 }

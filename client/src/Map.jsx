@@ -24,12 +24,6 @@ function Map(){
           bboxMax: {
             value: water.nodes['WATER_2'].geometry.boundingBox.max
           },
-        //   center: { value: new THREE.Vector2(0.5, 0.5) },
-          
-        //   gradientDirection: { value: new THREE.Vector3(0, 1, 0) },
-        //   gradientPower: { value: 0.1 }
-            // center: { value: new THREE.Vector2(0.5, 0.5) }, // Radial center point
-            // radius: { value: 1.0 } // Maximum radius
         },
         
         vertexShader: `
@@ -92,13 +86,13 @@ function Map(){
       
 
     const newName = water.name
-        const newGeometry = water.nodes['WATER_2'].geometry
-        let newMaterial =  water.nodes['WATER_2'].material;
-        const newCastShadow = true
-        const newRecieveShadow = true
-        const newPosition = water.nodes['WATER_2'].position
-        const newRotation = water.nodes['WATER_2'].rotation
-        const newScale = water.nodes['WATER_2'].scale
+    const newGeometry = water.nodes['WATER_2'].geometry
+    let newMaterial =  water.nodes['WATER_2'].material;
+    const newCastShadow = true
+    const newRecieveShadow = true
+    const newPosition = water.nodes['WATER_2'].position
+    const newRotation = water.nodes['WATER_2'].rotation
+    const newScale = water.nodes['WATER_2'].scale
 
     return(
         <>
