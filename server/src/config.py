@@ -22,6 +22,7 @@ convention = {
 
 # init flask app
 # ADD STATIC FOLDER PATHS FOR DEPLOYMENT
+# what are static folders? 
 app = Flask(__name__)
 
 # JUST SHOW ERRORS FOR REQUESTS
