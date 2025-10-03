@@ -32,6 +32,7 @@ log.disabled = True
 
 # pip install python-dotenv in command line 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URI']
+print(app.config['SQLALCHEMY_DATABASE_URI'])
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = os.environ['SECRET_KEY']

@@ -5,7 +5,10 @@ from Classes import Journey, TrainData, FormattedTrainData, ArrivalsForStation
 import modules_app
 
 
+
 ct = datetime.now()
+
+
 
 # takes input from journey planner, returns train or trains going from start to end station
 @app.route('/api/plan_trip/<string:start_station_id>/<string:end_station_id>')
