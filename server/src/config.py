@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 import os
 from flask import Flask
 from flask_migrate import Migrate
@@ -9,7 +10,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from sqlalchemy import MetaData, create_engine
 
-
+# need to initialize to use os.getenv instead of os.environ
+load_dotenv()
 
 # metadata to fix alembic bug
 convention = {
@@ -30,12 +32,11 @@ import logging
 log = logging.getLogger('werkzeug')
 log.disabled = True
 
-# pip install python-dotenv in command line 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URI']
-print(app.config['SQLALCHEMY_DATABASE_URI'])
+# switched from os.environ['DATABASE_URI] to os.getenv('DATABASE_URI)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = os.environ['SECRET_KEY']
+app.secret_key = os.getenv('SECRET_KEY')
 
 
 # init sqlalchemy object

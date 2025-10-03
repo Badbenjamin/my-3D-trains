@@ -1,6 +1,10 @@
+print('seeding stations')
+
 from models import Station
 from config import app, db
 import csv
+
+print('db', db)
 
 with app.app_context():
     print('adding stations...')
