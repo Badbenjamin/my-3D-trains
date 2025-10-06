@@ -84,5 +84,5 @@ def get_arrivals(gtfs_id):
 def get_train_locations():
     pass
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=False)
