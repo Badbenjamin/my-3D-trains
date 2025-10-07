@@ -31,7 +31,7 @@ export default function ComplexText({handleComplexClick,stationInTripArray, trip
             for (let route of routes){
                 // route is each route
                 if (route != " "){
-                    iconImageArray.push(<img className="route_icon" style={{width: iconSizeInPx, height : iconSizeInPx}} src={`../public/ICONS/${route}.png`}/>);
+                    iconImageArray.push(<img className="route_icon" style={{width: iconSizeInPx, height : iconSizeInPx}} src={`../ICONS/${route}.png`}/>);
                 }
             }
         }
