@@ -25,7 +25,15 @@ convention = {
 # init flask app
 # ADD STATIC FOLDER PATHS FOR DEPLOYMENT
 # what are static folders? 
-app = Flask(__name__)
+static_folder = os.path.join(os.path.dirname(__file__), '../../client/dist')
+print(os.path.abspath(static_folder))
+
+app = Flask(
+    __name__,
+    static_url_path='',
+    static_folder=static_folder,
+    template_folder='../../client/dist'
+)
 
 # JUST SHOW ERRORS FOR REQUESTS
 import logging
@@ -50,3 +58,20 @@ CORS(app, supports_credentials=True)
 
 # init bcrypt plugin
 bcrypt = Bcrypt()
+
+# GUNICORN stuff
+
+
+# workers = int(os.environ.get('GUNICORN_PROCESSES', '2'))
+
+# threads = int(os.environ.get('GUNICORN_THREADS', '4'))
+
+# # timeout = int(os.environ.get('GUNICORN_TIMEOUT', '120'))
+
+# bind = os.environ.get('GUNICORN_BIND', '0.0.0.0:8080')
+
+
+
+# forwarded_allow_ips = '*'
+
+# secure_scheme_headers = { 'X-Forwarded-Proto': 'https' }

@@ -7,8 +7,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        // target: 'https://pets-app-ksmt.onrender.com'
-        target: 'http://localhost:5555'
+        // local flask route
+        // target: 'http://localhost:5555',
+        // gunicorn production route
+        target: 'http://localhost:8000'
       }
     }
   }

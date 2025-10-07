@@ -3,12 +3,18 @@ from datetime import datetime
 from models import Station
 from Classes import Journey, TrainData, FormattedTrainData, ArrivalsForStation
 import modules_app
+import config
+from flask import Flask, send_from_directory
 
 
 
 ct = datetime.now()
 
+print('app.py', config.static_folder)
 
+@app.route('/')
+def serve_static_folder():
+    return send_from_directory(config.static_folder, 'index.html')
 
 # takes input from journey planner, returns train or trains going from start to end station
 @app.route('/api/plan_trip/<string:start_station_id>/<string:end_station_id>')
