@@ -13,7 +13,7 @@ export default function ComplexTooltip({complexStationRouteIdObjs, averagePositi
 
     // tooltip displays routes until a route is clicked, then it changes to a station info tooltip
     function handleClick(gtfsStopId){
-        fetch(`http://127.0.0.1:5555/api/arrivals/${gtfsStopId}`)
+        fetch(`/api/arrivals/${gtfsStopId}`)
                 .then(response => response.json())
                 .then(newStationInfo => {setStationInfo(newStationInfo)})
         setComplexOrStation("station")     

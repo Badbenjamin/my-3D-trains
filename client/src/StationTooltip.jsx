@@ -9,7 +9,7 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
     let [northArrivals, setNorthArrivals] = useState([])
     let [southArrivals, setSouthArrivals] = useState([])
     useEffect(()=>{
-        fetch(`http://127.0.0.1:5555/api/arrivals/${stopId}`)
+        fetch(`/api/arrivals/${stopId}`)
                 .then(response => response.json())
                 .then(newArrivals => {setArrivalInfo(newArrivals)})
 
