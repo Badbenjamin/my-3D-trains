@@ -46,6 +46,7 @@ def plan_trip(start_station_id, end_station_id):
 # get names and routes (and gtfs id) for react-select search bar in journey planner
 @app.route('/api/stations')
 def get_all_stations():
+    print('stations')
     stations = Station.query.all()
     station_list = []
     complex_ids = []

@@ -29,7 +29,7 @@ function App() {
   // get station info for trip planner  for station search. 
   useEffect(() => {
     // remove local host for deployment
-    fetch("http://127.0.0.1:5555/api/stations")
+    fetch("/api/stations")
       .then(response => response.json())
       .then(stationsData => setStations(stationsData))
   }, [])
@@ -327,5 +327,5 @@ function App() {
   )
 }
 
-useGLTF.preload('./public/subway_map_G_7.glb')
+useGLTF.preload('./subway_map_TRACK_STATIONS_ONLY_8.25.glb')
 export default App
