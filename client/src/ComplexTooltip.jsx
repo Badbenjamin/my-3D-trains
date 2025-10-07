@@ -24,7 +24,7 @@ export default function ComplexTooltip({complexStationRouteIdObjs, averagePositi
         if (arrivalObjectArray) {
             for (const arrivalObject of arrivalObjectArray){
                 let imgTimePair = <div className="icon-time-pair">
-                                     <img className="tooltip_route_icon" src={`../public/ICONS/${arrivalObject["route"]}.png`} />
+                                     <img className="tooltip_route_icon" src={`../ICONS/${arrivalObject["route"]}.png`} />
                                      <div>{arrivalObject['time']}</div>
                                   </div>
                 imgTimePairs.push(imgTimePair)
@@ -58,7 +58,7 @@ export default function ComplexTooltip({complexStationRouteIdObjs, averagePositi
     complexStationRouteIdObjs.map((stationObj)=>{
         let iconImageArray = [];
         stationObj.routes.split(" ").map((route)=>{
-            iconImageArray.push(<img className="route_icon_complex" src={`../public/ICONS/${route}.png`}/>)
+            iconImageArray.push(<img className="route_icon_complex" src={`../ICONS/${route}.png`}/>)
         })
         
         let stationInfoButton = <button className="complex-button" onClick={()=>{handleClick(stationObj.gtfs_stop_id)}}>{stationObj.name}{iconImageArray}</button>

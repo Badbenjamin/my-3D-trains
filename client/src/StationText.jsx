@@ -16,7 +16,7 @@ export default function StationText({handleStationClick, position, daytime_route
    
     let iconImageArray = []
     daytime_routes.split(" ").map((route)=>{
-        iconImageArray.push(<img className="route_icon" style={{width: iconSizeInPx, height : iconSizeInPx}}  src={`../public/ICONS/${route}.png`}/>)
+        iconImageArray.push(<img className="route_icon" style={{width: iconSizeInPx, height : iconSizeInPx}}  src={`../ICONS/${route}.png`}/>)
     })
 
     function handleClick(e){

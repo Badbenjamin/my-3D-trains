@@ -75,7 +75,7 @@ function StationSearch({setStartOrEndStation, position, stations, journeyStation
     for (const station of stations){
         let routes = station.daytime_routes
         let routeIcons = routes.split(" ").map((route)=>{
-            return <img className="route_icon_search"  src={`../public/ICONS/${route}.png`}/>
+            return <img className="route_icon_search"  src={`../ICONS/${route}.png`}/>
         })
         const stationObj = { value : station.gtfs_stop_id, label:`${station.name}`, routeIcons: routeIcons, pos: {position}};
         optionsArray.push(stationObj);

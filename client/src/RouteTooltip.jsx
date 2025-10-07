@@ -48,7 +48,7 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                     "route" : stationInfo.route,
                     "stop_id" : stationInfo.stopId,
                     "type" : stationInfo.type,
-                    "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.route}.png`}/>
+                    "routeIcon" : <img className="route_icon_route_tt"   src={`../ICONS/${stationInfo.route}.png`}/>
                 }
                 return newInfo
             })
@@ -79,7 +79,7 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                     "route" : stationInfo.route,
                     "stop_id" : stationInfo.stopId,
                     "type" : stationInfo.type,
-                    "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.route}.png`}/>
+                    "routeIcon" : <img className="route_icon_route_tt"   src={`../ICONS/${stationInfo.route}.png`}/>
                 }
                 return newInfo
             })
@@ -136,7 +136,7 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                         "route" : stationInfo.route,
                         "stop_id" : stationInfo.stopId,
                         "type" : stationInfo.type,
-                        "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.route}.png`}/>,
+                        "routeIcon" : <img className="route_icon_route_tt"   src={`../ICONS/${stationInfo.route}.png`}/>,
                         "transfer_time" : stationInfo.transfer_time
                     }
     
@@ -149,7 +149,7 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                         "route" : stationInfo.second_transfer_info[0].route,
                         "stop_id" : stationInfo.second_transfer_info[0].stopId,
                         "type" : stationInfo.second_transfer_info[0].type,
-                        "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.second_transfer_info[0].route}.png`}/>
+                        "routeIcon" : <img className="route_icon_route_tt"   src={`../ICONS/${stationInfo.second_transfer_info[0].route}.png`}/>
                     }
                     // if stationInfo.secondTransferInfo[0] is actually the first station in the transfer
                 } else if ((stationInfo.arrival > stationInfo.second_transfer_info[0].arrival)){
@@ -163,7 +163,7 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                         "route" : stationInfo.route,
                         "stop_id" : stationInfo.stopId,
                         "type" : stationInfo.type,
-                        "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.route}.png`}/>
+                        "routeIcon" : <img className="route_icon_route_tt"   src={`../ICONS/${stationInfo.route}.png`}/>
                     }
     
                     firstStationObject = {
@@ -175,7 +175,7 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                         "route" : stationInfo.second_transfer_info[0].route,
                         "stop_id" : stationInfo.second_transfer_info[0].stopId,
                         "type" : stationInfo.second_transfer_info[0].type,
-                        "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.second_transfer_info[0].route}.png`}/>,
+                        "routeIcon" : <img className="route_icon_route_tt"   src={`../ICONS/${stationInfo.second_transfer_info[0].route}.png`}/>,
                         "transfer_time" : stationInfo.second_transfer_info[0].transfer_time
                     }
                 }
@@ -216,7 +216,7 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                     "route" : stationInfo.route,
                     "stop_id" : stationInfo.stopId,
                     "type" : stationInfo.type,
-                    "routeIcon" : <img className="route_icon_route_tt"   src={`../public/ICONS/${stationInfo.route}.png`}/>
+                    "routeIcon" : <img className="route_icon_route_tt"   src={`../ICONS/${stationInfo.route}.png`}/>
                 }
 
                 // DISPLAY ERROR FOR SECOND LEG
@@ -229,11 +229,11 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                  
  
                  let routesNotLeavingStartNorthLogos = routesNotLeavingStartNorth.map((route)=>{
-                     return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                     return <img className="route_icon_route_tt"   src={`../ICONS/${route}.png`}/>
                  })
  
                  let routesNotLeavingStartSouthLogos = routesNotLeavingStartSouth.map((route)=>{
-                     return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                     return <img className="route_icon_route_tt"   src={`../ICONS/${route}.png`}/>
                  })
 
                 // START STATION IN SERVICE, END STATION HAS PLATFORM CLOSURE
@@ -241,11 +241,11 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
                 let routesNotArrivingAtDestSouth = findPlatformClosure(stationInfo.second_transfer_info[0], sharedRoutes, 'end', 'south')
         
                 let routesNotArrivingAtDestNorthLogos = routesNotArrivingAtDestNorth.map((route)=>{
-                    return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                    return <img className="route_icon_route_tt"   src={`../ICONS/${route}.png`}/>
                 })
 
                 let routesNotArrivingAtDestSouthLogos = routesNotArrivingAtDestSouth.map((route)=>{
-                    return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                    return <img className="route_icon_route_tt"   src={`../ICONS/${route}.png`}/>
                 })
 
                 let secondStationErrorHtml = null
@@ -292,11 +292,11 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
             let routesNotLeavingStartSouth = findPlatformClosure(stationInfo, sharedRoutes, 'start', 'south')
 
             let routesNotLeavingStartNorthLogos = routesNotLeavingStartNorth.map((route)=>{
-                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                return <img className="route_icon_route_tt"   src={`../ICONS/${route}.png`}/>
             })
 
             let routesNotLeavingStartSouthLogos = routesNotLeavingStartSouth.map((route)=>{
-                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                return <img className="route_icon_route_tt"   src={`../ICONS/${route}.png`}/>
             })
 
             // WHAT ROUTES FROM START STATION WON'T ARRIVE AT END STATION?
@@ -305,16 +305,16 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
             
        
             let routesNotArrivingAtDestNorthLogos = routesNotArrivingAtDestNorth.map((route)=>{
-                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                return <img className="route_icon_route_tt"   src={`../ICONS/${route}.png`}/>
             })
 
             let routesNotArrivingAtDestSouthLogos = routesNotArrivingAtDestSouth.map((route)=>{
-                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                return <img className="route_icon_route_tt"   src={`../ICONS/${route}.png`}/>
             })
 
             // Normal schedule routes served by start station
             let startStationRouteLogos = stationInfo.start_station_routes.map((route)=>{
-                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                return <img className="route_icon_route_tt"   src={`../ICONS/${route}.png`}/>
             })
 
             // station is out of service in one or more directoins, trains from start cant arrive at dest
@@ -356,11 +356,11 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
             
 
             let routesNotLeavingStartNorthLogos = routesNotLeavingStartNorth.map((route)=>{
-                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                return <img className="route_icon_route_tt"   src={`../ICONS/${route}.png`}/>
             })
 
             let routesNotLeavingStartSouthLogos = routesNotLeavingStartSouth.map((route)=>{
-                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                return <img className="route_icon_route_tt"   src={`../ICONS/${route}.png`}/>
             })
 
             // START STATION IN SERVICE, END STATION HAS PLATFORM CLOSURE
@@ -369,15 +369,15 @@ export default function RouteTooltip({stationInfo, name, position, routes}){
             
             
             let routesNotArrivingAtDestNorthLogos = routesNotArrivingAtDestNorth.map((route)=>{
-                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                return <img className="route_icon_route_tt"   src={`../ICONS/${route}.png`}/>
             })
 
             let routesNotArrivingAtDestSouthLogos = routesNotArrivingAtDestSouth.map((route)=>{
-                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                return <img className="route_icon_route_tt"   src={`../ICONS/${route}.png`}/>
             })
 
             let endStationRouteLogos = stationInfo.end_station_routes.map((route)=>{
-                return <img className="route_icon_route_tt"   src={`../public/ICONS/${route}.png`}/>
+                return <img className="route_icon_route_tt"   src={`../ICONS/${route}.png`}/>
             })
 
             

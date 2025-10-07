@@ -17,7 +17,7 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
 
     let iconImageArray = [];
     daytime_routes.split(" ").map((route)=>{
-            iconImageArray.push(<img className="route_icon_complex" src={`../public/ICONS/${route}.png`}/>)
+            iconImageArray.push(<img className="route_icon_complex" src={`../ICONS/${route}.png`}/>)
     })
   
     function handleXClick(stopId){
@@ -30,7 +30,7 @@ export default function StationToolTip({stopId, position, name, daytime_routes, 
         if (arrivalObjectArray) {
             for (const arrivalObject of arrivalObjectArray){
                 let imgTimePair = <div className="icon-time-pair"> 
-                                     <img className="tooltip_route_icon" src={`../public/ICONS/${arrivalObject["route"]}.png`} />
+                                     <img className="tooltip_route_icon" src={`../ICONS/${arrivalObject["route"]}.png`} />
                                      <div> {arrivalObject['time']}, </div>
                                   </div>
                 imgTimePairs.push(imgTimePair)

@@ -3,7 +3,7 @@ import './Component.css'
 
 function LegInfo({leg, type}){
  
-    let routeIcon = <img className='route_icon_leg_info' src={`../public/ICONS/${leg.route}.png`}/>
+    let routeIcon = <img className='route_icon_leg_info' src={`../ICONS/${leg.route}.png`}/>
     if (type == 'single-leg'){
         return(
             <div>

@@ -3,8 +3,8 @@ import { useGLTF } from '@react-three/drei'
 import * as THREE from "three"
 
 function Map(){
-    const land = useGLTF('./public/subway_map_LAND_ONLY_8.25.glb')
-    const water = useGLTF('./public/subway_map_WATER_ONLY_8.25.glb')
+    const land = useGLTF('./subway_map_LAND_ONLY_8.25.glb')
+    const water = useGLTF('./subway_map_WATER_ONLY_8.25.glb')
 
   
     water.nodes['WATER_2'].geometry.computeBoundingBox();
