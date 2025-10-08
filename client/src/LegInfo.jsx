@@ -2,6 +2,21 @@ import './Component.css'
 
 
 function LegInfo({leg, type}){
+
+    let departureTime = new Date(leg.start_station_departure_ts * 1000)
+    let departureTimeString = departureTime.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+    })
+
+    let arrivalTime = new Date(leg.end_station_arrival_ts * 1000)
+    let arrivalTimeString = arrivalTime.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+    })
+ 
  
     let routeIcon = <img className='route_icon_leg_info' src={`../ICONS/${leg.route}.png`}/>
     if (type == 'single-leg'){
@@ -10,7 +25,7 @@ function LegInfo({leg, type}){
                 <div className="start-station-info">
                     <div className="station">{leg.start_station}</div>
                     <div className="direction">{leg.direction_label} {routeIcon}</div>
-                    <span className="time">Departs {leg.start_station_departure}</span>
+                    <span className="time">Departs {departureTimeString}</span>
                 </div>
                 <div className="middle-info">
                     <div className='arrow-icon'>⬇</div>
@@ -21,7 +36,7 @@ function LegInfo({leg, type}){
                 </div>
                 <div className="end-station-info">
                     <div className="station">{leg.end_station}</div>
-                    <span className="time">Arrives {leg.end_station_arrival}</span>
+                    <span className="time">Arrives {arrivalTimeString}</span>
                 </div>
                 <hr width="100%" size="2"/>
             </div>
@@ -32,7 +47,7 @@ function LegInfo({leg, type}){
                 <div className="start-station-info">
                     <div className="station">{leg.start_station}</div>
                     <div className="direction">{leg.direction_label} {routeIcon}</div>
-                    <span className="time">Departs {leg.start_station_departure}</span>
+                    <span className="time">Departs {departureTimeString}</span>
                 </div>
                 <div className="middle-info">
                     <div className='arrow-icon'>⬇</div>
@@ -43,7 +58,7 @@ function LegInfo({leg, type}){
                 </div>
                 <div className="end-station-info">
                     <div className="station">{leg.end_station}</div>
-                    <span className="time">Arrives {leg.end_station_arrival}</span>
+                    <span className="time">Arrives {arrivalTimeString}</span>
                 </div>
                 <hr width="100%" size="2"/>
                 <div className="transfer-info">
@@ -58,7 +73,7 @@ function LegInfo({leg, type}){
                 <div className="start-station-info">
                     <div className="station">{leg.start_station}</div>
                     <div className="direction">{leg.direction_label} {routeIcon}</div>
-                    <span className="time">Departs {leg.start_station_departure}</span>
+                    <span className="time">Departs {departureTimeString}</span>
                 </div>
                 <div className="middle-info">
                     <div className='arrow-icon'>⬇</div>
@@ -69,7 +84,7 @@ function LegInfo({leg, type}){
                 </div>
                 <div className="end-station-info">
                     <div className="station">{leg.end_station}</div>
-                    <span className="time">Arrives {leg.end_station_arrival}</span>
+                    <span className="time">Arrives {arrivalTimeString}</span>
                 </div>
                 <hr width="100%" size="2"/>
             </div>
