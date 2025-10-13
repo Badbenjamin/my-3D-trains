@@ -16,6 +16,8 @@ function LegInfo({leg, type}){
         minute: '2-digit',
         hour12: true 
     })
+
+    let arrowIcon = <img className="arrow-icon" src={`arrow.png`}/>
  
  
     let routeIcon = <img className='route_icon_leg_info' src={`../ICONS/${leg.route}.png`}/>
@@ -28,7 +30,7 @@ function LegInfo({leg, type}){
                     <span className="time">Departs {departureTimeString}</span>
                 </div>
                 <div className="middle-info">
-                    <div className='arrow-icon'>⬇</div>
+                    <div className='arrow-icon'>{arrowIcon}</div>
                     <div className='stops-and-time'>
                         <div className="number-of-stops">{leg.number_of_stops} Stops</div>
                         <div className="trip-time">{leg.trip_time} Minutes</div>
@@ -50,7 +52,7 @@ function LegInfo({leg, type}){
                     <span className="time">Departs {departureTimeString}</span>
                 </div>
                 <div className="middle-info">
-                    <div className='arrow-icon'>⬇</div>
+                    <div className='arrow-icon'>{arrowIcon}</div>
                     <div className='stops-and-time'>
                         <div className="number-of-stops">{leg.number_of_stops} Stops</div>
                         <div className="trip-time">{leg.trip_time} Minutes</div>
@@ -76,7 +78,7 @@ function LegInfo({leg, type}){
                     <span className="time">Departs {departureTimeString}</span>
                 </div>
                 <div className="middle-info">
-                    <div className='arrow-icon'>⬇</div>
+                    <div className='arrow-icon'>{arrowIcon}</div>
                     <div className='stops-and-time'>
                         <div className="number-of-stops">{leg.number_of_stops} Stops</div>
                         <div className="trip-time">{leg.trip_time} Minutes</div>
