@@ -317,7 +317,7 @@ function App() {
         tripInfo : tripInfo,
         setTripInfo : setTripInfo,
         stationIdStartAndEnd : stationIdStartAndEnd,
-        setStationIdStartAndEnd, setStationIdStartAndEnd,
+        setStationIdStartAndEnd: setStationIdStartAndEnd,
         vectorPosition : vectorPosition,
         setVectorPositon : setVectorPositon,
         retrieveStationId : retrieveStationId,
