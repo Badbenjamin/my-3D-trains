@@ -1,0 +1,2 @@
+[start]
+cmd = "cd server && gunicorn app:app"
